@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pscs.moneyx.entity.Role;
 import com.pscs.moneyx.entity.UserEntity;
+import com.pscs.moneyx.helper.ConvertRequestUtils;
 import com.pscs.moneyx.model.RequestData;
 import com.pscs.moneyx.model.ResponseData;
 import com.pscs.moneyx.repo.RoleRepo;
@@ -61,8 +62,8 @@ public class AuthenticationController {
 	public ResponseEntity<ResponseData> generateToken(@RequestBody RequestData requestBody) {
 		ResponseData responseData = new ResponseData();
 		UserEntity entity = new UserEntity();
-		ObjectMapper mapper = new ObjectMapper();
-		UserEntity userEntity = mapper.convertValue(requestBody.getJbody(), UserEntity.class);
+		
+		UserEntity userEntity = ConvertRequestUtils.convertValue(requestBody.getJbody(), UserEntity.class);
 		if (userRepo.existsByUsername(userEntity.getUsername())) {
 			responseData.setResponseCode("01");
 			responseData.setResponseMessage("User Already Registered!");
@@ -86,8 +87,8 @@ public class AuthenticationController {
 	@PostMapping("/login")
 	public ResponseEntity<ResponseData> authLogic(@RequestBody RequestData requestBody) {
 
-		ObjectMapper mapper = new ObjectMapper();
-		UserEntity userEntity = mapper.convertValue(requestBody.getJbody(), UserEntity.class);
+		
+		UserEntity userEntity = ConvertRequestUtils.convertValue(requestBody.getJbody(), UserEntity.class);
 
 		ResponseData responseData = new ResponseData();
 		Authentication authentication = authenticationManager.authenticate(
