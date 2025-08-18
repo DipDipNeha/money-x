@@ -21,11 +21,6 @@ import lombok.Setter;
 import lombok.ToString;
 
 
-@Setter
-@Getter
-@ToString
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity(name = "USERS")
 //@Table(name = "USERS")
 public class UserEntity {
@@ -39,5 +34,35 @@ public class UserEntity {
 	@JoinTable(name = "user_roles" ,joinColumns = @JoinColumn(name="user_id",referencedColumnName = "id") 
 	,inverseJoinColumns = @JoinColumn(name="role_id",referencedColumnName = "id"))
 	private List<Role> role=new ArrayList();
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
+	}
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
+	}
+	public String getPassword() {
+		return password;
+	}
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	public List<Role> getRole() {
+		return role;
+	}
+	public void setRole(List<Role> role) {
+		this.role = role;
+	}
+	@Override
+	public String toString() {
+		return "UserEntity [id=" + id + ", username=" + username + ", password=" + password + ", role=" + role + "]";
+	}
+	
+	
 	
 }
