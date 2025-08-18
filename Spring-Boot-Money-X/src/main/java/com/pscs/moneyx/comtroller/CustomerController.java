@@ -14,7 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pscs.moneyx.entity.MobileCustomer;
+import com.pscs.moneyx.entity.UserEntity;
+import com.pscs.moneyx.model.RequestData;
 import com.pscs.moneyx.services.MobileCustomerService;
 
 /**
@@ -36,8 +39,10 @@ public class CustomerController {
 		return new ResponseEntity<>("Welcome to PSCS", HttpStatus.OK);
 	}
 	@PostMapping("save")
-	public ResponseEntity<MobileCustomer> save(@RequestBody MobileCustomer customer) {
-
+	public ResponseEntity<MobileCustomer> save(@RequestBody RequestData requestBody) {
+		ObjectMapper mapper = new ObjectMapper();
+		MobileCustomer customer = mapper.convertValue(requestBody.getJbody(), MobileCustomer.class);
+		
 		MobileCustomer save = mobileCustomerService.save(customer);
 		return new ResponseEntity<MobileCustomer>(save, HttpStatus.OK);
 	}
