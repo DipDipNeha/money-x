@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 public class RequestData {
 	private String responseCode;
 	private String responseMessage;
-	private Object responseData;
+	private Object jbody;
+	private Object jheader;
 	
 }

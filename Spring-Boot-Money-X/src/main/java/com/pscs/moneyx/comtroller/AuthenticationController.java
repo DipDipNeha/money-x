@@ -62,7 +62,7 @@ public class AuthenticationController {
 		ResponseData responseData = new ResponseData();
 		UserEntity entity = new UserEntity();
 		ObjectMapper mapper = new ObjectMapper();
-		UserEntity userEntity = mapper.convertValue(requestBody.getResponseData(), UserEntity.class);
+		UserEntity userEntity = mapper.convertValue(requestBody.getJbody(), UserEntity.class);
 		if (userRepo.existsByUsername(userEntity.getUsername())) {
 			responseData.setResponseCode("01");
 			responseData.setResponseMessage("User Already Registered!");
@@ -87,7 +87,7 @@ public class AuthenticationController {
 	public ResponseEntity<ResponseData> authLogic(@RequestBody RequestData requestBody) {
 
 		ObjectMapper mapper = new ObjectMapper();
-		UserEntity userEntity = mapper.convertValue(requestBody.getResponseData(), UserEntity.class);
+		UserEntity userEntity = mapper.convertValue(requestBody.getJbody(), UserEntity.class);
 
 		ResponseData responseData = new ResponseData();
 		Authentication authentication = authenticationManager.authenticate(
