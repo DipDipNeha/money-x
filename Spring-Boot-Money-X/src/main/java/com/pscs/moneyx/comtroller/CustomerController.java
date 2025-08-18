@@ -38,7 +38,7 @@ public class CustomerController {
 	public ResponseEntity<String> echo() {
 		return new ResponseEntity<>("Welcome to PSCS", HttpStatus.OK);
 	}
-	@PostMapping("save")
+	@PostMapping("/save")
 	public ResponseEntity<MobileCustomer> save(@RequestBody RequestData requestBody) {
 		ObjectMapper mapper = new ObjectMapper();
 		MobileCustomer customer = mapper.convertValue(requestBody.getJbody(), MobileCustomer.class);
