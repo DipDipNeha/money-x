@@ -19,7 +19,7 @@ public interface CustomerLoginRepo extends JpaRepository<CustomerLogin, Long> {
 	// Example of a custom query method:
 	 Optional<CustomerLogin> findByUsername(String username);
 
-	CustomerLogin findByUsernamePassword(String username, String password);
+	CustomerLogin findByUsernameAndPassword(String username, String password);
 	
 
 	

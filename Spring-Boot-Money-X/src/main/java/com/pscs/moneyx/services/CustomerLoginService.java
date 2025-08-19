@@ -18,7 +18,7 @@ public class CustomerLoginService {
 		CustomerLogin customerlogin = customerLoginRepo.findByUsername(customerLogin.getUsername())
 				.orElseThrow(() -> new ResourceNotFoundException("No Data Found By this Username: " + customerLogin.getUsername()));
 		if (customerlogin != null) {
-			 customerlogin = customerLoginRepo.findByUsernamePassword(customerLogin.getPassword(), customerlogin.getPassword());
+			 customerlogin = customerLoginRepo.findByUsernameAndPassword(customerLogin.getPassword(), customerlogin.getPassword());
 			
 		}
 		return customerlogin;
