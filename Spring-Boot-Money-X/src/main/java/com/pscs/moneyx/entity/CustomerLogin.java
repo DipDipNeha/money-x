@@ -23,7 +23,7 @@ public class CustomerLogin {
 	private String authType;
 	private String authValue;
 	private String customerType;
-	private Date lastLogin;
+	private String lastLogin;
 	private String customer_code;
 	
 	
@@ -64,10 +64,10 @@ public class CustomerLogin {
 	public void setCustomerType(String customerType) {
 		this.customerType = customerType;
 	}
-	public Date getLastLogin() {
+	public String getLastLogin() {
 		return lastLogin;
 	}
-	public void setLastLogin(Date lastLogin) {
+	public void setLastLogin(String lastLogin) {
 		this.lastLogin = lastLogin;
 	}
 	public String getCustomer_code() {
@@ -82,6 +82,7 @@ public class CustomerLogin {
 				+ authType + ", authValue=" + authValue + ", customerType=" + customerType + ", lastLogin=" + lastLogin
 				+ ", customer_code=" + customer_code + "]";
 	}
+	
 	
 	
 	
