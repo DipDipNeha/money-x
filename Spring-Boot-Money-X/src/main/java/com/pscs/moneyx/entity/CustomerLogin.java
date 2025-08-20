@@ -22,10 +22,13 @@ public class CustomerLogin {
 	private String authValue;
 	private String customerType;
 	private String lastLogin;
-	private String customer_code;
-	
-	
-	
+	private String customerId;
+	private String fullName ;
+	private String accountNumber;
+	private String country;
+	private String nationalId;
+	private String mobileNumber;
+	private String email;
 	public Long getId() {
 		return id;
 	}
@@ -68,21 +71,55 @@ public class CustomerLogin {
 	public void setLastLogin(String lastLogin) {
 		this.lastLogin = lastLogin;
 	}
-	public String getCustomer_code() {
-		return customer_code;
+	public String getCustomerId() {
+		return customerId;
 	}
-	public void setCustomer_code(String customer_code) {
-		this.customer_code = customer_code;
+	public void setCustomerId(String customerId) {
+		this.customerId = customerId;
+	}
+	public String getFullName() {
+		return fullName;
+	}
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
+	}
+	public String getAccountNumber() {
+		return accountNumber;
+	}
+	public void setAccountNumber(String accountNumber) {
+		this.accountNumber = accountNumber;
+	}
+	public String getCountry() {
+		return country;
+	}
+	public void setCountry(String country) {
+		this.country = country;
+	}
+	public String getNationalId() {
+		return nationalId;
+	}
+	public void setNationalId(String nationalId) {
+		this.nationalId = nationalId;
+	}
+	public String getMobileNumber() {
+		return mobileNumber;
+	}
+	public void setMobileNumber(String mobileNumber) {
+		this.mobileNumber = mobileNumber;
+	}
+	public String getEmail() {
+		return email;
+	}
+	public void setEmail(String email) {
+		this.email = email;
 	}
 	@Override
 	public String toString() {
 		return "CustomerLogin [id=" + id + ", username=" + username + ", password=" + password + ", authType="
 				+ authType + ", authValue=" + authValue + ", customerType=" + customerType + ", lastLogin=" + lastLogin
-				+ ", customer_code=" + customer_code + "]";
+				+ ", customerId=" + customerId + ", fullName=" + fullName + ", accountNumber=" + accountNumber
+				+ ", country=" + country + ", nationalId=" + nationalId + ", mobileNumber=" + mobileNumber + ", email="
+				+ email + "]";
 	}
 	
-	
-	
-	
-
 }
