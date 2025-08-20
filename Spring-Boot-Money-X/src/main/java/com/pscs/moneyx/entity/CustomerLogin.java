@@ -29,6 +29,8 @@ public class CustomerLogin {
 	private String nationalId;
 	private String mobileNumber;
 	private String email;
+	private String nationalType;
+	
 	public Long getId() {
 		return id;
 	}
@@ -112,6 +114,14 @@ public class CustomerLogin {
 	}
 	public void setEmail(String email) {
 		this.email = email;
+	}
+	
+	
+	public String getNationalType() {
+		return nationalType;
+	}
+	public void setNationalType(String nationalType) {
+		this.nationalType = nationalType;
 	}
 	@Override
 	public String toString() {

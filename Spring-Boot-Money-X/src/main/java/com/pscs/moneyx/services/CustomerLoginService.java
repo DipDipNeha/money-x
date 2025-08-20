@@ -1,10 +1,11 @@
 package com.pscs.moneyx.services;
 
-import java.util.Random;
+import java.util.Date;
 
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pscs.moneyx.entity.CustomerLogin;
 import com.pscs.moneyx.model.RequestData;
 import com.pscs.moneyx.model.ResponseData;
@@ -23,7 +24,14 @@ public class CustomerLoginService {
 		ResponseData response = new ResponseData();
 		try {
 
-			JSONObject requestJson = new JSONObject(request.getJbody());
+			Object jbody = request.getJbody();
+			ObjectMapper objectMapper = new ObjectMapper();
+		  String  jsonString = objectMapper.writeValueAsString(jbody);
+			
+			
+			JSONObject requestJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + requestJson.toString());
+			
 			CustomerLogin customerlogin = customerLoginRepo.findByUsername(requestJson.getString("username"))
 					.orElseThrow(() -> new ResourceNotFoundException(
 							"No Data Found By this Username: " + requestJson.getString("username")));
@@ -55,20 +63,32 @@ public class CustomerLoginService {
 	public ResponseData createProfile(RequestData request) {
 		ResponseData response = new ResponseData();
 		try {
-			JSONObject jsonObject = new JSONObject(request.getJbody());
-
+			System.out.println("Request : " + request);
+			// Convert the request body to a JSON object
+			Object jbody = request.getJbody();
+			ObjectMapper objectMapper = new ObjectMapper();
+		    String  jsonString = objectMapper.writeValueAsString(jbody);
+			
+			
+			JSONObject jsonObject = new JSONObject(jsonString);
+			System.out.println("Request Body: " + jsonObject.toString());
+			
 			CustomerLogin customerLogin = new CustomerLogin();
 			customerLogin.setUsername(jsonObject.getString("username"));
 			customerLogin.setPassword(jsonObject.getString("password"));
 			customerLogin.setAuthType(jsonObject.getString("authType"));
 			customerLogin.setAuthValue(jsonObject.getString("authValue"));
 			customerLogin.setCustomerType(jsonObject.getString("customerType"));
-			customerLogin.setLastLogin(jsonObject.getString("lastLogin"));
+			customerLogin.setLastLogin(""+new Date());
 			customerLogin.setCustomerId(jsonObject.getString("customerId"));
 			customerLogin.setFullName(jsonObject.getString("fullName"));
 			customerLogin.setAccountNumber(jsonObject.getString("accountNumber"));
 			customerLogin.setEmail(jsonObject.getString("email"));
 			customerLogin.setMobileNumber(jsonObject.getString("mobileNumber"));
+			customerLogin.setNationalType(jsonObject.getString("nationalType"));
+			customerLogin.setNationalId(jsonObject.getString("nationalId"));
+			customerLogin.setCountry(jsonObject.getString("country"));
+			
 
 			CustomerLogin customer = customerLoginRepo.save(customerLogin);
 
@@ -79,6 +99,7 @@ public class CustomerLoginService {
 			} else {
 				response.setResponseCode("00");
 				response.setResponseMessage("Profile Created Successfully");
+				customer.setPassword(null);
 				response.setResponseData(customer);
 			}
 
@@ -91,13 +112,21 @@ public class CustomerLoginService {
 	public ResponseData generateOtp(RequestData request) {
 		ResponseData response = new ResponseData();
 		try {
-			JSONObject jsonObject = new JSONObject(request.getJbody());
+			Object jbody = request.getJbody();
+			ObjectMapper objectMapper = new ObjectMapper();
+		    String  jsonString = objectMapper.writeValueAsString(jbody);
+			
+			
+			JSONObject jsonObject = new JSONObject(jsonString);
+			System.out.println("Request Body: " + jsonObject.toString());
+			
 			String otp = "234567";
 			// generate otp by using random
 
+
 			response.setResponseCode("00");
 			response.setResponseMessage("OTP Generated Successfully " + otp);
-			response.setResponseData(otp);
+			
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -110,12 +139,20 @@ public class CustomerLoginService {
 	public ResponseData forgetPassword(RequestData request) {
 		ResponseData response = new ResponseData();
 		try {
-			JSONObject jsonObject = new JSONObject(request.getJbody());
-			String username = jsonObject.getString("username");
-			String otp = jsonObject.getString("otp");
-			String email= jsonObject.getString("email");
-			String oldPassword = jsonObject.getString("password");
-			String newPassword = jsonObject.getString("newPassword");
+			Object jbody = request.getJbody();
+			ObjectMapper objectMapper = new ObjectMapper();
+		    String  jsonString = objectMapper.writeValueAsString(jbody);
+			
+			
+			JSONObject requestJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + requestJson.toString());
+			
+			
+			String username = requestJson.getString("username");
+			String otp = requestJson.getString("authValue");
+			String email= requestJson.getString("email");
+			String oldPassword = requestJson.getString("password");
+			String newPassword = requestJson.getString("newPassword");
 			// find customer login by username
 			CustomerLogin customerLogin = customerLoginRepo.findByUsernameAndPassword(username, oldPassword);
 			if (customerLogin == null) {
