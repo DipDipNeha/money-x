@@ -29,62 +29,51 @@ public class CustomerController {
 	public CustomerController(CustomerLoginService customerLoginService) {
 		this.customerLoginService = customerLoginService;
 	}
-	
+
 	// echo
 	@GetMapping("/echo")
 	public ResponseEntity<String> echo() {
 		return new ResponseEntity<>("Welcome to PSCS", HttpStatus.OK);
 	}
-	//create profile post api by using
+
+	// create profile post api by using
 	@PostMapping("/register")
 	public ResponseEntity<ResponseData> createProfile(@RequestBody RequestData requestBody) {
-		ResponseData response = new ResponseData();
-		CustomerLogin customer = ConvertRequestUtils.convertValue(requestBody.getJbody(), CustomerLogin.class);
-		customer = customerLoginService.createProfile(customer);
-		if (customer == null) {
-			response.setResponseCode("01");
-			response.setResponseMessage("Profile Creation Failed");
-			return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-		} else {
-			response.setResponseCode("00");
-			response.setResponseMessage("Profile Created Successfully");
-			response.setResponseData(customer);
-		}
-		
+
+		ResponseData response = customerLoginService.createProfile(requestBody);
+
 		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
-	
-	
-	// create login post api by using 
-	
+
+	// create login post api by using
 	@PostMapping("/login")
 	public ResponseEntity<ResponseData> login(@RequestBody RequestData requestBody) {
-		
-		CustomerLogin customer = ConvertRequestUtils.convertValue(requestBody.getJbody(), CustomerLogin.class);
-	    customer = customerLoginService.login(customer);
-	    ResponseData response = new ResponseData();
-	    response.setResponseCode("00");
-	    response.setResponseMessage("Login Successful");
-	    response.setResponseData(customer);
-		if (customer == null) {
-			response.setResponseCode("01");
-			response.setResponseMessage("Login Failed");
-			return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
-		}
+
+		ResponseData response = customerLoginService.login(requestBody);
+
 		return new ResponseEntity<>(response, HttpStatus.OK);
-		
+
 	}
 
-	@PostMapping("/logout")
-	public ResponseEntity<ResponseData> logout() {
-		customerLoginService.logout();
+	// generate otp
+	@PostMapping("/generateotp")
+	public ResponseEntity<ResponseData> generateOtp(@RequestBody RequestData requestBody) {
 
-		ResponseData response = new ResponseData();
-		response.setResponseCode("00");
-		response.setResponseMessage("Logout Successful");
+		// Assuming a method to generate OTP exists in the service
+		ResponseData response = customerLoginService.generateOtp(requestBody);
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
+
+	// forget password
+	@PostMapping("/forgetpassword")
+	public ResponseEntity<ResponseData> forgetPassword(@RequestBody RequestData requestBody){
+		
+		ResponseData response = customerLoginService.forgetPassword(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+		
+	}
+	
 
 	@GetMapping("/current-user")
 	public ResponseEntity<ResponseData> getCurrentUser() {
@@ -104,6 +93,16 @@ public class CustomerController {
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
-	
+
+	@PostMapping("/logout")
+	public ResponseEntity<ResponseData> logout() {
+		customerLoginService.logout();
+
+		ResponseData response = new ResponseData();
+		response.setResponseCode("00");
+		response.setResponseMessage("Logout Successful");
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
 }
