@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pscs.moneyx.entity.CustomerLogin;
-import com.pscs.moneyx.helper.ConvertRequestUtils;
 import com.pscs.moneyx.model.RequestData;
 import com.pscs.moneyx.model.ResponseData;
 import com.pscs.moneyx.services.CustomerLoginService;
@@ -93,7 +92,27 @@ public class CustomerController {
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-
+  //fetch country
+	@GetMapping("/fetchcountry")
+	public ResponseEntity<ResponseData> fetchCountry() {
+		ResponseData response = customerLoginService.fetchCountry();
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	//fetch business type
+	@GetMapping("/fetchbusinesstype")
+	public ResponseEntity<ResponseData> fetchBusinessType() {
+		ResponseData response = customerLoginService.fetchBusinessType();
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	//fetch assign role
+	@GetMapping("/fetchassignrole")
+	public ResponseEntity<ResponseData> fetchAssignRole() {
+		ResponseData response = customerLoginService.fetchAssignRole();
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+		
+	
 	@PostMapping("/logout")
 	public ResponseEntity<ResponseData> logout() {
 		customerLoginService.logout();

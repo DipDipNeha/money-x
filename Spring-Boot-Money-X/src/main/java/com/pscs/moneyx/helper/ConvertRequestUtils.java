@@ -17,4 +17,14 @@ public class ConvertRequestUtils {
             throw new IllegalArgumentException("Failed to convert object to type: " + targetType.getName(), e);
         }
     }
+
+	public static String getJsonString(Object object) {
+		try {
+			ObjectMapper objectMapper = new ObjectMapper();
+			return objectMapper.writeValueAsString(object);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 }
