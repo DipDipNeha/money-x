@@ -6,6 +6,7 @@ package com.pscs.moneyx.comtroller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -111,7 +112,12 @@ public class CustomerController {
 		ResponseData response = customerLoginService.fetchAssignRole();
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-		
+	//fetch upload document type based on country
+	@GetMapping("/fetchdocumenttype/{countryId}")
+	public ResponseEntity<ResponseData> fetchDocumentType(@PathVariable String countryId) {
+		ResponseData response = customerLoginService.fetchDocumentType(countryId);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 	
 	@PostMapping("/logout")
 	public ResponseEntity<ResponseData> logout() {

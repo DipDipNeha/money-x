@@ -8,14 +8,18 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import com.pscs.moneyx.entity.Country;
+import com.pscs.moneyx.entity.CustomerDocInfo;
 import com.pscs.moneyx.entity.CustomerLogin;
 import com.pscs.moneyx.helper.ConvertRequestUtils;
+import com.pscs.moneyx.model.ImageUpload;
 import com.pscs.moneyx.model.RequestData;
 import com.pscs.moneyx.model.ResponseData;
 import com.pscs.moneyx.repo.BusinessRoleRepo;
 import com.pscs.moneyx.repo.BusinessTypeRepo;
 import com.pscs.moneyx.repo.CountryRepo;
+import com.pscs.moneyx.repo.CustomerDocInfoRepo;
 import com.pscs.moneyx.repo.CustomerLoginRepo;
+import com.pscs.moneyx.repo.DocumentRepo;
 
 @Service
 public class CustomerLoginService {
@@ -23,12 +27,19 @@ public class CustomerLoginService {
 	private final CountryRepo countryRepo;
 	private final BusinessTypeRepo businessTypeRepo;
 	private final BusinessRoleRepo businessRoleRepo;
+	private final CustomerDocInfoRepo customerDocInfoRepo;
+	private final DocumentRepo documentRepo;
+	
 
-	public CustomerLoginService(CustomerLoginRepo customerLoginRepo, CountryRepo countryRepo, BusinessTypeRepo businessTypeRepo, BusinessRoleRepo businessRoleRepo) {
+	public CustomerLoginService(CustomerLoginRepo customerLoginRepo, CountryRepo countryRepo,
+			BusinessTypeRepo businessTypeRepo, BusinessRoleRepo businessRoleRepo,
+			CustomerDocInfoRepo customerDocInfoRepo, DocumentRepo documentRepo) {
 		this.customerLoginRepo = customerLoginRepo;
 		this.countryRepo = countryRepo;
 		this.businessTypeRepo = businessTypeRepo;
 		this.businessRoleRepo = businessRoleRepo;
+		this.customerDocInfoRepo = customerDocInfoRepo;
+		this.documentRepo = documentRepo;
 	}
 
 	// find by username
@@ -205,22 +216,21 @@ public class CustomerLoginService {
 	}
 
 	public ResponseData fetchBusinessType() {
-		
+
 		ResponseData response = new ResponseData();
 		try {
-			List<String> businessTypes = new ArrayList<>();	
+			List<String> businessTypes = new ArrayList<>();
 			JSONObject jsonObject = new JSONObject();
 			businessTypeRepo.findAll().forEach(businessType -> {
 				businessTypes.add(businessType.getBusinessType());
 			});
-			
+
 			jsonObject.put("businessTypes", businessTypes);
 			response.setResponseData(jsonObject.toString());
 			response.setResponseCode("00");
 			response.setResponseMessage("Business types fetched successfully");
-			
-		}
-		catch (Exception e) {
+
+		} catch (Exception e) {
 			e.printStackTrace();
 			response.setResponseCode("01");
 			response.setResponseMessage("Failed to fetch business types");
@@ -242,6 +252,61 @@ public class CustomerLoginService {
 			e.printStackTrace();
 			response.setResponseCode("01");
 			response.setResponseMessage("Failed to fetch roles");
+		}
+
+		return response;
+	}
+
+	public ResponseData uploadImage(ImageUpload imageUpload) {
+		ResponseData response = new ResponseData();
+		try {
+			CustomerDocInfo mobCustomerDocInfo = new CustomerDocInfo();
+			mobCustomerDocInfo.setId("" + System.nanoTime());
+			mobCustomerDocInfo.setImageData(imageUpload.getFile().getBytes());
+			mobCustomerDocInfo.setImageType(imageUpload.getFileType());
+			mobCustomerDocInfo.setMakerId(imageUpload.getUserId());
+			mobCustomerDocInfo.setMakerDttm(new Date());
+			CustomerDocInfo saveresponse = customerDocInfoRepo.save(mobCustomerDocInfo);
+			if (saveresponse == null) {
+				response.setResponseCode("01");
+				response.setResponseMessage("Failed to upload image");
+				return response;
+			} else {
+
+				response.setResponseCode("00");
+				response.setResponseMessage("Image uploaded successfully");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode("01");
+			response.setResponseMessage("Failed to upload image: " + e.getMessage());
+			return response;
+		}
+
+		return response;
+	}
+
+	public ResponseData fetchDocumentType(String countryId) {
+		ResponseData response = new ResponseData();
+		try {	
+			List<String> documentTypes = new ArrayList<>();
+			JSONObject jsonObject = new JSONObject();
+
+			// Fetch document types based on countryId
+			documentRepo.findByCountryCode(countryId).forEach(document -> {
+				documentTypes.add(document.getDocumentType());
+			});
+
+			jsonObject.put("documentTypes", documentTypes);
+			response.setResponseData(jsonObject.toString());
+			response.setResponseCode("00");
+			response.setResponseMessage("Document types fetched successfully");
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode("01");
+			response.setResponseMessage("Failed to fetch document types: " + e.getMessage());
 		}
 		
 		return response;
