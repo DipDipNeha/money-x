@@ -19,11 +19,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pscs.moneyx.comtroller.CustomerController;
+import com.pscs.moneyx.controller.CustomerBusinessController;
 import com.pscs.moneyx.entity.MobileCustomer;
 import com.pscs.moneyx.services.MobileCustomerService;
 
-@WebMvcTest(controllers = CustomerController.class)
+@WebMvcTest(controllers = CustomerBusinessController.class)
 @AutoConfigureMockMvc(addFilters = false)
 @ExtendWith(MockitoExtension.class)
 public class ControllerTest {

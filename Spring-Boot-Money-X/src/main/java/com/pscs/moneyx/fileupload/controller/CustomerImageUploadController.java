@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.pscs.moneyx.fileupload.comtroller;
+package com.pscs.moneyx.fileupload.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +15,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.pscs.moneyx.model.ImageUpload;
 import com.pscs.moneyx.model.ResponseData;
-import com.pscs.moneyx.services.CustomerLoginService;
+import com.pscs.moneyx.services.CustomerBusinessService;
 import com.pscs.moneyx.services.FileSystemStorageService;
 
 /**
@@ -27,10 +27,10 @@ import com.pscs.moneyx.services.FileSystemStorageService;
 public class CustomerImageUploadController {
 
 	FileSystemStorageService fileSytemStorage;
-	CustomerLoginService customerProfileService;
+	CustomerBusinessService customerProfileService;
 
 	public CustomerImageUploadController(FileSystemStorageService fileSytemStorage,
-			CustomerLoginService customerProfileService) {
+			CustomerBusinessService customerProfileService) {
 
 		this.fileSytemStorage = fileSytemStorage;
 		this.customerProfileService = customerProfileService;

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.pscs.moneyx.comtroller;
+package com.pscs.moneyx.controller;
 
 import java.util.Collections;
 import java.util.Optional;

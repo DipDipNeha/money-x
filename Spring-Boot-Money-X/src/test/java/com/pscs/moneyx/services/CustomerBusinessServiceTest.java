@@ -20,7 +20,7 @@ import com.pscs.moneyx.repo.CustomerRepo;
 import com.pscs.moneyx.services.MobileCustomerService;
 
 @ExtendWith(MockitoExtension.class)
-public class CustomerServiceTest {
+public class CustomerBusinessServiceTest {
 
 	@Mock
 	private CustomerRepo customerRepo;

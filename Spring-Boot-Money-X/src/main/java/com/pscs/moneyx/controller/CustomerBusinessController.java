@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.pscs.moneyx.comtroller;
+package com.pscs.moneyx.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,18 +15,18 @@ import org.springframework.web.bind.annotation.RestController;
 import com.pscs.moneyx.entity.CustomerLogin;
 import com.pscs.moneyx.model.RequestData;
 import com.pscs.moneyx.model.ResponseData;
-import com.pscs.moneyx.services.CustomerLoginService;
+import com.pscs.moneyx.services.CustomerBusinessService;
 
 /**
  * 
  */
 @RestController
 @RequestMapping("/api/customer")
-public class CustomerController {
+public class CustomerBusinessController {
 
-	private final CustomerLoginService customerLoginService;
+	private final CustomerBusinessService customerLoginService;
 
-	public CustomerController(CustomerLoginService customerLoginService) {
+	public CustomerBusinessController(CustomerBusinessService customerLoginService) {
 		this.customerLoginService = customerLoginService;
 	}
 
@@ -75,8 +75,8 @@ public class CustomerController {
 	}
 	
 
-	@GetMapping("/current-user")
-	public ResponseEntity<ResponseData> getCurrentUser() {
+	@PostMapping("/current-user")
+	public ResponseEntity<ResponseData> getCurrentUser(@RequestBody RequestData requestBody) {
 		CustomerLogin loggedInUser = customerLoginService.getLoggedInUser();
 
 		if (loggedInUser == null) {
@@ -94,28 +94,28 @@ public class CustomerController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
   //fetch country
-	@GetMapping("/fetchcountry")
-	public ResponseEntity<ResponseData> fetchCountry() {
+	@PostMapping("/fetchcountry")
+	public ResponseEntity<ResponseData> fetchCountry(@RequestBody RequestData requestBody) {
 		ResponseData response = customerLoginService.fetchCountry();
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
 	//fetch business type
-	@GetMapping("/fetchbusinesstype")
-	public ResponseEntity<ResponseData> fetchBusinessType() {
+	@PostMapping("/fetchbusinesstype")
+	public ResponseEntity<ResponseData> fetchBusinessType(@RequestBody RequestData requestBody) {
 		ResponseData response = customerLoginService.fetchBusinessType();
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	//fetch assign role
-	@GetMapping("/fetchassignrole")
-	public ResponseEntity<ResponseData> fetchAssignRole() {
+	@PostMapping("/fetchassignrole")
+	public ResponseEntity<ResponseData> fetchAssignRole(@RequestBody RequestData requestBody) {
 		ResponseData response = customerLoginService.fetchAssignRole();
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	//fetch upload document type based on country
-	@GetMapping("/fetchdocumenttype/{countryId}")
-	public ResponseEntity<ResponseData> fetchDocumentType(@PathVariable String countryId) {
-		ResponseData response = customerLoginService.fetchDocumentType(countryId);
+	@PostMapping("/fetchdocumenttype")
+	public ResponseEntity<ResponseData> fetchDocumentType(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.fetchDocumentType(requestBody);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
