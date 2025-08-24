@@ -5,7 +5,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
 public class CommonUtils {
-	public final static Long OTP_VALIDITY_DURATION = 120000L; // 2 minutes;
+	
+	public final static Long OTP_VALIDITY_DURATION = 300000L; // 5 minutes in milliseconds
 
 	public final static String createRandomNumber(long len) {
 

@@ -226,7 +226,7 @@ public class CustomerBusinessService {
 	}
 
 	// Validate otp
-	public ResponseData validateOtp(RequestData request) {
+	public  ResponseData validateOtp(RequestData request) {
 		ResponseData response = new ResponseData();
 		try {
 
@@ -303,7 +303,10 @@ public class CustomerBusinessService {
 			String email = requestJson.getString("email");
 			String mobileNumber=requestJson.getString("mobileNumber");
 			
-			
+			ResponseData validateOtp = validateOtp(request);
+			if (!validateOtp.getResponseCode().equals("00")) {
+				return validateOtp; // Return if OTP validation fails
+			}else {
 			String oldPassword = CommonUtils.b64_sha256(requestJson.getString("password"));
 			String newPassword = CommonUtils.b64_sha256(requestJson.getString("newPassword"));
 			// find customer login by username
@@ -312,13 +315,14 @@ public class CustomerBusinessService {
 			if (customerLogin == null) {
 				response.setResponseCode("01");
 				response.setResponseMessage("Invalid Username or Password");
-				return response;
+				
 			} else {
 				customerLogin.setPassword(newPassword);
 				moneyXBusinessRepo.save(customerLogin);
 
 				response.setResponseCode("00");
 				response.setResponseMessage("Password Updated Successfully");
+			}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
