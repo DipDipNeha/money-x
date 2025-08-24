@@ -304,8 +304,8 @@ public class CustomerBusinessService {
 			String mobileNumber=requestJson.getString("mobileNumber");
 			
 			
-			String oldPassword = requestJson.getString("password");
-			String newPassword = requestJson.getString("newPassword");
+			String oldPassword = CommonUtils.b64_sha256(requestJson.getString("password"));
+			String newPassword = CommonUtils.b64_sha256(requestJson.getString("newPassword"));
 			// find customer login by username
 			MoneyXBusiness customerLogin = moneyXBusinessRepo.findByUserNameAndPassword(username, oldPassword);
 			
