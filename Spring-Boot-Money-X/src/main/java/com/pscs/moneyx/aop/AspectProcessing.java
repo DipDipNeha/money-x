@@ -42,7 +42,7 @@ public class AspectProcessing {
 
 	@After("executeAspects()")
 	public void logsAfter() {
-		System.err.println("Logging after advice method");
+		logger.error("Logging after advice method");
 	}
 
 	@Around("executeAspects()")
