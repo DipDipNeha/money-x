@@ -3,6 +3,7 @@
  */
 package com.pscs.moneyx.aop;
 
+import org.apache.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Around;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import com.pscs.moneyx.model.RequestData;
 import com.pscs.moneyx.model.ResponseData;
+import com.pscs.moneyx.services.CustomerBusinessService;
 import com.pscs.moneyx.services.RequestLogService;
 
 /**
@@ -24,6 +26,7 @@ import com.pscs.moneyx.services.RequestLogService;
 @Component
 @Aspect
 public class AspectProcessing {
+	private static final Logger logger = Logger.getLogger(AspectProcessing.class);
 
 	@Autowired
 	private RequestLogService requestLogService;
@@ -34,7 +37,7 @@ public class AspectProcessing {
 
 	@Before("executeAspects()")
 	public void losbefore() {
-		System.err.println("Logging before advice method");
+		logger.error("Logging before advice method");
 	}
 
 	@After("executeAspects()")

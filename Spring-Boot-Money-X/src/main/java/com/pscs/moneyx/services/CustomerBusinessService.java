@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,7 @@ import com.pscs.moneyx.utils.CommonUtils;
 
 @Service
 public class CustomerBusinessService {
+	private static final Logger logger = Logger.getLogger(CustomerBusinessService.class);
 	private final CustomerLoginRepo customerLoginRepo;
 	private final CountryRepo countryRepo;
 	private final BusinessTypeRepo businessTypeRepo;
@@ -60,7 +62,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 
-			System.out.println("Request : " + request);
+			logger.info("Request : " + request);
 			String jsonString = ConvertRequestUtils.getJsonString(request.getJbody());
 			// Convert the request body to a JSON object
 			JSONObject requestJson = new JSONObject(jsonString);
