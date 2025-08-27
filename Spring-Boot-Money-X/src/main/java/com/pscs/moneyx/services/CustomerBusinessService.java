@@ -13,6 +13,7 @@ import com.pscs.moneyx.entity.CustomerDocInfo;
 import com.pscs.moneyx.entity.CustomerLogin;
 import com.pscs.moneyx.entity.MoneyXBusiness;
 import com.pscs.moneyx.entity.OtpDataTabl;
+import com.pscs.moneyx.entity.WalletAcctData;
 import com.pscs.moneyx.helper.ConvertRequestUtils;
 import com.pscs.moneyx.model.ImageUpload;
 import com.pscs.moneyx.model.RequestData;
@@ -25,8 +26,11 @@ import com.pscs.moneyx.repo.CustomerLoginRepo;
 import com.pscs.moneyx.repo.DocumentRepo;
 import com.pscs.moneyx.repo.MoneyXBusinessRepo;
 import com.pscs.moneyx.repo.OtpDataTablRepo;
+import com.pscs.moneyx.repo.WalletAcctDataRepository;
 import com.pscs.moneyx.services.post.SMSPostingService;
 import com.pscs.moneyx.utils.CommonUtils;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class CustomerBusinessService {
@@ -40,11 +44,13 @@ public class CustomerBusinessService {
 	private final OtpDataTablRepo otpDataTablRepo;
 	private final SMSPostingService smsPostingService;
 	private final MoneyXBusinessRepo moneyXBusinessRepo;
+	private final WalletAcctDataRepository walletAcctDataRepository;
 
 	public CustomerBusinessService(CustomerLoginRepo customerLoginRepo, CountryRepo countryRepo,
 			BusinessTypeRepo businessTypeRepo, BusinessRoleRepo businessRoleRepo,
 			CustomerDocInfoRepo customerDocInfoRepo, DocumentRepo documentRepo, OtpDataTablRepo otpDataTablRepo,
-			SMSPostingService smsPostingService, MoneyXBusinessRepo moneyXBusinessRepo) {
+			SMSPostingService smsPostingService, MoneyXBusinessRepo moneyXBusinessRepo,
+			WalletAcctDataRepository walletAcctDataRepository) {
 		this.customerLoginRepo = customerLoginRepo;
 		this.countryRepo = countryRepo;
 		this.businessTypeRepo = businessTypeRepo;
@@ -54,9 +60,11 @@ public class CustomerBusinessService {
 		this.otpDataTablRepo = otpDataTablRepo;
 		this.smsPostingService = smsPostingService;
 		this.moneyXBusinessRepo = moneyXBusinessRepo;
+		this.walletAcctDataRepository = walletAcctDataRepository;
 	}
 
 	// find by username
+	@Transactional
 	public ResponseData login(RequestData request) {
 		ResponseData response = new ResponseData();
 		String isLoginAttemptActive = "N";
@@ -138,6 +146,7 @@ public class CustomerBusinessService {
 		return response;
 	}
 
+	@Transactional
 	public ResponseData createProfile(RequestData request) {
 		ResponseData response = new ResponseData();
 		try {
@@ -521,6 +530,38 @@ public class CustomerBusinessService {
 			response.setResponseMessage("Failed to fetch document types: " + e.getMessage());
 		}
 
+		return response;
+	}
+
+	public ResponseData viewBalance(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+
+			// fetch account number from request
+			String accountNo = reqJson.getString("accountNumber");
+
+			// fetch wallet account data by account number
+			WalletAcctData byAcctNo = walletAcctDataRepository.findByAcctNo(accountNo);
+			if (byAcctNo != null) {
+				response.setResponseCode("00");
+				response.setResponseMessage("Account balance fetched successfully");
+				response.setResponseData(byAcctNo);
+				return response;
+			} else {
+				response.setResponseCode("01");
+				response.setResponseMessage("No account found with the provided account number");
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode("01");
+			response.setResponseMessage("Failed to fetch account balance: " + e.getMessage());
+		}
 		return response;
 	}
 

@@ -120,6 +120,16 @@ public class CustomerBusinessController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
+	//view balance api
+	@PostMapping("/viewbalance")
+	public ResponseEntity<ResponseData> viewBalance(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.viewBalance(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	
+	
+	
 	@PostMapping("/logout")
 	public ResponseEntity<ResponseData> logout() {
 		customerLoginService.logout();
