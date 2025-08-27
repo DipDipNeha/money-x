@@ -19,6 +19,15 @@ public class Country {
 	private Long id;
 	private String countryName;
 	private String countryCode;
+	private String countryDialCode;
+	
+	public String getCountryDialCode() {
+		return countryDialCode;
+	}
+
+	public void setCountryDialCode(String countryDialCode) {
+		this.countryDialCode = countryDialCode;
+	}
 	public Long getId() {
 		return id;
 	}
@@ -37,13 +46,12 @@ public class Country {
 	public void setCountryCode(String countryCode) {
 		this.countryCode = countryCode;
 	}
+
 	@Override
 	public String toString() {
-		return "Country [id=" + id + ", countryName=" + countryName + ", countryCode=" + countryCode + "]";
+		return "Country [id=" + id + ", countryName=" + countryName + ", countryCode=" + countryCode
+				+ ", countryDialCode=" + countryDialCode + "]";
 	}
-	
-	
-	
 	
 	
 }

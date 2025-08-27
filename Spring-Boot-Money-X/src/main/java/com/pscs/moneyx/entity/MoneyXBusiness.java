@@ -5,6 +5,7 @@ package com.pscs.moneyx.entity;
 
 import java.util.Date;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -53,7 +54,14 @@ public class MoneyXBusiness {
 	private String customerId;
 	
 	private String docInfo;
-
+	private int retryLoginAttempt;
+	private String isLocked;
+	private String isActive;
+	private String lastLoginTime;
+	@Column(name = "retry_login_active")
+	private String isLoginAttemptActive;
+	
+	
 	public Long getId() {
 		return id;
 	}
@@ -269,6 +277,49 @@ public class MoneyXBusiness {
 	public void setDocInfo(String docInfo) {
 		this.docInfo = docInfo;
 	}
+	
+	
+
+
+	public String getIsLocked() {
+		return isLocked;
+	}
+
+	public void setIsLocked(String isLocked) {
+		this.isLocked = isLocked;
+	}
+
+	public String getIsActive() {
+		return isActive;
+	}
+
+	public void setIsActive(String isActive) {
+		this.isActive = isActive;
+	}
+
+	public String getLastLoginTime() {
+		return lastLoginTime;
+	}
+
+	public void setLastLoginTime(String lastLoginTime) {
+		this.lastLoginTime = lastLoginTime;
+	}
+
+	public String getIsLoginAttemptActive() {
+		return isLoginAttemptActive;
+	}
+
+	public void setIsLoginAttemptActive(String isLoginAttemptActive) {
+		this.isLoginAttemptActive = isLoginAttemptActive;
+	}
+
+	public int getRetryLoginAttempt() {
+		return retryLoginAttempt;
+	}
+
+	public void setRetryLoginAttempt(int retryLoginAttempt) {
+		this.retryLoginAttempt = retryLoginAttempt;
+	}
 
 	@Override
 	public String toString() {
@@ -281,11 +332,11 @@ public class MoneyXBusiness {
 				+ ", accountNumber=" + accountNumber + ", accountType=" + accountType + ", currency=" + currency
 				+ ", userName=" + userName + ", password=" + password + ", txnPin=" + txnPin + ", authType=" + authType
 				+ ", authValue=" + authValue + ", customerType=" + customerType + ", customerId=" + customerId
-				+ ", docInfo=" + docInfo + "]";
+				+ ", docInfo=" + docInfo + ", retryLoginAttempt=" + retryLoginAttempt + ", isLocked=" + isLocked
+				+ ", isActive=" + isActive + ", lastLoginTime=" + lastLoginTime + ", isLoginAttemptActive="
+				+ isLoginAttemptActive + "]";
 	}
-	
-	
-	
+
 	
 	
 	

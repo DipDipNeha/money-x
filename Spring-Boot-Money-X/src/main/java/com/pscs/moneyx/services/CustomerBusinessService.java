@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
@@ -60,6 +59,9 @@ public class CustomerBusinessService {
 	// find by username
 	public ResponseData login(RequestData request) {
 		ResponseData response = new ResponseData();
+		String isLoginAttemptActive = "N";
+		int maxRetryLoginAttempt = 3;
+		int retryLoginAttempt = 0;
 		try {
 
 			logger.info("Request : " + request);
@@ -68,24 +70,64 @@ public class CustomerBusinessService {
 			JSONObject requestJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + requestJson.toString());
 
-			 MoneyXBusiness checkCustomerres = moneyXBusinessRepo.findByUserName(requestJson.getString("username"))
+			MoneyXBusiness checkCustomerres = moneyXBusinessRepo.findByUserName(requestJson.getString("username"))
 					.orElseThrow(() -> new ResourceNotFoundException(
 							"No Data Found By this Username: " + requestJson.getString("username")));
+
 			if (checkCustomerres != null) {
+				isLoginAttemptActive = checkCustomerres.getIsLoginAttemptActive();
+				retryLoginAttempt = checkCustomerres.getRetryLoginAttempt();
+
+				if (checkCustomerres.getIsActive().equals("N")) {
+					response.setResponseCode("01");
+					response.setResponseMessage("Your Account is Inactive Please Contact Admin");
+					return response;
+				}
+				if (checkCustomerres.getIsLocked().equals("Y")) {
+					response.setResponseCode("01");
+					response.setResponseMessage("Your Account is Locked Please Contact Admin");
+					return response;
+				}
+
 				checkCustomerres = moneyXBusinessRepo.findByUserNameAndPassword(requestJson.getString("username"),
-						CommonUtils.b64_sha256( requestJson.getString("password")));
+						CommonUtils.b64_sha256(requestJson.getString("password")));
+				// check if user exist
+				if (checkCustomerres == null) {
 
-			}
+					response.setResponseCode("01");
+					response.setResponseMessage("Login Failed");
 
-			if (checkCustomerres == null) {
-				response.setResponseCode("01");
-				response.setResponseMessage("Login Failed");
+					if (isLoginAttemptActive.equals("Y")) {
+
+						if (retryLoginAttempt >= maxRetryLoginAttempt) {
+							moneyXBusinessRepo.updateIsLockedByUserName("L", requestJson.getString("username"));
+							response.setResponseCode("01");
+							response.setResponseMessage("Your Account is Locked Please Contact Admin");
+							return response;
+						} else {
+							response.setResponseMessage("Invalid Username or Password You Have "
+									+ (maxRetryLoginAttempt - retryLoginAttempt) + " Attempt Left");
+							moneyXBusinessRepo.incrementRetryLoginAttemptNative(requestJson.getString("username"));
+						}
+
+						return response;
+					}
+
+				} else {
+					checkCustomerres.setLastLoginTime(new Date() + "");
+
+					response.setResponseCode("00");
+					response.setResponseMessage("Login Successful");
+					response.setResponseData(checkCustomerres);
+					if (isLoginAttemptActive.equals("Y")) {
+						moneyXBusinessRepo.resetRetryLoginAttempt(checkCustomerres.getUserName());
+					}
+				}
 
 			} else {
-				response.setResponseCode("00");
-				response.setResponseMessage("Login Successful");
-				checkCustomerres.setPassword(null);
-				response.setResponseData(checkCustomerres);
+				response.setResponseCode("01");
+				response.setResponseMessage("Invalid Username!");
+				return response;
 			}
 
 		} catch (Exception e) {
@@ -127,7 +169,7 @@ public class CustomerBusinessService {
 			customerLogin.setCurrency(jsonObject.getString("currency"));
 			customerLogin.setUserName(jsonObject.getString("userName"));
 			System.out.println(jsonObject.getString("password"));
-			customerLogin.setPassword(CommonUtils.b64_sha256( jsonObject.getString("password")));
+			customerLogin.setPassword(CommonUtils.b64_sha256(jsonObject.getString("password")));
 			customerLogin.setTxnPin(jsonObject.getString("txnPin"));
 			customerLogin.setAuthType(jsonObject.getString("authType"));
 			customerLogin.setAuthValue(jsonObject.getString("authValue"));
@@ -135,25 +177,31 @@ public class CustomerBusinessService {
 			customerLogin.setCustomerId(jsonObject.getString("customerId"));
 			customerLogin.setDocInfo(jsonObject.getJSONArray("docInfo").toString());
 			customerLogin.setRegistrationDate(new Date());
-						
-			MoneyXBusiness customer =	moneyXBusinessRepo.findByAccountNumber(jsonObject.getString("accountNumber"));
-			if(customer==null) {
-			 customer = moneyXBusinessRepo.save(customerLogin);
-			//validate accountNumber
-			System.out.println(customer);
-			 
-			if (customer == null) {
-				response.setResponseCode("01");
-				response.setResponseMessage("Profile Creation Failed");
 
+			customerLogin.setIsActive("A");
+			customerLogin.setIsLocked("N");
+			customerLogin.setIsLoginAttemptActive("N");
+			customerLogin.setRetryLoginAttempt(0);
+
+			MoneyXBusiness customer = moneyXBusinessRepo.findByAccountNumber(jsonObject.getString("accountNumber"));
+			if (customer == null) {
+				customer = moneyXBusinessRepo.save(customerLogin);
+				// validate accountNumber
+				System.out.println(customer);
+
+				if (customer == null) {
+					response.setResponseCode("01");
+					response.setResponseMessage("Profile Creation Failed");
+
+				} else {
+					response.setResponseCode("00");
+					response.setResponseMessage("Profile Created Successfully");
+					response.setResponseData(customer);
+				}
 			} else {
-				response.setResponseCode("00");
-				response.setResponseMessage("Profile Created Successfully");
-				response.setResponseData(customer);
-			}
-			}else {
 				response.setResponseCode("01");
-				response.setResponseMessage("This Account Profile Already Exist On System +"+jsonObject.getString("accountNumber"));
+				response.setResponseMessage(
+						"This Account Profile Already Exist On System +" + jsonObject.getString("accountNumber"));
 			}
 
 		} catch (Exception e) {
@@ -193,16 +241,17 @@ public class CustomerBusinessService {
 				response.setResponseMessage("OTP Generation Failed");
 				return response;
 			} else {
-
 				JSONObject smsRequest = new JSONObject();
+				if (jsonObject.getString("mobileNumber").startsWith("234")) {
 
-				JSONArray messages = new JSONArray();
-				messages.put(new JSONObject().put("sender", "InfoSMS")
-						.put("destinations",
-								new JSONArray().put(new JSONObject().put("to", jsonObject.getString("mobileNumber"))))
-						.put("content", new JSONObject().put("text", "Your OTP is: " + otp)));
+					smsRequest.put("messages", ConvertRequestUtils.generateSMSJson(jsonObject.getString("mobileNumber"),
+							jHeader.getString("requestType"), otp));
 
-				smsRequest.put("messages", messages);
+				} else {
+					response.setResponseCode("00");
+					response.setResponseMessage("SMS Sent Successfully " + otp);
+					return response;
+				}
 
 				response.setResponseMessage("OTP Generated Successfully " + otp);
 				response.setResponseCode("00");
@@ -210,9 +259,13 @@ public class CustomerBusinessService {
 
 				if (sendPostRequest.getString("respsode").equals("200")) {
 					response.setResponseCode("00");
-					response.setResponseMessage("SMS Sent Successfully "+otp);
+					response.setResponseMessage("SMS Sent Successfully " + otp);
 					response.setResponseData(sendPostRequest.toMap());
 
+				} else {
+					response.setResponseCode("01");
+					response.setResponseMessage("Failed to Send SMS");
+					response.setResponseData(sendPostRequest.toMap());
 				}
 
 			}
@@ -228,7 +281,7 @@ public class CustomerBusinessService {
 	}
 
 	// Validate otp
-	public  ResponseData validateOtp(RequestData request) {
+	public ResponseData validateOtp(RequestData request) {
 		ResponseData response = new ResponseData();
 		try {
 
@@ -240,7 +293,7 @@ public class CustomerBusinessService {
 
 			String otp = requestJson.getString("authValue");
 			String username = requestJson.getString("username");
-			String mobileNumber=requestJson.getString("mobileNumber");
+			String mobileNumber = requestJson.getString("mobileNumber");
 
 			OtpDataTabl otpDataTabl = otpDataTablRepo.findByUserIdAndOtp(username, CommonUtils.b64_sha256(otp));
 
@@ -303,28 +356,28 @@ public class CustomerBusinessService {
 			String username = requestJson.getString("username");
 			String otp = requestJson.getString("authValue");
 			String email = requestJson.getString("email");
-			String mobileNumber=requestJson.getString("mobileNumber");
-			
+			String mobileNumber = requestJson.getString("mobileNumber");
+
 			ResponseData validateOtp = validateOtp(request);
 			if (!validateOtp.getResponseCode().equals("00")) {
 				return validateOtp; // Return if OTP validation fails
-			}else {
-			String oldPassword = CommonUtils.b64_sha256(requestJson.getString("password"));
-			String newPassword = CommonUtils.b64_sha256(requestJson.getString("newPassword"));
-			// find customer login by username
-			MoneyXBusiness customerLogin = moneyXBusinessRepo.findByUserNameAndPassword(username, oldPassword);
-			
-			if (customerLogin == null) {
-				response.setResponseCode("01");
-				response.setResponseMessage("Invalid Username or Password");
-				
 			} else {
-				customerLogin.setPassword(newPassword);
-				moneyXBusinessRepo.save(customerLogin);
+				String oldPassword = CommonUtils.b64_sha256(requestJson.getString("password"));
+				String newPassword = CommonUtils.b64_sha256(requestJson.getString("newPassword"));
+				// find customer login by username
+				MoneyXBusiness customerLogin = moneyXBusinessRepo.findByUserNameAndPassword(username, oldPassword);
 
-				response.setResponseCode("00");
-				response.setResponseMessage("Password Updated Successfully");
-			}
+				if (customerLogin == null) {
+					response.setResponseCode("01");
+					response.setResponseMessage("Invalid Username or Password");
+
+				} else {
+					customerLogin.setPassword(newPassword);
+					moneyXBusinessRepo.save(customerLogin);
+
+					response.setResponseCode("00");
+					response.setResponseMessage("Password Updated Successfully");
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -408,19 +461,19 @@ public class CustomerBusinessService {
 	public ResponseData uploadImage(ImageUpload imageUpload) {
 		ResponseData response = new ResponseData();
 		try {
-			JSONObject resjson=new JSONObject();
-			
+			JSONObject resjson = new JSONObject();
+
 			CustomerDocInfo mobCustomerDocInfo = new CustomerDocInfo();
-			String docId= "PSCS"+System.nanoTime();
+			String docId = "PSCS" + System.nanoTime();
 			mobCustomerDocInfo.setId(docId);
 			mobCustomerDocInfo.setImageData(imageUpload.getFile().getBytes());
 			mobCustomerDocInfo.setImageType(imageUpload.getFileType());
 			mobCustomerDocInfo.setMakerId(imageUpload.getUserId());
 			mobCustomerDocInfo.setMakerDttm(new Date());
 			CustomerDocInfo saveresponse = customerDocInfoRepo.save(mobCustomerDocInfo);
-			
+
 			resjson.put("docUploadId", docId);
-			
+
 			if (saveresponse == null) {
 				response.setResponseCode("01");
 				response.setResponseMessage("Failed to upload image");
