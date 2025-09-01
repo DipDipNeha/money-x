@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.pscs.moneyx.helper.ConvertRequestUtils;
 import com.pscs.moneyx.model.RequestData;
 import com.pscs.moneyx.model.ResponseData;
+import com.pscs.moneyx.services.post.EkycPostingService;
 
 /**
  * 
@@ -14,6 +15,13 @@ import com.pscs.moneyx.model.ResponseData;
 @Service
 public class EkycService {
 	private static Logger logger = Logger.getLogger(EkycService.class);
+	private final EkycPostingService ekycPostingService;
+	
+
+	public EkycService(EkycPostingService ekycPostingService) {
+		this.ekycPostingService = ekycPostingService;
+	}
+
 
 	public ResponseData doEkyc(RequestData request) {
 		ResponseData responseData = new ResponseData();
@@ -22,10 +30,13 @@ public class EkycService {
 			String jsonString = ConvertRequestUtils.getJsonString(request.getJbody());
 			logger.info("Request Json String : " + jsonString);
 			JSONObject jsonObject = new JSONObject(jsonString);
+			String ekycNumber=jsonObject.getString("ekycNumber");
+			String ekycType=jsonObject.getString("ekycType");
+			JSONObject sendGetRequest = ekycPostingService.sendGetRequest(jsonString,ekycType,ekycNumber);
 		    //need to write business code here	
 			responseData.setResponseCode("00");
 			responseData.setResponseMessage("Ekyc processed successfully");
-			responseData.setResponseData(null);
+			responseData.setResponseData(sendGetRequest.toMap());
 			
 			
 		}
