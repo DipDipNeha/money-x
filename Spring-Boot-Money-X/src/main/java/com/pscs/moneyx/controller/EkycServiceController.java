@@ -28,7 +28,7 @@ public class EkycServiceController {
 	public EkycServiceController(EkycService ekycService) {
 		this.ekycService = ekycService;
 	}
-	@PostMapping("/ekcy")
+	@PostMapping("/ekyc")
 	public ResponseEntity<ResponseData> doEkyc(@RequestBody RequestData requestBody) {
 
 		ResponseData response = ekycService.doEkyc(requestBody);
