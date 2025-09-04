@@ -1,23 +1,34 @@
 package com.pscs.moneyx.services;
 
+import java.util.List;
+
 import org.json.JSONObject;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-import com.pscs.moneyx.model.RequestData;
-import com.pscs.moneyx.model.ResponseData;
+
+import com.pscs.moneyx.entity.Transactions;
 import com.pscs.moneyx.entity.WalletAcctData;
 import com.pscs.moneyx.helper.ConvertRequestUtils;
+import com.pscs.moneyx.model.RequestData;
+import com.pscs.moneyx.model.ResponseData;
+import com.pscs.moneyx.repo.TransactionsRepo;
 import com.pscs.moneyx.repo.WalletAcctDataRepository;
 
 @Service
 public class ServiceBusinessService {
 
     private final WalletAcctDataRepository walletRepo;
+    private final TransactionsRepo transactionsRepo;
+    
 
-    public ServiceBusinessService(WalletAcctDataRepository walletRepo) {
-        this.walletRepo = walletRepo;
-    }
 
-    // 1. View balance
+    public ServiceBusinessService(WalletAcctDataRepository walletRepo, TransactionsRepo transactionsRepo) {
+		
+		this.walletRepo = walletRepo;
+		this.transactionsRepo = transactionsRepo;
+	}
+
+	// 1. View balance
     public ResponseData viewBalance(RequestData request) {
         ResponseData response = new ResponseData();
         try {
@@ -51,10 +62,27 @@ public class ServiceBusinessService {
   
         ResponseData response = new ResponseData();
         try {
+        	String jsonString = ConvertRequestUtils.getJsonString(request.getJbody());
+            JSONObject requestJson = new JSONObject(jsonString);
+            System.out.println("Request Body: " + requestJson.toString());
+            
+			List<Transactions> content = transactionsRepo.findAll(PageRequest.of(0, 5))	.getContent();
+			if (content.isEmpty()) {
+				response.setResponseCode("01");
+				response.setResponseMessage("No transactions found");
+				response.setResponseData(null);
+				return response;
+			} else {
+				response.setResponseCode("00");
+				response.setResponseMessage("Transactions fetched successfully");
+				response.setResponseData(content);
+				return response;
+			}
+
+			// Placeholder response	
         
-        	 response.setResponseCode("01");
-             response.setResponseMessage("Mini Statement not implemented yet");
-             response.setResponseData(null);
+        	
+      
         }catch(Exception e) {
         	e.printStackTrace();
         }
@@ -66,9 +94,25 @@ public class ServiceBusinessService {
     public ResponseData fullStatement(RequestData request) {
         ResponseData response = new ResponseData();
         try {
-        response.setResponseCode("01");
-        response.setResponseMessage("Full Statement not implemented yet");
-        response.setResponseData(null);
+        	String jsonString = ConvertRequestUtils.getJsonString(request.getJbody());
+            JSONObject requestJson = new JSONObject(jsonString);
+            System.out.println("Request Body: " + requestJson.toString());
+        List<Transactions> all =transactionsRepo.findByAcctNoAndTxnDate(requestJson.getString("accountNumber"), requestJson.getString("txnDate"));
+        
+		if (all.isEmpty()) {
+			response.setResponseCode("01");
+			response.setResponseMessage("No transactions found");
+			response.setResponseData(null);
+			return response;
+		}
+		else {
+			response.setResponseCode("00");
+			response.setResponseMessage("Transactions fetched successfully");
+			response.setResponseData(all);
+			return response;
+		}
+        
+       
         }catch(Exception e) {
         	e.printStackTrace();
         }
@@ -79,9 +123,22 @@ public class ServiceBusinessService {
     public ResponseData instantReceipts(RequestData request) {
         ResponseData response = new ResponseData();
         try{
-        	response.setResponseCode("01");
+        	  String jsonString = ConvertRequestUtils.getJsonString(request.getJbody());
+              JSONObject requestJson = new JSONObject(jsonString);
+              System.out.println("Request Body: " + requestJson.toString());
+        	
+        	
+        	Transactions byPaymentReference = transactionsRepo.findByPaymentReference(requestJson.getString("paymentReference"));
+        	if(byPaymentReference==null) {
+        		response.setResponseCode("01");
+        	
 			response.setResponseMessage("Instant Receipts not implemented yet");
 			response.setResponseData(null);
+		} else {
+			response.setResponseCode("00");
+			response.setResponseMessage("Transaction fetched successfully");
+			response.setResponseData(byPaymentReference);
+		}
         }catch(Exception e) {
 			e.printStackTrace();
 			}
