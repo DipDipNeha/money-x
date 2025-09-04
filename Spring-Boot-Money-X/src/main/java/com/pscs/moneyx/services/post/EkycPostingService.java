@@ -18,17 +18,18 @@ public class EkycPostingService {
 
 	private ResourceBundle bundle = ResourceBundle.getBundle("ekyc");
 
-	public JSONObject sendPostRequest(String jsonBody) {
+	public JSONObject sendPostRequest(String jsonBody, String urlType) {
 		JSONObject responseJson = new JSONObject();
 		try {
-			String apiKey = bundle.getString("ekyc.apiKey");
+			String apiKey = bundle.getString("API_KEY");
 			String url = bundle.getString("ekyc.url");
 
 			System.out.println("EKYC URL" + url + "\n Api Key" + apiKey + "\n Request " + jsonBody);
 			RestTemplate restTemplate = new RestTemplate();
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_JSON);
-			headers.set("Authorization", "App " + apiKey);
+			headers.set("Authorization", bundle.getString("SECRET_KEY"));
+			headers.set("AppId", apiKey);
 
 			HttpEntity<String> entity = new HttpEntity<>(jsonBody, headers);
 
@@ -48,9 +49,16 @@ public class EkycPostingService {
 				responseJson.put("respmsg", "Failed");
 				responseJson.put("data", response.getBody());
 			}
+		} catch (HttpClientErrorException.NotFound e) {
+			System.err.println("Error: Resource not found - " + e.getResponseBodyAsString());
+			responseJson.put("respcode", "404");
+			responseJson.put("respmsg", "Resource not found");
+			responseJson.put("data", e.getResponseBodyAsString());
 		} catch (Exception e) {
 			e.printStackTrace();
-
+			responseJson.put("respcode", "500");
+			responseJson.put("respmsg", "Internal Server Error");
+			responseJson.put("data", e.getMessage());
 		}
 		return responseJson;
 	}
@@ -103,4 +111,5 @@ public class EkycPostingService {
 		return responseJson;
 
 	}
+
 }

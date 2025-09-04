@@ -240,6 +240,26 @@ public class CustomerBusinessService {
 			otpDataTabl.setTransType(jHeader.getString("requestType"));
 			otpDataTabl.setMobileNo(jsonObject.getString("mobileNumber"));
 			otpDataTabl.setEmailId(jsonObject.getString("email"));
+			
+			//get email from db if email is blank
+			if (otpDataTabl.getEmailId() == null || otpDataTabl.getEmailId().isEmpty()) {
+				MoneyXBusiness business = moneyXBusinessRepo.findByUserName(jHeader.getString("userid")).orElse(null);
+				if (business != null) {
+					otpDataTabl.setEmailId(business.getOwnerEmail());
+				}
+			}
+			// get phone from db if phone is blank
+			if (otpDataTabl.getMobileNo() == null || otpDataTabl.getMobileNo().isEmpty()) {
+				MoneyXBusiness business = moneyXBusinessRepo.findByUserName(jHeader.getString("userid")).orElse(null);
+				if (business != null) {
+					otpDataTabl.setMobileNo(business.getOwnerPhone());
+				}
+			}
+			
+			
+			
+			
+			
 			otpDataTabl.setChannel(jHeader.getString("channel"));
 			otpDataTabl.setOtpStatus("A");
 

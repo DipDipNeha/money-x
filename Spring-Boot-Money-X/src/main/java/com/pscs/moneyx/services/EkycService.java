@@ -16,12 +16,10 @@ import com.pscs.moneyx.services.post.EkycPostingService;
 public class EkycService {
 	private static Logger logger = Logger.getLogger(EkycService.class);
 	private final EkycPostingService ekycPostingService;
-	
 
 	public EkycService(EkycPostingService ekycPostingService) {
 		this.ekycPostingService = ekycPostingService;
 	}
-
 
 	public ResponseData doEkyc(RequestData request) {
 		ResponseData responseData = new ResponseData();
@@ -40,8 +38,7 @@ public class EkycService {
 				responseData.setResponseMessage("Business Country is missing");
 				responseData.setResponseCode("400");
 				return responseData;
-			}
-			else if (businessCountry.equalsIgnoreCase("NG")) {
+			} else if (businessCountry.equalsIgnoreCase("NG")) {
 				if (ekycType == null || ekycType.isEmpty()) {
 					responseData.setResponseMessage("Ekyc Type is missing");
 					responseData.setResponseCode("400");
@@ -60,7 +57,7 @@ public class EkycService {
 
 				} else if (ekycType.equalsIgnoreCase("NUBAN")) {
 					urlType = "LOOKUP_BY_NUBAN_EKY_URL";
-					params = "?account_number=" + ekycNumber+ "&bank_code="+jsonObject.getString("bankCode");
+					params = "?account_number=" + ekycNumber + "&bank_code=" + jsonObject.getString("bankCode");
 
 				} else if (ekycType.equalsIgnoreCase("DL")) {
 					urlType = "LOOKUP_BY_DL_URL";
@@ -70,15 +67,14 @@ public class EkycService {
 					urlType = "LOOKUP_BY_VOTER_URL";
 					params = "?vin=" + ekycNumber;
 
-				}
-				else {
+				} else {
 					responseData.setResponseMessage("Invalid Ekyc Type");
 					responseData.setResponseCode("400");
 					return responseData;
 				}
 
-				JSONObject sendGetRequest = ekycPostingService.sendGetRequest(jsonString, urlType,  params);
-				// need to write business code here 
+				JSONObject sendGetRequest = ekycPostingService.sendGetRequest(jsonString, urlType, params);
+				// need to write business code here
 				if (sendGetRequest.getString("respcode").equalsIgnoreCase("200")) {
 					responseData.setResponseCode("00");
 					responseData.setResponseMessage("Ekyc processed successfully");
@@ -226,7 +222,7 @@ public class EkycService {
 					responseData.setResponseCode(sendGetRequest.getString("respcode"));
 					return responseData;
 				}
-			} //GH
+			} // GH
 			else if (businessCountry.equalsIgnoreCase("UG")) {
 				if (ekycType == null || ekycType.isEmpty()) {
 					responseData.setResponseMessage("Ekyc Type is missing");
@@ -261,7 +257,7 @@ public class EkycService {
 					responseData.setResponseCode(sendGetRequest.getString("respcode"));
 					return responseData;
 				}
-			} else if(businessCountry.equalsIgnoreCase("ZI")) {
+			} else if (businessCountry.equalsIgnoreCase("ZI")) {
 				if (ekycType == null || ekycType.isEmpty()) {
 					responseData.setResponseMessage("Ekyc Type is missing");
 					responseData.setResponseCode("400");
@@ -329,16 +325,14 @@ public class EkycService {
 					responseData.setResponseCode(sendGetRequest.getString("respcode"));
 					return responseData;
 				}
-				
+
 			}
-			
+
 			else {
 				responseData.setResponseMessage("Invalid Business Country");
 				responseData.setResponseCode("400");
 				return responseData;
 			}
-			
-			
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -348,5 +342,122 @@ public class EkycService {
 		}
 		return responseData;
 	}
-	
+
+	public ResponseData verifyDocument(RequestData request) {
+		ResponseData responseData = new ResponseData();
+		try {
+			logger.info("Request : " + request);
+			String jsonString = ConvertRequestUtils.getJsonString(request.getJbody());
+			logger.info("Request Json String : " + jsonString);
+			JSONObject jsonObject = new JSONObject(jsonString);
+			JSONObject sendGetRequest = ekycPostingService.sendPostRequest(jsonObject.toString(), "DOCUMENT_VERIFICATION_URL");
+			// need to write business code here
+			if (sendGetRequest.getString("respcode").equalsIgnoreCase("200")) {
+				responseData.setResponseCode("00");
+				responseData.setResponseMessage("Document verified successfully");
+				responseData.setResponseData(sendGetRequest.toMap());
+			} else {
+				responseData.setResponseMessage(sendGetRequest.getString("respmsg"));
+				responseData.setResponseCode(sendGetRequest.getString("respcode"));
+				return responseData;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			responseData.setResponseMessage("Failed to verify document");
+			responseData.setResponseCode("500");
+			return responseData;
+		}
+
+		return responseData;
+	}
+
+	public ResponseData businessDocVerify(RequestData request) {
+		ResponseData responseData = new ResponseData();
+		try {
+			logger.info("Request : " + request);
+			String jsonString = ConvertRequestUtils.getJsonString(request.getJbody());
+			logger.info("Request Json String : " + jsonString);
+			JSONObject jsonObject = new JSONObject(jsonString);
+			JSONObject sendGetRequest = ekycPostingService.sendPostRequest(jsonObject.toString(), "BUSINESS_DOC_URL");
+			if (sendGetRequest.getString("respcode").equalsIgnoreCase("200")) {
+				responseData.setResponseCode("00");
+				responseData.setResponseMessage("Face verified successfully");
+				responseData.setResponseData(sendGetRequest.toMap());
+			} else {
+				responseData.setResponseMessage(sendGetRequest.getString("respmsg"));
+				responseData.setResponseCode(sendGetRequest.getString("respcode"));
+				return responseData;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			responseData.setResponseMessage("Failed to verify Business document");
+			responseData.setResponseCode("500");
+			return responseData;
+		}
+
+		return responseData;
+	}
+
+	public ResponseData livelinessCheck(RequestData request) {
+		ResponseData responseData = new ResponseData();
+		try {
+			logger.info("Request : " + request);
+			String jsonString = ConvertRequestUtils.getJsonString(request.getJbody());
+			logger.info("Request Json String : " + jsonString);
+			JSONObject jsonObject = new JSONObject(jsonString);
+			JSONObject sendGetRequest = ekycPostingService.sendPostRequest(jsonObject.toString(), "LIVENESS_URL");
+			if (sendGetRequest.getString("respcode").equalsIgnoreCase("200")) {
+				responseData.setResponseCode("00");
+				responseData.setResponseMessage("Face verified successfully");
+				responseData.setResponseData(sendGetRequest.toMap());
+			} else {
+				responseData.setResponseMessage(sendGetRequest.getString("respmsg"));
+				responseData.setResponseCode(sendGetRequest.getString("respcode"));
+				return responseData;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			responseData.setResponseMessage("Failed to verify face");
+			responseData.setResponseCode("500");
+			return responseData;
+		}
+
+		return responseData;
+	}
+
+	public ResponseData accountEnquiry(RequestData requestBody) {
+		ResponseData responseData = new ResponseData();
+		try {
+			logger.info("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			logger.info("Request Json String : " + jsonString);
+			JSONObject jsonObject = new JSONObject(jsonString);
+			
+			String params = "?account_number=" + jsonObject.getString("accountNumber") + "&bank_code=" + jsonObject.getString("bankCode");
+			
+			
+			JSONObject sendGetRequest = ekycPostingService.sendGetRequest(jsonObject.toString(),
+					"ACCOUNT_ENQUIRY_URL",params);
+			// need to write business code here
+			if (sendGetRequest.getString("respcode").equalsIgnoreCase("200")) {
+				responseData.setResponseCode("00");
+				responseData.setResponseMessage("Account enquiry processed successfully");
+				responseData.setResponseData(sendGetRequest.toMap());
+			} else {
+				responseData.setResponseMessage(sendGetRequest.getString("respmsg"));
+				responseData.setResponseCode(sendGetRequest.getString("respcode"));
+				return responseData;
+			}
+			
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			responseData.setResponseMessage("Failed to process account enquiry");
+			responseData.setResponseCode("500");
+			return responseData;
+		}
+		
+		return null;
+	}
+
 }
