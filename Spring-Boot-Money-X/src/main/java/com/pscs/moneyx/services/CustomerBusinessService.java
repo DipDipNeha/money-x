@@ -151,11 +151,11 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			// Convert the request body to a JSON object
-			System.out.println("Request : " + request);
+			logger.info("Request : " + request);
 			String jsonString = ConvertRequestUtils.getJsonString(request.getJbody());
 
 			JSONObject jsonObject = new JSONObject(jsonString);
-			System.out.println("Request Body: " + jsonObject.toString());
+			logger.info("Request Body: " + jsonObject.toString());
 
 			MoneyXBusiness customerLogin = new MoneyXBusiness();
 
