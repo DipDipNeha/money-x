@@ -1,5 +1,6 @@
 package com.pscs.moneyx.repo;
 
+
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,7 +14,7 @@ public interface TransactionsRepo extends JpaRepository <Transactions, Long> {
 	
 	List<Transactions> findByAcctNo(String acctNo);
 	List<Transactions> findByAcctNoAndTxnDate(String acctNo, String txnDate);
-	Transactions findByAcctNoAndTxnDate(String paymentReference);
+//	Transactions findByAcctNoAndTxnDate(String actcNo, String txnDate, String paymentReference);
 	Transactions findByPaymentReference(String paymentReference);
 	
 	
