@@ -51,8 +51,10 @@ public class AspectProcessing {
 
 		Object[] args = process.getArgs();
 
+		
 		Object proceed = process.proceed();
 
+		
 		try {
 	        if (args.length > 0) {
 	            System.err.println("Argument type: " + args[0].getClass().getName());

@@ -22,7 +22,7 @@ public class EkycPostingService {
 		JSONObject responseJson = new JSONObject();
 		try {
 			String apiKey = bundle.getString("API_KEY");
-			String url = bundle.getString("ekyc.url");
+			String url = bundle.getString(urlType);
 
 			System.out.println("EKYC URL" + url + "\n Api Key" + apiKey + "\n Request " + jsonBody);
 			RestTemplate restTemplate = new RestTemplate();

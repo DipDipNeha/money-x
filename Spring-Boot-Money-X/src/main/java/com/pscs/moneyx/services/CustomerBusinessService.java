@@ -71,13 +71,13 @@ public class CustomerBusinessService {
 		int maxRetryLoginAttempt = 3;
 		int retryLoginAttempt = 0;
 		try {
-
+			
 			logger.info("Request : " + request);
 			String jsonString = ConvertRequestUtils.getJsonString(request.getJbody());
 			// Convert the request body to a JSON object
 			JSONObject requestJson = new JSONObject(jsonString);
-			System.out.println("Request Body: " + requestJson.toString());
-
+			logger.info("Request Body: " + requestJson.toString());
+			
 			MoneyXBusiness checkCustomerres = moneyXBusinessRepo.findByUserName(requestJson.getString("username"))
 					.orElseThrow(() -> new ResourceNotFoundException(
 							"No Data Found By this Username: " + requestJson.getString("username")));
@@ -91,7 +91,7 @@ public class CustomerBusinessService {
 					response.setResponseMessage("Your Account is Inactive Please Contact Admin");
 					return response;
 				}
-				if (checkCustomerres.getIsLocked().equals("Y")) {
+				if (checkCustomerres.getIsLocked().equals("L")) {
 					response.setResponseCode("01");
 					response.setResponseMessage("Your Account is Locked Please Contact Admin");
 					return response;
@@ -191,6 +191,9 @@ public class CustomerBusinessService {
 			customerLogin.setIsLocked("N");
 			customerLogin.setIsLoginAttemptActive("N");
 			customerLogin.setRetryLoginAttempt(0);
+			
+			
+			
 
 			MoneyXBusiness customer = moneyXBusinessRepo.findByAccountNumber(jsonObject.getString("accountNumber"));
 			if (customer == null) {
