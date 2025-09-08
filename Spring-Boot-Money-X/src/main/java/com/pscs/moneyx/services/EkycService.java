@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import com.pscs.moneyx.helper.ConvertRequestUtils;
+import com.pscs.moneyx.helper.CoreConstant;
 import com.pscs.moneyx.model.RequestData;
 import com.pscs.moneyx.model.ResponseData;
 import com.pscs.moneyx.services.post.EkycPostingService;
@@ -137,8 +138,8 @@ public class EkycService {
 	    ResponseData responseData = new ResponseData();
 	    String responseCode = apiResponse.optString("respcode");
 	    if ("200".equalsIgnoreCase(responseCode)) {
-	        responseData.setResponseCode("00");
-	        responseData.setResponseMessage("Ekyc processed successfully");
+	        responseData.setResponseCode(CoreConstant.SUCCESS_CODE);
+	        responseData.setResponseMessage(CoreConstant.SUCCESS);
 	        responseData.setResponseData(apiResponse.toMap());
 	    } else {
 	        responseData.setResponseCode(responseCode);
@@ -156,8 +157,8 @@ public class EkycService {
 			JSONObject sendGetRequest = ekycPostingService.sendPostRequest(jsonObject.toString(), "DOCUMENT_VERIFICATION_URL");
 			// need to write business code here
 			if (sendGetRequest.getString("respcode").equalsIgnoreCase("200")) {
-				responseData.setResponseCode("00");
-				responseData.setResponseMessage("Document verified successfully");
+				responseData.setResponseCode(CoreConstant.SUCCESS_CODE);
+				responseData.setResponseMessage(CoreConstant.SUCCESS);
 				responseData.setResponseData(sendGetRequest.toMap());
 			} else {
 				responseData.setResponseMessage(sendGetRequest.getString("respmsg"));
@@ -166,7 +167,7 @@ public class EkycService {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			responseData.setResponseMessage("Failed to verify document");
+			responseData.setResponseMessage(CoreConstant.ERROR);
 			responseData.setResponseCode("500");
 			return responseData;
 		}
@@ -183,8 +184,8 @@ public class EkycService {
 			JSONObject jsonObject = new JSONObject(jsonString);
 			JSONObject sendGetRequest = ekycPostingService.sendPostRequest(jsonObject.toString(), "BUSINESS_DOC_URL");
 			if (sendGetRequest.getString("respcode").equalsIgnoreCase("200")) {
-				responseData.setResponseCode("00");
-				responseData.setResponseMessage("Face verified successfully");
+				responseData.setResponseCode(CoreConstant.SUCCESS_CODE);
+				responseData.setResponseMessage(CoreConstant.SUCCESS);
 				responseData.setResponseData(sendGetRequest.toMap());
 			} else {
 				responseData.setResponseMessage(sendGetRequest.getString("respmsg"));
@@ -193,7 +194,7 @@ public class EkycService {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			responseData.setResponseMessage("Failed to verify Business document");
+			responseData.setResponseMessage(CoreConstant.ERROR);
 			responseData.setResponseCode("500");
 			return responseData;
 		}
@@ -210,8 +211,8 @@ public class EkycService {
 			JSONObject jsonObject = new JSONObject(jsonString);
 			JSONObject sendGetRequest = ekycPostingService.sendPostRequest(jsonObject.toString(), "LIVENESS_URL");
 			if (sendGetRequest.getString("respcode").equalsIgnoreCase("200")) {
-				responseData.setResponseCode("00");
-				responseData.setResponseMessage("Face verified successfully");
+				responseData.setResponseCode(CoreConstant.SUCCESS_CODE);
+				responseData.setResponseMessage(CoreConstant.SUCCESS);
 				responseData.setResponseData(sendGetRequest.toMap());
 			} else {
 				responseData.setResponseMessage(sendGetRequest.getString("respmsg"));
@@ -220,7 +221,7 @@ public class EkycService {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			responseData.setResponseMessage("Failed to verify face");
+			responseData.setResponseMessage(CoreConstant.ERROR);
 			responseData.setResponseCode("500");
 			return responseData;
 		}
@@ -243,8 +244,8 @@ public class EkycService {
 					"ACCOUNT_ENQUIRY_URL",params);
 			// need to write business code here
 			if (sendGetRequest.getString("respcode").equalsIgnoreCase("200")) {
-				responseData.setResponseCode("00");
-				responseData.setResponseMessage("Account enquiry processed successfully");
+				responseData.setResponseCode(CoreConstant.SUCCESS_CODE);
+				responseData.setResponseMessage(CoreConstant.SUCCESS);
 				responseData.setResponseData(sendGetRequest.toMap());
 			} else {
 				responseData.setResponseMessage(sendGetRequest.getString("respmsg"));
@@ -255,7 +256,7 @@ public class EkycService {
 		}
 		catch (Exception e) {
 			e.printStackTrace();
-			responseData.setResponseMessage("Failed to process account enquiry");
+			responseData.setResponseMessage(CoreConstant.ERROR);
 			responseData.setResponseCode("500");
 			return responseData;
 		}

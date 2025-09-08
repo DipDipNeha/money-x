@@ -15,6 +15,7 @@ import com.pscs.moneyx.entity.MoneyXBusiness;
 import com.pscs.moneyx.entity.OtpDataTabl;
 import com.pscs.moneyx.entity.WalletAcctData;
 import com.pscs.moneyx.helper.ConvertRequestUtils;
+import com.pscs.moneyx.helper.CoreConstant;
 import com.pscs.moneyx.model.ImageUpload;
 import com.pscs.moneyx.model.RequestData;
 import com.pscs.moneyx.model.ResponseData;
@@ -27,7 +28,7 @@ import com.pscs.moneyx.repo.DocumentRepo;
 import com.pscs.moneyx.repo.MoneyXBusinessRepo;
 import com.pscs.moneyx.repo.OtpDataTablRepo;
 import com.pscs.moneyx.repo.WalletAcctDataRepository;
-import com.pscs.moneyx.services.post.SMSPostingService;
+import com.pscs.moneyx.services.post.EmailAndSMSPostingService;
 import com.pscs.moneyx.utils.CommonUtils;
 
 import jakarta.transaction.Transactional;
@@ -42,14 +43,14 @@ public class CustomerBusinessService {
 	private final CustomerDocInfoRepo customerDocInfoRepo;
 	private final DocumentRepo documentRepo;
 	private final OtpDataTablRepo otpDataTablRepo;
-	private final SMSPostingService smsPostingService;
+	private final EmailAndSMSPostingService smsPostingService;
 	private final MoneyXBusinessRepo moneyXBusinessRepo;
 	private final WalletAcctDataRepository walletAcctDataRepository;
 
 	public CustomerBusinessService(CustomerLoginRepo customerLoginRepo, CountryRepo countryRepo,
 			BusinessTypeRepo businessTypeRepo, BusinessRoleRepo businessRoleRepo,
 			CustomerDocInfoRepo customerDocInfoRepo, DocumentRepo documentRepo, OtpDataTablRepo otpDataTablRepo,
-			SMSPostingService smsPostingService, MoneyXBusinessRepo moneyXBusinessRepo,
+			EmailAndSMSPostingService smsPostingService, MoneyXBusinessRepo moneyXBusinessRepo,
 			WalletAcctDataRepository walletAcctDataRepository) {
 		this.customerLoginRepo = customerLoginRepo;
 		this.countryRepo = countryRepo;
@@ -87,13 +88,13 @@ public class CustomerBusinessService {
 				retryLoginAttempt = checkCustomerres.getRetryLoginAttempt();
 
 				if (checkCustomerres.getIsActive().equals("N")) {
-					response.setResponseCode("01");
-					response.setResponseMessage("Your Account is Inactive Please Contact Admin");
+					response.setResponseCode(CoreConstant.FAILURE_CODE);
+					response.setResponseMessage(CoreConstant.INACTIVE_AC);
 					return response;
 				}
 				if (checkCustomerres.getIsLocked().equals("L")) {
-					response.setResponseCode("01");
-					response.setResponseMessage("Your Account is Locked Please Contact Admin");
+					response.setResponseCode(CoreConstant.FAILURE_CODE);
+					response.setResponseMessage(CoreConstant.ACCOUNT_LOCKED);
 					return response;
 				}
 
@@ -102,15 +103,15 @@ public class CustomerBusinessService {
 				// check if user exist
 				if (checkCustomerres == null) {
 
-					response.setResponseCode("01");
-					response.setResponseMessage("Login Failed");
+					response.setResponseCode(CoreConstant.FAILURE_CODE);
+					response.setResponseMessage(CoreConstant.INVALID_CREDENTIALS);
 
 					if (isLoginAttemptActive.equals("Y")) {
 
 						if (retryLoginAttempt >= maxRetryLoginAttempt) {
 							moneyXBusinessRepo.updateIsLockedByUserName("L", requestJson.getString("username"));
-							response.setResponseCode("01");
-							response.setResponseMessage("Your Account is Locked Please Contact Admin");
+							response.setResponseCode(CoreConstant.FAILURE_CODE);
+							response.setResponseMessage(CoreConstant.ACCOUNT_LOCKED);
 							return response;
 						} else {
 							response.setResponseMessage("Invalid Username or Password You Have "
@@ -124,8 +125,8 @@ public class CustomerBusinessService {
 				} else {
 					checkCustomerres.setLastLoginTime(new Date() + "");
 
-					response.setResponseCode("00");
-					response.setResponseMessage("Login Successful");
+					response.setResponseCode(CoreConstant.SUCCESS_CODE);
+					response.setResponseMessage(CoreConstant.LOGIN_SUCCESSFUL);
 					response.setResponseData(checkCustomerres);
 					if (isLoginAttemptActive.equals("Y")) {
 						moneyXBusinessRepo.resetRetryLoginAttempt(checkCustomerres.getUserName());
@@ -134,7 +135,7 @@ public class CustomerBusinessService {
 
 			} else {
 				response.setResponseCode("01");
-				response.setResponseMessage("Invalid Username!");
+				response.setResponseMessage(CoreConstant.USER_NOT_FOUND);
 				return response;
 			}
 
@@ -202,18 +203,18 @@ public class CustomerBusinessService {
 				System.out.println(customer);
 
 				if (customer == null) {
-					response.setResponseCode("01");
-					response.setResponseMessage("Profile Creation Failed");
+					response.setResponseCode(CoreConstant.FAILURE_CODE);
+					response.setResponseMessage(CoreConstant.FAILED + " to Create Profile");
 
 				} else {
-					response.setResponseCode("00");
-					response.setResponseMessage("Profile Created Successfully");
+					response.setResponseCode(CoreConstant.SUCCESS_CODE);
+					response.setResponseMessage(CoreConstant.SUCCESS + " Profile Created Successfully");
 					response.setResponseData(customer);
 				}
 			} else {
-				response.setResponseCode("01");
+				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(
-						"This Account Profile Already Exist On System +" + jsonObject.getString("accountNumber"));
+						CoreConstant.RECORD_ALREADY_EXISTS+":" + jsonObject.getString("accountNumber"));
 			}
 
 		} catch (Exception e) {
@@ -269,8 +270,8 @@ public class CustomerBusinessService {
 			OtpDataTabl save = otpDataTablRepo.save(otpDataTabl);
 
 			if (save == null) {
-				response.setResponseCode("01");
-				response.setResponseMessage("OTP Generation Failed");
+				response.setResponseCode(CoreConstant.FAILURE_CODE);
+				response.setResponseMessage(CoreConstant.FAILED + " to Generate OTP");
 				return response;
 			} else {
 				JSONObject smsRequest = new JSONObject();
@@ -280,32 +281,39 @@ public class CustomerBusinessService {
 							jHeader.getString("requestType"), otp));
 
 				} else {
-					response.setResponseCode("00");
-					response.setResponseMessage("SMS Sent Successfully " + otp);
+					response.setResponseCode(CoreConstant.SUCCESS_CODE);
+					response.setResponseMessage(CoreConstant.SMS_SENT + otp);
 					return response;
 				}
 
-				response.setResponseMessage("OTP Generated Successfully " + otp);
-				response.setResponseCode("00");
-				JSONObject sendPostRequest = smsPostingService.sendPostRequest(smsRequest.toString());
+				response.setResponseMessage(CoreConstant.OTP_SENT + otp);
+				response.setResponseCode(CoreConstant.SUCCESS_CODE);
+				JSONObject sendSMSRes = smsPostingService.sendPostRequest(smsRequest.toString(),"sms.url");
+				
+				JSONObject emailRequest = new JSONObject();
+				
+				emailRequest.put("messages", ConvertRequestUtils.generateEmailJson(otpDataTabl.getEmailId(),
+						"MoneyX One Time Password", "Dear Customer, Your OTP is " + otp));
+				
+				JSONObject sendMailRes = smsPostingService.sendPostRequest(emailRequest.toString(),"email.url");
 
-				if (sendPostRequest.getString("respsode").equals("200")) {
-					response.setResponseCode("00");
-					response.setResponseMessage("SMS Sent Successfully " + otp);
-					response.setResponseData(sendPostRequest.toMap());
+				if (sendSMSRes.getString("respsode").equals("200")) {
+					response.setResponseCode(CoreConstant.SUCCESS_CODE);
+					response.setResponseMessage(CoreConstant.SMS_SENT + otp);
+					response.setResponseData(sendSMSRes.toMap());
 
 				} else {
-					response.setResponseCode("01");
-					response.setResponseMessage("Failed to Send SMS");
-					response.setResponseData(sendPostRequest.toMap());
+					response.setResponseCode(CoreConstant.FAILURE_CODE);
+					response.setResponseMessage(CoreConstant.FAILED + " to send SMS");
+					response.setResponseData(sendSMSRes.toMap());
 				}
 
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			response.setResponseCode("01");
-			response.setResponseMessage("Failed to Generate OTP");
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED );
 
 		}
 		return response;
@@ -341,35 +349,35 @@ public class CustomerBusinessService {
 				if (timeDifference > CommonUtils.OTP_VALIDITY_DURATION) {
 					otpDataTabl.setOtpStatus("E"); // Set status to Expired
 					otpDataTablRepo.save(otpDataTabl);
-					response.setResponseCode("01");
-					response.setResponseMessage("OTP Expired or Invalid");
+					response.setResponseCode(CoreConstant.FAILURE_CODE);
+					response.setResponseMessage(CoreConstant.EXPIRED_OTP);
 					return response;
 				}
 			}
 
 			if (otpDataTabl == null) {
-				response.setResponseCode("01");
-				response.setResponseMessage("Invalid OTP");
+				response.setResponseCode(CoreConstant.FAILURE_CODE);
+				response.setResponseMessage(CoreConstant.INVALID_OTP);
 				return response;
 			} else if (otpDataTabl.getOtpStatus().equals("A")) {
-				response.setResponseCode("00");
-				response.setResponseMessage("OTP Validated Successfully");
+				response.setResponseCode(CoreConstant.SUCCESS_CODE);
+				response.setResponseMessage(CoreConstant.OTP_VERIFIED);
 				// if success the update the oto status to S
 				otpDataTabl.setOtpStatus("S");
 				otpDataTablRepo.save(otpDataTabl);
 
 			} else if (otpDataTabl.getOtpStatus().equals("S")) {
-				response.setResponseCode("01");
-				response.setResponseMessage("OTP Already Used");
+				response.setResponseCode(CoreConstant.FAILURE_CODE);
+				response.setResponseMessage(CoreConstant.OTP_USED);
 			} else if (otpDataTabl.getOtpStatus().equals("E")) {
-				response.setResponseCode("01");
-				response.setResponseMessage("OTP Expired or Invalid");
+				response.setResponseCode(CoreConstant.FAILURE_CODE);
+				response.setResponseMessage(CoreConstant.EXPIRED_OTP);
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			response.setResponseCode("01");
-			response.setResponseMessage("Failed to Validate OTP");
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + " to Validate OTP");
 		}
 		return response;
 	}
@@ -391,7 +399,7 @@ public class CustomerBusinessService {
 			String mobileNumber = requestJson.getString("mobileNumber");
 
 			ResponseData validateOtp = validateOtp(request);
-			if (!validateOtp.getResponseCode().equals("00")) {
+			if (!validateOtp.getResponseCode().equals(CoreConstant.SUCCESS_CODE)) {
 				return validateOtp; // Return if OTP validation fails
 			} else {
 				String oldPassword = CommonUtils.b64_sha256(requestJson.getString("password"));
@@ -400,21 +408,21 @@ public class CustomerBusinessService {
 				MoneyXBusiness customerLogin = moneyXBusinessRepo.findByUserNameAndPassword(username, oldPassword);
 
 				if (customerLogin == null) {
-					response.setResponseCode("01");
-					response.setResponseMessage("Invalid Username or Password");
+					response.setResponseCode(CoreConstant.FAILURE_CODE);
+					response.setResponseMessage(CoreConstant.INVALID_CREDENTIALS);
 
 				} else {
 					customerLogin.setPassword(newPassword);
 					moneyXBusinessRepo.save(customerLogin);
 
-					response.setResponseCode("00");
-					response.setResponseMessage("Password Updated Successfully");
+					response.setResponseCode(CoreConstant.SUCCESS_CODE);
+					response.setResponseMessage(CoreConstant.PASSWORD_CHANGED );
 				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			response.setResponseCode("01");
-			response.setResponseMessage("Failed to Update Password");
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + " to Change Password");
 		}
 		return response;
 	}
@@ -437,12 +445,12 @@ public class CustomerBusinessService {
 				countries.add(country);
 			});
 			response.setResponseData(countries);
-			response.setResponseCode("00");
-			response.setResponseMessage("Countries fetched successfully");
+			response.setResponseCode(CoreConstant.SUCCESS_CODE);
+			response.setResponseMessage(CoreConstant.SUCCESS );
 		} catch (Exception e) {
 			e.printStackTrace();
-			response.setResponseCode("01");
-			response.setResponseMessage("Failed to fetch countries");
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + " to fetch countries");
 		}
 
 		return response;
@@ -460,13 +468,13 @@ public class CustomerBusinessService {
 
 			jsonObject.put("businessTypes", businessTypes);
 			response.setResponseData(jsonObject.toMap());
-			response.setResponseCode("00");
-			response.setResponseMessage("Business types fetched successfully");
+			response.setResponseCode(CoreConstant.SUCCESS_CODE);
+			response.setResponseMessage(CoreConstant.SUCCESS );
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			response.setResponseCode("01");
-			response.setResponseMessage("Failed to fetch business types");
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + " to fetch business types");
 		}
 		return response;
 	}
@@ -479,12 +487,12 @@ public class CustomerBusinessService {
 				roles.add(role.getRoleName());
 			});
 			response.setResponseData(roles);
-			response.setResponseCode("00");
-			response.setResponseMessage("Roles fetched successfully");
+			response.setResponseCode(CoreConstant.SUCCESS_CODE);
+			response.setResponseMessage(CoreConstant.SUCCESS );
 		} catch (Exception e) {
 			e.printStackTrace();
-			response.setResponseCode("01");
-			response.setResponseMessage("Failed to fetch roles");
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + " to fetch roles");
 		}
 
 		return response;
@@ -507,19 +515,19 @@ public class CustomerBusinessService {
 			resjson.put("docUploadId", docId);
 
 			if (saveresponse == null) {
-				response.setResponseCode("01");
-				response.setResponseMessage("Failed to upload image");
+				response.setResponseCode(CoreConstant.FAILURE_CODE);
+				response.setResponseMessage(CoreConstant.FAILED + " to upload image");
 				return response;
 			} else {
 
-				response.setResponseCode("00");
-				response.setResponseMessage("Image uploaded successfully");
+				response.setResponseCode(CoreConstant.SUCCESS_CODE);
+				response.setResponseMessage(CoreConstant.SUCCESS );
 				response.setResponseData(resjson.toMap());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			response.setResponseCode("01");
-			response.setResponseMessage("Failed to upload image: " + e.getMessage());
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
 			return response;
 		}
 
@@ -544,13 +552,13 @@ public class CustomerBusinessService {
 
 			jsonObject.put("documentTypes", documentTypes);
 			response.setResponseData(jsonObject.toMap());
-			response.setResponseCode("00");
-			response.setResponseMessage("Document types fetched successfully");
+			response.setResponseCode(CoreConstant.SUCCESS_CODE);
+			response.setResponseMessage(CoreConstant.SUCCESS );
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			response.setResponseCode("01");
-			response.setResponseMessage("Failed to fetch document types: " + e.getMessage());
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
 		}
 
 		return response;
@@ -571,19 +579,19 @@ public class CustomerBusinessService {
 			// fetch wallet account data by account number
 			WalletAcctData byAcctNo = walletAcctDataRepository.findByAcctNo(accountNo);
 			if (byAcctNo != null) {
-				response.setResponseCode("00");
-				response.setResponseMessage("Account balance fetched successfully");
+				response.setResponseCode(CoreConstant.SUCCESS_CODE);
+				response.setResponseMessage(CoreConstant.SUCCESS );
 				response.setResponseData(byAcctNo);
 				return response;
 			} else {
-				response.setResponseCode("01");
-				response.setResponseMessage("No account found with the provided account number");
+				response.setResponseCode(CoreConstant.FAILURE_CODE);
+				response.setResponseMessage(CoreConstant.DATA_NOT_FOUND + " for account number: " + accountNo);
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			response.setResponseCode("01");
-			response.setResponseMessage("Failed to fetch account balance: " + e.getMessage());
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
 		}
 		return response;
 	}

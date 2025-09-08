@@ -13,6 +13,7 @@ import com.pscs.moneyx.model.RequestData;
 import com.pscs.moneyx.model.ResponseData;
 import com.pscs.moneyx.repo.TransactionsRepo;
 import com.pscs.moneyx.repo.WalletAcctDataRepository;
+import com.pscs.moneyx.helper.CoreConstant;
 
 @Service
 public class ServiceBusinessService {
@@ -40,12 +41,12 @@ public class ServiceBusinessService {
         WalletAcctData wallet = walletRepo.findByAcctNo(accountNumber);
 
         if (wallet == null) {
-            response.setResponseCode("01");
-            response.setResponseMessage("Failed Balance fetched ");
+            response.setResponseCode(CoreConstant.FAILURE_CODE);
+            response.setResponseMessage(CoreConstant.FAILED);
             response.setResponseData("Wallet not found");
         } else {
-            response.setResponseCode("00");
-            response.setResponseMessage("Balance fetched successfully");
+            response.setResponseCode(CoreConstant.SUCCESS_CODE);
+            response.setResponseMessage(CoreConstant.SUCCESS);
             JSONObject balance = new JSONObject();
             balance.put("balance", wallet.getBalance());
             balance.put("accountNumber", wallet.getAcctNo());
@@ -68,13 +69,13 @@ public class ServiceBusinessService {
             
 			List<Transactions> content = transactionsRepo.findAll(PageRequest.of(0, 5))	.getContent();
 			if (content.isEmpty()) {
-				response.setResponseCode("01");
-				response.setResponseMessage("No transactions found");
+				response.setResponseCode(CoreConstant.FAILURE_CODE);
+				response.setResponseMessage(CoreConstant.FAILED);
 				response.setResponseData(null);
 				return response;
 			} else {
-				response.setResponseCode("00");
-				response.setResponseMessage("Transactions fetched successfully");
+				response.setResponseCode(CoreConstant.SUCCESS_CODE);
+				response.setResponseMessage(CoreConstant.SUCCESS);
 				response.setResponseData(content);
 				return response;
 			}
@@ -100,14 +101,14 @@ public class ServiceBusinessService {
         List<Transactions> all =transactionsRepo.findByAcctNoAndTxnDate(requestJson.getString("accountNumber"), requestJson.getString("txnDate"));
         
 		if (all.isEmpty()) {
-			response.setResponseCode("01");
-			response.setResponseMessage("No transactions found");
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED);
 			response.setResponseData(null);
 			return response;
 		}
 		else {
-			response.setResponseCode("00");
-			response.setResponseMessage("Transactions fetched successfully");
+			response.setResponseCode(CoreConstant.SUCCESS_CODE);
+			response.setResponseMessage(CoreConstant.SUCCESS);
 			response.setResponseData(all);
 			return response;
 		}
@@ -130,13 +131,13 @@ public class ServiceBusinessService {
         	
         	Transactions byPaymentReference = transactionsRepo.findByPaymentReference(requestJson.getString("paymentReference"));
         	if(byPaymentReference==null) {
-        		response.setResponseCode("01");
+        		response.setResponseCode(CoreConstant.FAILURE_CODE);
         	
-			response.setResponseMessage("Instant Receipts not implemented yet");
+			response.setResponseMessage(CoreConstant.FAILED);
 			response.setResponseData(null);
 		} else {
-			response.setResponseCode("00");
-			response.setResponseMessage("Transaction fetched successfully");
+			response.setResponseCode(CoreConstant.SUCCESS_CODE);
+			response.setResponseMessage(CoreConstant.SUCCESS);
 			response.setResponseData(byPaymentReference);
 		}
         }catch(Exception e) {

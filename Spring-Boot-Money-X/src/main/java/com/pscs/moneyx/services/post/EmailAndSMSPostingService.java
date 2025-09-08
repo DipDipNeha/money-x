@@ -12,15 +12,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 @Service
-public class SMSPostingService {
+public class EmailAndSMSPostingService {
 
 	private ResourceBundle bundle = ResourceBundle.getBundle("sms");
 
-	public JSONObject sendPostRequest(String jsonBody) {
+	public JSONObject sendPostRequest(String jsonBody,String urlType) {
 		JSONObject responseJson = new JSONObject();
 		try {
 			String apiKey = bundle.getString("sms.apiKey");
-			String url = bundle.getString("sms.url");
+			String url = bundle.getString(urlType);
 
 			System.out.println("SMS URL" + url + "\n Api Key" + apiKey + "\n Request " + jsonBody);
 			RestTemplate restTemplate = new RestTemplate();
@@ -72,7 +72,7 @@ public class SMSPostingService {
 		String request = "{\"messages\": [{\"sender\": \"InfoSMS\", \"destinations\": [{\"to\": \"916301655736\"}],\"content\": {\"text\": \"This is a sample message\"}}]}";
 
 		// Example usage
-		JSONObject sendPostRequest = new SMSPostingService().sendPostRequest(request);
+		JSONObject sendPostRequest = new EmailAndSMSPostingService().sendPostRequest(request,"sms.url");
 
 		System.out.println(sendPostRequest);
 

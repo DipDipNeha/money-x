@@ -64,9 +64,6 @@ public class ConvertRequestUtils {
 				text = "Dear customer this is one time password MoneyXpay service "+otp;
 			}
 			
-			
-			
-
 			messages.put(new JSONObject().put("sender", bundle.getString("sms.sender"))
 					.put("destinations", new JSONArray().put(new JSONObject().put("to", mobileNumber)))
 					.put("content", new JSONObject().put("text", text)));
@@ -76,4 +73,24 @@ public class ConvertRequestUtils {
 		}
 		return messages;
 	}
+
+	public static JSONArray generateEmailJson(String email, String subject, String body) {
+		JSONArray messages = new JSONArray();
+		try {
+
+			String emailSubject = (subject == null || subject.isEmpty()) ? bundle.getString("email.subject") : subject;
+			String emailBody = (body == null || body.isEmpty()) ? "MoneyXPay Test" : body;
+
+			messages.put(new JSONObject().put("sender", bundle.getString("email.sender"))
+					.put("destinations",
+							new JSONArray().put(new JSONObject().put("to",
+									new JSONArray().put(new JSONObject().put("destination", email)))))
+					.put("content", new JSONObject().put("subject", emailSubject).put("text", emailBody)));
+		} catch (JSONException e) {
+			e.printStackTrace();
+			return new JSONArray();
+		}
+		return messages;
+	}
+	
 }
