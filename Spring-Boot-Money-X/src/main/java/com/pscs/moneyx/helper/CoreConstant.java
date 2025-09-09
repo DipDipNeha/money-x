@@ -24,7 +24,7 @@ public interface CoreConstant {
 	String OTP_USED = "OTP Already Used";
 	String LOGIN_SUCCESSFUL = "Login Successful";
 	String INVALID_CREDENTIALS = "Invalid Credentials";
-	
+
 	String USER_NOT_FOUND = "User Not Found";
 	String ACCOUNT_LOCKED = "Account Locked";
 	String PASSWORD_CHANGED = "Password Changed Successfully";
@@ -58,7 +58,7 @@ public interface CoreConstant {
 	String UPLOAD_SUCCESSFUL = "File Uploaded Successfully";
 	String DELETE_SUCCESSFUL = "Record Deleted Successfully";
 	String OPERATION_NOT_ALLOWED = "Operation Not Allowed";
-	String INACTIVE_AC="Your Account is Inactive Please Contact Admin";
+	String INACTIVE_AC = "Your Account is Inactive Please Contact Admin";
 	String ALREADY_LOGGED_IN = "User Already Logged In";
 	String PASSWORD_RESET_LINK_SENT = "Password Reset Link Sent to Your Email";
 	String PASSWORD_RESET_SUCCESSFUL = "Password Reset Successfully";
@@ -69,6 +69,5 @@ public interface CoreConstant {
 	String CART_UPDATED = "Cart Updated Successfully";
 	String ORDER_PLACED = "Order Placed Successfully";
 	String PROFILE_LOCKED = "Profile is Locked, Please Contact Support";
-	
-	
+
 }
