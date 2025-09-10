@@ -79,10 +79,7 @@ public class CustomerBusinessService {
 			JSONObject requestJson = new JSONObject(jsonString);
 			logger.info("Request Body: " + requestJson.toString());
 			
-			MoneyXBusiness checkCustomerres = moneyXBusinessRepo.findByUserName(requestJson.getString("username"))
-					.orElseThrow(() -> new ResourceNotFoundException(
-							"No Data Found By this Username: " + requestJson.getString("username")));
-
+			MoneyXBusiness checkCustomerres = moneyXBusinessRepo.findByUserName(requestJson.getString("username"));
 			if (checkCustomerres != null) {
 				isLoginAttemptActive = checkCustomerres.getIsLoginAttemptActive();
 				retryLoginAttempt = checkCustomerres.getRetryLoginAttempt();
@@ -247,14 +244,14 @@ public class CustomerBusinessService {
 			
 			//get email from db if email is blank
 			if (otpDataTabl.getEmailId() == null || otpDataTabl.getEmailId().isEmpty()) {
-				MoneyXBusiness business = moneyXBusinessRepo.findByUserName(jHeader.getString("userid")).orElse(null);
+				MoneyXBusiness business = moneyXBusinessRepo.findByUserName(jHeader.getString("userid"));
 				if (business != null) {
 					otpDataTabl.setEmailId(business.getOwnerEmail());
 				}
 			}
 			// get phone from db if phone is blank
 			if (otpDataTabl.getMobileNo() == null || otpDataTabl.getMobileNo().isEmpty()) {
-				MoneyXBusiness business = moneyXBusinessRepo.findByUserName(jHeader.getString("userid")).orElse(null);
+				MoneyXBusiness business = moneyXBusinessRepo.findByUserName(jHeader.getString("userid"));
 				if (business != null) {
 					otpDataTabl.setMobileNo(business.getOwnerPhone());
 				}

@@ -17,7 +17,7 @@ public interface MoneyXBusinessRepo extends JpaRepository<MoneyXBusiness, Long> 
 
 	MoneyXBusiness findByUserNameAndPassword(String userName, String password);
 
-	Optional<MoneyXBusiness> findByUserName(String userName);
+	MoneyXBusiness findByUserName(String userName);
 
 	MoneyXBusiness findByAccountNumber(String accountNumber);
 

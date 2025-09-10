@@ -1,7 +1,6 @@
 package com.pscs.moneyx.security;
 
 import java.util.Date;
-import java.util.HashMap;
 
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
