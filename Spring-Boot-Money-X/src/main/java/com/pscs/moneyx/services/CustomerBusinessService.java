@@ -175,7 +175,6 @@ public class CustomerBusinessService {
 			customerLogin.setAccountType(jsonObject.getString("accountType"));
 			customerLogin.setCurrency(jsonObject.getString("currency"));
 			customerLogin.setUserName(jsonObject.getString("userName"));
-			System.out.println(jsonObject.getString("password"));
 			customerLogin.setPassword(CommonUtils.b64_sha256(jsonObject.getString("password")));
 			customerLogin.setTxnPin(jsonObject.getString("txnPin"));
 			customerLogin.setAuthType(jsonObject.getString("authType"));
@@ -193,7 +192,7 @@ public class CustomerBusinessService {
 			
 			
 
-			MoneyXBusiness customer = moneyXBusinessRepo.findByAccountNumber(jsonObject.getString("accountNumber"));
+			MoneyXBusiness customer = moneyXBusinessRepo.findByAccountNumberAndUserName(jsonObject.getString("accountNumber"),jsonObject.getString("userName"));
 			if (customer == null) {
 				customer = moneyXBusinessRepo.save(customerLogin);
 				// validate accountNumber
