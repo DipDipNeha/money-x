@@ -69,5 +69,6 @@ public interface CoreConstant {
 	String CART_UPDATED = "Cart Updated Successfully";
 	String ORDER_PLACED = "Order Placed Successfully";
 	String PROFILE_LOCKED = "Profile is Locked, Please Contact Support";
+	String USER_EXIST="User already Exist";
 
 }

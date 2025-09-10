@@ -36,7 +36,15 @@ public class CustomerBusinessController {
 	public ResponseEntity<String> echo() {
 		return new ResponseEntity<>("Welcome to PSCS", HttpStatus.OK);
 	}
+	//check username exist
+	@PostMapping("/checkusername")
+	public ResponseEntity<ResponseData> checkUserName(@RequestBody RequestData requestBody) {
 
+		ResponseData response = customerLoginService.checkUserName(requestBody);
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
 	// create profile post api by using
 	@PostMapping("/register")
 	public ResponseEntity<ResponseData> createProfile(@RequestBody RequestData requestBody) {

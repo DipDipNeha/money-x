@@ -131,7 +131,7 @@ public class CustomerBusinessService {
 				}
 
 			} else {
-				response.setResponseCode("01");
+				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.USER_NOT_FOUND);
 				return response;
 			}
@@ -144,6 +144,29 @@ public class CustomerBusinessService {
 		return response;
 	}
 
+
+	public ResponseData checkUserName(RequestData request) {
+		ResponseData response = new ResponseData();
+		try {
+			logger.info("Request : " + request);
+			String jsonString = ConvertRequestUtils.getJsonString(request.getJbody());
+			// Convert the request body to a JSON object
+			JSONObject requestJson = new JSONObject(jsonString);
+			logger.info("Request Body: " + requestJson.toString());
+			MoneyXBusiness checkCustomerres = moneyXBusinessRepo.findByUserName(requestJson.getString("username"));
+			if (checkCustomerres != null) {
+				response.setResponseCode(CoreConstant.FAILURE_CODE);
+				response.setResponseMessage(CoreConstant.USER_EXIST);
+			}else {
+				response.setResponseCode(CoreConstant.SUCCESS_CODE);
+				response.setResponseMessage(CoreConstant.USER_NOT_FOUND);
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 	@Transactional
 	public ResponseData createProfile(RequestData request) {
 		ResponseData response = new ResponseData();
@@ -591,5 +614,6 @@ public class CustomerBusinessService {
 		}
 		return response;
 	}
+
 
 }
