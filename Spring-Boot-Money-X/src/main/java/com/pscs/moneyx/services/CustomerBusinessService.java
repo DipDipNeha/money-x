@@ -218,9 +218,6 @@ public class CustomerBusinessService {
 			MoneyXBusiness customer = moneyXBusinessRepo.findByAccountNumberOrUserName(jsonObject.getString("accountNumber"),jsonObject.getString("userName"));
 			if (customer == null) {
 				customer = moneyXBusinessRepo.save(customerLogin);
-				// validate accountNumber
-				System.out.println(customer);
-
 				if (customer == null) {
 					response.setResponseCode(CoreConstant.FAILURE_CODE);
 					response.setResponseMessage(CoreConstant.FAILED + " to Create Profile");
