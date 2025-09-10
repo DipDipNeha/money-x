@@ -212,8 +212,6 @@ public class CustomerBusinessService {
 			customerLogin.setIsLoginAttemptActive("Y");
 			customerLogin.setRetryLoginAttempt(0);
 			
-			
-			
 
 			MoneyXBusiness customer = moneyXBusinessRepo.findByAccountNumberOrUserName(jsonObject.getString("accountNumber"),jsonObject.getString("userName"));
 			if (customer == null) {
