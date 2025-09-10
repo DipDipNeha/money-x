@@ -215,7 +215,7 @@ public class CustomerBusinessService {
 			
 			
 
-			MoneyXBusiness customer = moneyXBusinessRepo.findByAccountNumberAndUserName(jsonObject.getString("accountNumber"),jsonObject.getString("userName"));
+			MoneyXBusiness customer = moneyXBusinessRepo.findByAccountNumberOrUserName(jsonObject.getString("accountNumber"),jsonObject.getString("userName"));
 			if (customer == null) {
 				customer = moneyXBusinessRepo.save(customerLogin);
 				// validate accountNumber

@@ -19,7 +19,7 @@ public interface MoneyXBusinessRepo extends JpaRepository<MoneyXBusiness, Long> 
 
 	MoneyXBusiness findByUserName(String userName);
 
-	MoneyXBusiness findByAccountNumberAndUserName(String accountNumber,String userName);
+	MoneyXBusiness findByAccountNumberOrUserName(String accountNumber,String userName);
 
 //    @Modifying
 //    @Query("UPDATE MONEYX_BUSINESS_TBL m SET m.retryLoginAttempt = :retryLoginAttempt WHERE m.userName = :userName")
