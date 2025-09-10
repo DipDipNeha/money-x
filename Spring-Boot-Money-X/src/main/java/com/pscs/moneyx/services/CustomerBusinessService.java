@@ -209,7 +209,7 @@ public class CustomerBusinessService {
 
 			customerLogin.setIsActive("A");
 			customerLogin.setIsLocked("N");
-			customerLogin.setIsLoginAttemptActive("N");
+			customerLogin.setIsLoginAttemptActive("Y");
 			customerLogin.setRetryLoginAttempt(0);
 			
 			
