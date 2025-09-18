@@ -148,5 +148,33 @@ public class CustomerBusinessController {
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
+//start from here embedly integration 
+	
+	@PostMapping("/createcustomer")
+	public ResponseEntity<ResponseData> createCustomer(@RequestBody RequestData requestBody) {
 
+		ResponseData response = customerLoginService.createCustomer(requestBody);
+
+		return new ResponseEntity<>(response, HttpStatus.CREATED);
+	}
+	
+	//get Customer details by Customer id
+	@PostMapping("/getcustomerdetails")
+	public ResponseEntity<ResponseData> getCustomerDetails(@RequestBody RequestData requestBody) {
+
+		ResponseData response = customerLoginService.getCustomerDetails(requestBody);
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	//get all customer details
+	@PostMapping("/getallcustomerdetails")
+	public ResponseEntity<ResponseData> getAllCustomerDetails(@RequestBody RequestData requestBody) {
+
+		ResponseData response = customerLoginService.getAllCustomerDetails(requestBody);
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	
+	
 }

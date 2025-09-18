@@ -610,5 +610,64 @@ public class CustomerBusinessService {
 		return response;
 	}
 
+	public ResponseData createCustomer(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+			
+			
+			
+			
+			
+			
+			
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		return response;
+	}
+
+	public ResponseData getCustomerDetails(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		return response;
+	}
+
+	public ResponseData getAllCustomerDetails(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		return response;
+	}
+
 
 }
