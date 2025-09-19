@@ -1328,6 +1328,250 @@ public class CustomerBusinessService {
 		}
 		return response;
 	}
+
+	public ResponseData getProductLimit(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		return response;
+	}
+
+	public ResponseData setCustomerLimit(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		return response;
+	}
+
+	public ResponseData setDefaultTxnLimit(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		return response;
+	}
+
+	public ResponseData getCustomerLimit(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		return response;
+	}
+
+	public ResponseData updDefTxnLimit(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		return response;
+	}
+
+	public ResponseData addProductLimit(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		return response;
+	}
+
+	public ResponseData customerLimit(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		return response;
+	}
+
+	public ResponseData getOrgPrefixMappings(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		return response;
+	}
+
+	public ResponseData createCheckoutWallet(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+	    
+		return response;
+	}
+
+	public ResponseData getChckkoWallets(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		return response;
+	}
+
+	public ResponseData getChckkoWltTrans(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		return response;
+	}
+
+	public ResponseData issueAfrigoCard(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		return response;
+	}
+
+	public ResponseData activateAfrigoCard(RequestData requestBody) {
+	ResponseData response = new ResponseData();
+	try {
+		System.out.println("Request : " + requestBody);
+		String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+		JSONObject reqJson = new JSONObject(jsonString);
+		System.out.println("Request Body: " + reqJson.toString());
+	} catch (Exception e) {
+		e.printStackTrace();
+		response.setResponseCode(CoreConstant.FAILURE_CODE);
+		response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+	}
+	
+		return response;
+	}
+
+	public ResponseData updateAfrigoCardInfo(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		return response;
+	}
+
+	public ResponseData mapPhysAfrigoCard(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		return response;
+	}
+
+	
 	
 
 

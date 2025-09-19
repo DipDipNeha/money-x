@@ -461,6 +461,97 @@ public class CustomerBusinessController {
 		ResponseData response = customerLoginService.deactivateProduct(requestBody);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
+	//Retrieve Limit of a product and Currency
+	@PostMapping("/getProductLimit")
+	public ResponseEntity<ResponseData> getProductLimit(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.getProductLimit(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	//Limit for Customer
+    @PostMapping("/setCustomerLimit")
+        public ResponseEntity<ResponseData> setCustomerLimit(@RequestBody RequestData requestBody) {
+    	            ResponseData response = customerLoginService.setCustomerLimit(requestBody);
+    	            return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+	//Default transaction limits
+	@PostMapping("/setDefaultTxnLimit")
+	public ResponseEntity<ResponseData> setDefaultTxnLimit(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.setDefaultTxnLimit(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	//Limit Customer
+	@PostMapping("/getCustomerLimit")
+	public ResponseEntity<ResponseData> getCustomerLimit(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.getCustomerLimit(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	//Update default transaction limit
+	@PostMapping("/updDefTxnLimit")
+	public ResponseEntity<ResponseData> updDefTxnLimit(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.updDefTxnLimit(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	//Add Limit to existing Product
+	@PostMapping("/addProductLimit")
+	public ResponseEntity<ResponseData> addProductLimit(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.addProductLimit(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.CREATED);
+	}
+	//Customer Limit
+	@PostMapping("/customerLimit")
+	public ResponseEntity<ResponseData> customerLimit(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.customerLimit(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	//Get Organization Prefix Mappings
+	@PostMapping("/getOrgPrefixMappings")
+	public ResponseEntity<ResponseData> getOrgPrefixMappings(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.getOrgPrefixMappings(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	//Create Checkout Wallet
+	@PostMapping("/createCheckoutWallet")
+	public ResponseEntity<ResponseData> createCheckoutWallet(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.createCheckoutWallet(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.CREATED);
+	}
+	//Get checkout wallets
+	@PostMapping("/getChckkoWallets")
+	public ResponseEntity<ResponseData> getChckkoWallets(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.getChckkoWallets(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	//Get checkout wallet transactions
+	@PostMapping("/getChckkoWltTrans")
+	public ResponseEntity<ResponseData> getChckkoWltTrans(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.getChckkoWltTrans(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	//Issue Afrigo Card
+	@PostMapping("/issueAfrigoCard")
+	public ResponseEntity<ResponseData> issueAfrigoCard(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.issueAfrigoCard(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.CREATED);
+	}
+	//Activate Afrigo Card
+	@PostMapping("/activateAfrigoCard")
+	public ResponseEntity<ResponseData> activateAfrigoCard(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.activateAfrigoCard(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	//Update Afrigo Card Information
+	@PostMapping("/updateAfrigoCardInfo")
+	public ResponseEntity<ResponseData> updateAfrigoCardInfo(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.updateAfrigoCardInfo(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	//Map Physical Afrigo   to Customer
+	@PostMapping("/mapPhysAfrigoCard")
+	public ResponseEntity<ResponseData> mapPhysAfrigoCard(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.mapPhysAfrigoCard(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	} 
 	
 	
 }
