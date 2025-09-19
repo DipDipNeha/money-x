@@ -175,6 +175,196 @@ public class CustomerBusinessController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
+     //Update Customer Name
+	@PostMapping("/UpdateCustomerName")
+	public ResponseEntity<ResponseData> UpdateCustomerName(@RequestBody RequestData requestBody) {
+
+		ResponseData response = customerLoginService.UpdateCustomerName(requestBody);
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	//Update Customer Contact
+	@PostMapping("/UpdateCustomerContact")
+	public ResponseEntity<ResponseData> UpdateCustomerContact(@RequestBody RequestData requestBody) {
+
+		ResponseData response = customerLoginService.UpdateCustomerContact(requestBody);
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 	
 	
+	//Get Customer KYC Property Status
+	@PostMapping("/getCustKycStatus")
+	public ResponseEntity<ResponseData> getCustKycStatus(@RequestBody RequestData requestBody) {
+
+		ResponseData response = customerLoginService.getCustKycStatus(requestBody);
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	
+	
+	//Get All Customer types
+	@PostMapping("/GetAllCustomerTypes")
+	public ResponseEntity<ResponseData> GetAllCustomerTypes(@RequestBody RequestData requestBody) {
+
+		ResponseData response = customerLoginService.GetAllCustomerTypes(requestBody);
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	
+	// Create Corporate Customer
+	@PostMapping("/CreateCorporateCustomer")
+	public ResponseEntity<ResponseData> CreateCorporateCustomer(@RequestBody RequestData requestBody) {
+
+		ResponseData response = customerLoginService.CreateCorporateCustomer(requestBody);
+
+		return new ResponseEntity<>(response, HttpStatus.CREATED);
+	}
+	
+	
+	//Get A Corporate Customer
+	@PostMapping("/GetACorporateCustomer")
+	public ResponseEntity<ResponseData> GetACorporateCustomer(@RequestBody RequestData requestBody) {
+
+		ResponseData response = customerLoginService.GetACorporateCustomer(requestBody);
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	//Update Corporate Customer
+	@PostMapping("/updateCorpCustomer")
+	public ResponseEntity<ResponseData> updateCorpCustomer(@RequestBody RequestData requestBody) {
+
+		ResponseData response = customerLoginService.updateCorpCustomer(requestBody);
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	//Add Director to Corporate Customer
+    @PostMapping("/addDirector")
+           public ResponseEntity<ResponseData> addDirector(@RequestBody RequestData requestBody) {
+    	        ResponseData response = customerLoginService.addDirector(requestBody);
+    	        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+    
+    //Get A Corporate Customer Director
+    @PostMapping("/getCorpDirector")
+	public ResponseEntity<ResponseData> getCorpDirector(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.getCorpDirector(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+    
+    //Get All Corporate Customer Directors
+    @PostMapping("/getAllCorpDirectors")
+        public ResponseEntity<ResponseData> getAllCorpDirectors(@RequestBody RequestData requestBody) {	
+			ResponseData response = customerLoginService.getAllCorpDirectors(requestBody);
+			return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+    
+    //Update Corporate Customer Director
+    @PostMapping("/updateCorpDirector")
+        public ResponseEntity<ResponseData> updateCorpDirector(@RequestBody RequestData requestBody) {
+    	            ResponseData response = customerLoginService.updateCorpDirector(requestBody);
+    	            return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+    
+    //Upload Corporate Customer Documents
+	@PostMapping("/uploadCorpDocuments")
+	public ResponseEntity<ResponseData> uploadCorpDocuments(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.uploadCorpDocuments(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+    //Update Corporate Customer Documents
+	@PostMapping("/updateCorpDocuments")
+	public ResponseEntity<ResponseData> updateCorpDocuments(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.updateCorpDocuments(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	//Get Corporate Customer Documents
+	@PostMapping("/getCorpDocuments")
+	public ResponseEntity<ResponseData> getCorpDocuments(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.getCorpDocuments(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	//Create Wallet
+    @PostMapping("/createWallet")
+	public ResponseEntity<ResponseData> createWallet(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.createWallet(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.CREATED);
+	}
+    //Create Corporate Customer Wallet
+    @PostMapping("/createCustWallet")
+        public ResponseEntity<ResponseData> createCustWallet(@RequestBody RequestData requestBody) {
+			ResponseData response = customerLoginService.createCustWallet(requestBody);
+			return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+    //Get Wallet by ID
+	@PostMapping("/getWalletById")
+        public ResponseEntity<ResponseData> getWalletById(@RequestBody RequestData requestBody) {
+		    ResponseData response = customerLoginService.getWalletById(requestBody);
+		    return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	//Get Wallet by Account Number
+	@PostMapping("/getWalletByAccNumber")
+	public ResponseEntity<ResponseData> getWalletByAccNumber(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.getWalletByAccNumber(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	// Wallet to Wallet Transfers
+	@PostMapping("/transferWallet")
+	public ResponseEntity<ResponseData> transferWallet(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.transferWallet(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+     
+	//Get Organization Wallet Transactions
+    @PostMapping("/getOrgWalletTrans")
+        public ResponseEntity<ResponseData> getOrgWalletTrans(@RequestBody RequestData requestBody) {
+    	            ResponseData response = customerLoginService.getOrgWalletTrans(requestBody);
+    	            return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+//    Wallet to Wallet Requery
+	@PostMapping("/requeryWalletTrans")
+	public ResponseEntity<ResponseData> requeryWalletTrans(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.requeryWalletTrans(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	//Wallet History
+	@PostMapping("/walletHistory")
+	public ResponseEntity<ResponseData> walletHistory(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.walletHistory(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	//Reverse Transaction
+	@PostMapping("/reverseTxn")
+	public ResponseEntity<ResponseData> reverseTxn(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.reverseTxn(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	//Close Wallet
+	@PostMapping("/closeWallet")
+	public ResponseEntity<ResponseData> closeWallet(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.closeWallet(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	//Restrict by AccountID
+	@PostMapping("/restrictByAccId")
+	public ResponseEntity<ResponseData> restrictByAccId(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.restrictByAccId(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+//	Restrict Wallet
+	@PostMapping("/restrictWallet")
+	public ResponseEntity<ResponseData> restrictWallet(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.restrictWallet(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 }

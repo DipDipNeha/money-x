@@ -73,7 +73,36 @@ public class EkycServiceController {
 
 	}
 	
-	//
+	//Customer KYC Upgrade-nin
+	@PostMapping("/customerkycupgradenin")
+	public ResponseEntity<ResponseData> customerKYCUpgradeNin(@RequestBody RequestData requestBody) {
+
+		ResponseData response = ekycService.customerKYCUpgradeNin(requestBody);
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
+
+	}
+	
+	//Customer KYC Upgrade-bvn
+	@PostMapping("/customerkycupgradebvn")
+	public ResponseEntity<ResponseData> customerKYCUpgradeBvn(@RequestBody RequestData requestBody) {
+
+		ResponseData response = ekycService.customerKYCUpgradeBvn(requestBody);
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	//Customer Address Verification (Tier 3 upgrade)
+	@PostMapping("/customeraddressverification")
+	public ResponseEntity<ResponseData> customerAddressVerification(@RequestBody RequestData requestBody) {
+
+		ResponseData response = ekycService.customerAddressVerification(requestBody);
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
+
+	}
+	
+	
 	
 
 }

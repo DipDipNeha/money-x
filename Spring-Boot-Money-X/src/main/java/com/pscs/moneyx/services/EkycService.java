@@ -264,4 +264,94 @@ public class EkycService {
 		return null;
 	}
 
+	public ResponseData customerKYCUpgradeNin(RequestData requestBody) {
+		ResponseData responseData = new ResponseData();
+		try {
+			logger.info("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			logger.info("Request Json String : " + jsonString);
+			JSONObject jsonObject = new JSONObject(jsonString);
+
+			JSONObject sendGetRequest = ekycPostingService.sendPostRequest(jsonObject.toString(),
+					"CUSTOMER_KYC_UPGRADE_NIN_URL");
+			// need to write business code here
+			if (sendGetRequest.getString("respcode").equalsIgnoreCase("200")) {
+				responseData.setResponseCode(CoreConstant.SUCCESS_CODE);
+				responseData.setResponseMessage(CoreConstant.SUCCESS);
+				responseData.setResponseData(sendGetRequest.toMap());
+			} else {
+				responseData.setResponseMessage(sendGetRequest.getString("respmsg"));
+				responseData.setResponseCode(sendGetRequest.getString("respcode"));
+				return responseData;
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			responseData.setResponseMessage(CoreConstant.ERROR);
+			responseData.setResponseCode("500");
+			return responseData;
+		}
+		return responseData;
+	}
+
+	public ResponseData customerKYCUpgradeBvn(RequestData requestBody) {
+		ResponseData responseData = new ResponseData();
+		try {
+			logger.info("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			logger.info("Request Json String : " + jsonString);
+			JSONObject jsonObject = new JSONObject(jsonString);
+
+			JSONObject sendGetRequest = ekycPostingService.sendPostRequest(jsonObject.toString(),
+					"CUSTOMER_KYC_UPGRADE_BVN_URL");
+			// need to write business code here
+			if (sendGetRequest.getString("respcode").equalsIgnoreCase("200")) {
+				responseData.setResponseCode(CoreConstant.SUCCESS_CODE);
+				responseData.setResponseMessage(CoreConstant.SUCCESS);
+				responseData.setResponseData(sendGetRequest.toMap());
+			} else {
+				responseData.setResponseMessage(sendGetRequest.getString("respmsg"));
+				responseData.setResponseCode(sendGetRequest.getString("respcode"));
+				return responseData;
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			responseData.setResponseMessage(CoreConstant.ERROR);
+			responseData.setResponseCode("500");
+			return responseData;
+		}
+		return responseData;
+	}
+
+	public ResponseData customerAddressVerification(RequestData requestBody) {
+		ResponseData responseData = new ResponseData();
+		try {
+			logger.info("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			logger.info("Request Json String : " + jsonString);
+			JSONObject jsonObject = new JSONObject(jsonString);
+
+			JSONObject sendGetRequest = ekycPostingService.sendPostRequest(jsonObject.toString(),
+					"CUSTOMER_ADDRESS_VERIFICATION_URL");
+			// need to write business code here
+			if (sendGetRequest.getString("respcode").equalsIgnoreCase("200")) {
+				responseData.setResponseCode(CoreConstant.SUCCESS_CODE);
+				responseData.setResponseMessage(CoreConstant.SUCCESS);
+				responseData.setResponseData(sendGetRequest.toMap());
+			} else {
+				responseData.setResponseMessage(sendGetRequest.getString("respmsg"));
+				responseData.setResponseCode(sendGetRequest.getString("respcode"));
+				return responseData;
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			responseData.setResponseMessage(CoreConstant.ERROR);
+			responseData.setResponseCode("500");
+			return responseData;
+		}
+		return responseData;
+	}
+
 }
