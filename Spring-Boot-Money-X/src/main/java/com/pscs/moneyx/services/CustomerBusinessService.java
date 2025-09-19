@@ -720,21 +720,6 @@ public class CustomerBusinessService {
 		return null;
 	}
 
-	public ResponseData GetAllCustomerTypes(RequestData requestBody) {
-		ResponseData response = new ResponseData();
-		try {
-			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
-
-			JSONObject reqJson = new JSONObject(jsonString);
-			System.out.println("Request Body: " + reqJson.toString());
-		} catch (Exception e) {
-			e.printStackTrace();
-			response.setResponseCode(CoreConstant.FAILURE_CODE);
-			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
-		}
-		return response;
-	}
 
 	public ResponseData CreateCorporateCustomer(RequestData requestBody) {
 		ResponseData response = new ResponseData();
@@ -866,6 +851,22 @@ public class CustomerBusinessService {
 	}
 
 	public ResponseData updateCorpDocuments(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		return response;
+	}
+	
+	public ResponseData GetAllCustomerTypes(RequestData requestBody) {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
@@ -1102,9 +1103,232 @@ public class CustomerBusinessService {
 		}
 		return 	response;
 	}
-
 	
 
+	public ResponseData retrieveCurrencies(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		return response;
+	}
+	public ResponseData getWltResTypes(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		return response;
+	}
+	public ResponseData accountClosure(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		return response;
+	}
+	
+
+	public ResponseData addWalletGroup(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		return response;
+	}
+
+	public ResponseData addWalletToGroup(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		return response;
+	}
+
+	public ResponseData addWalletGroupFeature(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		
+		return response;
+	}
+
+	public ResponseData getWalletGroupFeature(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		return response;
+	}
+
+	public ResponseData getWalletGroupById(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		return response;
+	}
+
+	public ResponseData getAllWalletGroups(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		return response;
+	}
+
+	public ResponseData createProduct(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		return response;
+	}
+
+	public ResponseData getAllProducts(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		return response;
+	}
+
+	public ResponseData updateProduct(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		return response;
+	}
+
+	public ResponseData activateProduct(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		return response;
+	}
+
+	public ResponseData deactivateProduct(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		return response;
+	}
+	
 
 
 }

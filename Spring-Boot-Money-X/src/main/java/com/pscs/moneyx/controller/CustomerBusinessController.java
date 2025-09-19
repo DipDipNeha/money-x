@@ -203,18 +203,7 @@ public class CustomerBusinessController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 	
-	
-	
-	//Get All Customer types
-	@PostMapping("/GetAllCustomerTypes")
-	public ResponseEntity<ResponseData> GetAllCustomerTypes(@RequestBody RequestData requestBody) {
 
-		ResponseData response = customerLoginService.GetAllCustomerTypes(requestBody);
-
-		return new ResponseEntity<>(response, HttpStatus.OK);
-	}
-	
-	
 	// Create Corporate Customer
 	@PostMapping("/CreateCorporateCustomer")
 	public ResponseEntity<ResponseData> CreateCorporateCustomer(@RequestBody RequestData requestBody) {
@@ -289,6 +278,15 @@ public class CustomerBusinessController {
 		ResponseData response = customerLoginService.getCorpDocuments(requestBody);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
+	
+	//Get All Customer types
+		@PostMapping("/GetAllCustomerTypes")
+		public ResponseEntity<ResponseData> GetAllCustomerTypes(@RequestBody RequestData requestBody) {
+
+			ResponseData response = customerLoginService.GetAllCustomerTypes(requestBody);
+
+			return new ResponseEntity<>(response, HttpStatus.OK);
+		}
 	
 	//Create Wallet
     @PostMapping("/createWallet")
@@ -367,4 +365,102 @@ public class CustomerBusinessController {
 		ResponseData response = customerLoginService.restrictWallet(requestBody);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
+	
+//	Retrieve Currencies
+	@PostMapping("/retrieveCurrencies")
+	public ResponseEntity<ResponseData> retrieveCurrencies(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.retrieveCurrencies(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	//Retrieve Wallet Restriction Types
+	@PostMapping("/getWltResTypes")
+	public ResponseEntity<ResponseData> getWltResTypes(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.getWltResTypes(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	//Account Closure
+	@PostMapping("/accountClosure")
+	public ResponseEntity<ResponseData> accountClosure(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.accountClosure(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	
+	
+	//Add WalletGroup
+	@PostMapping("/addWalletGroup")
+	public ResponseEntity<ResponseData> addWalletGroup(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.addWalletGroup(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.CREATED);
+	}
+
+//	Add Wallet to WalletGroup
+	@PostMapping("/addWalletToGroup")
+	public ResponseEntity<ResponseData> addWalletToGroup(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.addWalletToGroup(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+//Add WalletGroup Feature
+	@PostMapping("/addWalletGroupFeature")
+	public ResponseEntity<ResponseData> addWalletGroupFeature(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.addWalletGroupFeature(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.CREATED);
+	}
+	
+	//WalletGroup Feature
+	@PostMapping("/getWalletGroupFeature")
+	public ResponseEntity<ResponseData> getWalletGroupFeature(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.getWalletGroupFeature(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	//WalletGroup ID
+	@PostMapping("/getWalletGroupById")
+	public ResponseEntity<ResponseData> getWalletGroupById(@RequestBody RequestData requestBody) {
+        ResponseData response = customerLoginService.getWalletGroupById(requestBody);
+                return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+	
+	// WalletGroup
+	@PostMapping("/getAllWalletGroups")
+	public ResponseEntity<ResponseData> getAllWalletGroups(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.getAllWalletGroups(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	//Create new product
+	@PostMapping("/createProduct")
+	public ResponseEntity<ResponseData> createProduct(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.createProduct(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.CREATED);
+	}
+	
+	//List of all products
+	@PostMapping("/getAllProducts")
+	public ResponseEntity<ResponseData> getAllProducts(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.getAllProducts(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	//Update existing Product
+	@PostMapping("/updateProduct")
+	public ResponseEntity<ResponseData> updateProduct(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.updateProduct(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	//Activate Product by its ID
+	@PostMapping("/activateProduct")
+	public ResponseEntity<ResponseData> activateProduct(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.activateProduct(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	//Deactivate Product by its ID
+	@PostMapping("/deactivateProduct")
+	public ResponseEntity<ResponseData> deactivateProduct(@RequestBody RequestData requestBody) {
+		ResponseData response = customerLoginService.deactivateProduct(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	
 }
