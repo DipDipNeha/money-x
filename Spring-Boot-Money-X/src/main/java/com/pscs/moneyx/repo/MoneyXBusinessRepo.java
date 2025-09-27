@@ -37,5 +37,8 @@ public interface MoneyXBusinessRepo extends JpaRepository<MoneyXBusiness, Long> 
     @Query(value = "UPDATE MONEYX_BUSINESS_TBL SET retry_login_attempt = 0 WHERE user_name = :userName", nativeQuery = true)
     int resetRetryLoginAttempt(@Param("userName") String userName);
 
+	MoneyXBusiness findByEmailAddressOrUserName(String string, String string2);
+
+	MoneyXBusiness findByCustomerId(String customerId);
 
 }

@@ -104,7 +104,7 @@ public class CustomerBusinessController {
 	// fetch country
 	@PostMapping("/fetchcountry")
 	public ResponseEntity<ResponseData> fetchCountry(@RequestBody RequestData requestBody) {
-		ResponseData response = customerBusinessService.fetchCountry();
+		ResponseData response = customerBusinessService.fetchCountry(requestBody);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 

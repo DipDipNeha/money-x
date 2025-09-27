@@ -181,23 +181,21 @@ public class CustomerBusinessService {
 
 			MoneyXBusiness customerLogin = new MoneyXBusiness();
 
-			customerLogin.setBusinessName(jsonObject.getString("businessName"));
-			customerLogin.setBusinessType(jsonObject.getString("businessType"));
-			customerLogin.setBusinessEmail(jsonObject.getString("businessEmail"));
-			customerLogin.setBusinessPhone(jsonObject.getString("businessPhone"));
-			customerLogin.setBusinessIndustry(jsonObject.getString("businessIndustry"));
-			customerLogin.setBusinessId(jsonObject.getString("businessId"));
-			customerLogin.setBusinessAddress(jsonObject.getString("businessAddress"));
-			customerLogin.setBusinessCountry(jsonObject.getString("businessCountry"));
-			customerLogin.setBusinessStatus(jsonObject.getString("businessStatus"));
-			customerLogin.setBusinessRole(jsonObject.getString("businessRole"));
-			customerLogin.setInvitedByEmail(jsonObject.getString("invitedByEmail"));
-			customerLogin.setOwnerName(jsonObject.getString("ownerName"));
-			customerLogin.setOwnerEmail(jsonObject.getString("ownerEmail"));
-			customerLogin.setOwnerPhone(jsonObject.getString("ownerPhone"));
-			customerLogin.setAccountNumber(jsonObject.getString("accountNumber"));
-			customerLogin.setAccountType(jsonObject.getString("accountType"));
-			customerLogin.setCurrency(jsonObject.getString("currency"));
+			
+
+			customerLogin.setOrganizationId(jsonObject.getString("organizationId"));
+			customerLogin.setFirstName(jsonObject.getString("firstName"));
+			customerLogin.setLastName(jsonObject.getString("lastName"));
+			customerLogin.setMiddleName(jsonObject.getString("middleName"));
+			customerLogin.setEmailAddress(jsonObject.getString("emailAddress"));
+			customerLogin.setMobileNumber(jsonObject.getString("mobileNumber"));
+			customerLogin.setDob(jsonObject.getString("dob"));
+			customerLogin.setCustomerTypeId(jsonObject.getString("customerTypeId"));
+			customerLogin.setAddress(jsonObject.getString("address"));
+			customerLogin.setCity(jsonObject.getString("city"));
+			customerLogin.setCountryId(jsonObject.getString("countryId"));
+			customerLogin.setAlias(jsonObject.getString("alias"));
+			customerLogin.setCurrency(jsonObject.has("currency") ?jsonObject.getString("currency"):"NGN");
 			customerLogin.setUserName(jsonObject.getString("userName"));
 			customerLogin.setPassword(CommonUtils.b64_sha256(jsonObject.getString("password")));
 			customerLogin.setTxnPin(jsonObject.getString("txnPin"));
@@ -205,8 +203,6 @@ public class CustomerBusinessService {
 			customerLogin.setAuthValue(jsonObject.getString("authValue"));
 			customerLogin.setCustomerType(jsonObject.getString("customerType"));
 			customerLogin.setCustomerId(jsonObject.getString("customerId"));
-			customerLogin.setDocInfo(jsonObject.getJSONArray("docInfo").toString());
-			customerLogin.setRegistrationDate(new Date());
 
 			customerLogin.setIsActive("A");
 			customerLogin.setIsLocked("N");
@@ -214,7 +210,7 @@ public class CustomerBusinessService {
 			customerLogin.setRetryLoginAttempt(0);
 			
 
-			MoneyXBusiness customer = moneyXBusinessRepo.findByAccountNumberOrUserName(jsonObject.getString("accountNumber"),jsonObject.getString("userName"));
+			MoneyXBusiness customer = moneyXBusinessRepo.findByEmailAddressOrUserName(jsonObject.getString("emailAddress"),jsonObject.getString("userName"));
 			if (customer == null) {
 				customer = moneyXBusinessRepo.save(customerLogin);
 				if (customer == null) {
@@ -264,14 +260,14 @@ public class CustomerBusinessService {
 			if (otpDataTabl.getEmailId() == null || otpDataTabl.getEmailId().isEmpty()) {
 				MoneyXBusiness business = moneyXBusinessRepo.findByUserName(jHeader.getString("userid"));
 				if (business != null) {
-					otpDataTabl.setEmailId(business.getOwnerEmail());
+					otpDataTabl.setEmailId(business.getEmailAddress());
 				}
 			}
 			// get phone from db if phone is blank
 			if (otpDataTabl.getMobileNo() == null || otpDataTabl.getMobileNo().isEmpty()) {
 				MoneyXBusiness business = moneyXBusinessRepo.findByUserName(jHeader.getString("userid"));
 				if (business != null) {
-					otpDataTabl.setMobileNo(business.getOwnerPhone());
+					otpDataTabl.setMobileNo(business.getMobileNumber());
 				}
 			}
 			
@@ -452,16 +448,29 @@ public class CustomerBusinessService {
 		return null;
 	}
 
-	public ResponseData fetchCountry() {
+	public ResponseData fetchCountry(RequestData requestBody) {
 		ResponseData response = new ResponseData();
 		try {
-			List<Country> countries = new ArrayList<>();
-			countryRepo.findAll().forEach(country -> {
-				countries.add(country);
-			});
-			response.setResponseData(countries);
-			response.setResponseCode(CoreConstant.SUCCESS_CODE);
-			response.setResponseMessage(CoreConstant.SUCCESS );
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+			
+
+			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
+			 JSONObject callService = service.callService(reqJson);
+			System.out.println("Response " + response.toString());
+			
+			if (callService.getString("respCode").equals("00")) {
+				response.setResponseCode(CoreConstant.SUCCESS_CODE);
+				response.setResponseMessage(CoreConstant.SUCCESS);
+				response.setResponseData(callService.toMap());
+			} else {
+				response.setResponseCode(CoreConstant.FAILURE_CODE);
+				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			response.setResponseCode(CoreConstant.FAILURE_CODE);
@@ -583,26 +592,25 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
+			
 
-			// fetch account number from request
-			String accountNo = reqJson.getString("accountNumber");
-
-			// fetch wallet account data by account number
-			WalletAcctData byAcctNo = walletAcctDataRepository.findByAcctNo(accountNo);
-			if (byAcctNo != null) {
+			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
+			 JSONObject callService = service.callService(reqJson);
+			System.out.println("Response " + response.toString());
+			
+			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
-				response.setResponseMessage(CoreConstant.SUCCESS );
-				response.setResponseData(byAcctNo);
-				return response;
+				response.setResponseMessage(CoreConstant.SUCCESS);
+				response.setResponseData(callService.toMap());
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.DATA_NOT_FOUND + " for account number: " + accountNo);
+				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
 			}
-
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			response.setResponseCode(CoreConstant.FAILURE_CODE);
@@ -648,7 +656,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -680,7 +688,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -711,7 +719,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -744,7 +752,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -776,7 +784,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -807,7 +815,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -837,7 +845,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -866,7 +874,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -898,7 +906,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -928,7 +936,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -958,7 +966,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -988,7 +996,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -1018,7 +1026,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -1048,7 +1056,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -1078,7 +1086,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -1108,7 +1116,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -1138,7 +1146,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -1148,6 +1156,13 @@ public class CustomerBusinessService {
 			System.out.println("Response " + response.toString());
 			
 			if (callService.getString("respCode").equals("00")) {
+				
+				MoneyXBusiness byCustomerId = moneyXBusinessRepo.findByCustomerId(reqJson.getJSONObject("jbody").getString("customerId"));
+				
+				
+				
+				
+				
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
 				response.setResponseData(callService.toMap());
@@ -1169,7 +1184,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -1199,7 +1214,7 @@ public class CustomerBusinessService {
 	    ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -1231,7 +1246,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -1261,7 +1276,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -1292,7 +1307,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -1324,7 +1339,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -1354,7 +1369,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -1384,7 +1399,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -1415,7 +1430,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -1444,7 +1459,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -1473,7 +1488,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -1504,7 +1519,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -1534,7 +1549,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody );
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -1564,7 +1579,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody );
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -1595,7 +1610,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody );
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -1625,7 +1640,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody );
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -1655,7 +1670,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody );
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -1685,7 +1700,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody );
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -1715,7 +1730,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody );
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -1745,7 +1760,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody );
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -1775,7 +1790,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody );
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -1805,7 +1820,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody );
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -1835,7 +1850,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody );
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -1865,7 +1880,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody );
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -1895,7 +1910,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody );
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -1925,7 +1940,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody );
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -1955,7 +1970,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody );
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -1985,7 +2000,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody );
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -2015,7 +2030,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody );
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -2045,7 +2060,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody );
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -2075,7 +2090,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody );
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -2106,7 +2121,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody );
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -2136,7 +2151,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody );
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -2166,7 +2181,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody );
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -2196,7 +2211,7 @@ public class CustomerBusinessService {
 	ResponseData response = new ResponseData();
 	try {
 		System.out.println("Request : " + requestBody);
-		String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+		String jsonString = ConvertRequestUtils.getJsonString(requestBody );
 
 		JSONObject reqJson = new JSONObject(jsonString);
 		System.out.println("Request Body: " + reqJson.toString());
@@ -2227,7 +2242,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody );
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -2257,7 +2272,7 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
