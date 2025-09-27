@@ -5,13 +5,14 @@
 package com.pscs.moneyx.services;
 
 import org.json.JSONObject;
+import org.springframework.stereotype.Service;
 
 import com.pscs.embedly.caller.EmbedlyServiceCaller;
 import com.pscs.moneyx.helper.ConvertRequestUtils;
 import com.pscs.moneyx.helper.CoreConstant;
 import com.pscs.moneyx.model.RequestData;
 import com.pscs.moneyx.model.ResponseData;
-
+@Service
 public class TransactionService {
 
 	public ResponseData getBanks(RequestData requestBody) {
