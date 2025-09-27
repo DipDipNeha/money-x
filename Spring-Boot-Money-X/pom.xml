@@ -118,8 +118,19 @@
 			<groupId>log4j</groupId>
 			<artifactId>apache-log4j-extras</artifactId>
 			<version>1.0</version>
-		</dependency
->
+		</dependency>
+		<dependency>
+			<groupId>com.pscs</groupId>
+			<artifactId>embedly-service-integration</artifactId>
+			<version>0.1</version>
+			<scope>system</scope>
+			<systemPath>D:\pscs-workspace\lib\embedly-service-integration.0.0.01v.jar</systemPath>
+		</dependency>
+<dependency>
+    <groupId>org.apache.httpcomponents</groupId>
+    <artifactId>httpclient</artifactId>
+    <version>4.5.14</version>
+</dependency>
 
 	</dependencies>
 

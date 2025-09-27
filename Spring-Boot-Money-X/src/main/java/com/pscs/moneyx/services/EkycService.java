@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
+import com.pscs.embedly.caller.EmbedlyServiceCaller;
 import com.pscs.moneyx.helper.ConvertRequestUtils;
 import com.pscs.moneyx.helper.CoreConstant;
 import com.pscs.moneyx.model.RequestData;
@@ -261,97 +262,101 @@ public class EkycService {
 			return responseData;
 		}
 		
-		return null;
+		return responseData;
 	}
 
 	public ResponseData customerKYCUpgradeNin(RequestData requestBody) {
-		ResponseData responseData = new ResponseData();
+		ResponseData response = new ResponseData();
 		try {
 			logger.info("Request : " + requestBody);
 			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
 			logger.info("Request Json String : " + jsonString);
-			JSONObject jsonObject = new JSONObject(jsonString);
+			JSONObject reqJson = new JSONObject(jsonString);
 
-			JSONObject sendGetRequest = ekycPostingService.sendPostRequest(jsonObject.toString(),
-					"CUSTOMER_KYC_UPGRADE_NIN_URL");
-			// need to write business code here
-			if (sendGetRequest.getString("respcode").equalsIgnoreCase("200")) {
-				responseData.setResponseCode(CoreConstant.SUCCESS_CODE);
-				responseData.setResponseMessage(CoreConstant.SUCCESS);
-				responseData.setResponseData(sendGetRequest.toMap());
+
+			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
+			 JSONObject callService = service.callService(reqJson);
+			System.out.println("Response " + response.toString());
+			
+			if (callService.getString("respCode").equals("00")) {
+				response.setResponseCode(CoreConstant.SUCCESS_CODE);
+				response.setResponseMessage(CoreConstant.SUCCESS);
+				response.setResponseData(callService.toMap());
 			} else {
-				responseData.setResponseMessage(sendGetRequest.getString("respmsg"));
-				responseData.setResponseCode(sendGetRequest.getString("respcode"));
-				return responseData;
+				response.setResponseCode(CoreConstant.FAILURE_CODE);
+				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
 			}
+			
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			responseData.setResponseMessage(CoreConstant.ERROR);
-			responseData.setResponseCode("500");
-			return responseData;
+			response.setResponseMessage(CoreConstant.ERROR);
+			response.setResponseCode("500");
+			return response;
 		}
-		return responseData;
+		return response;
 	}
 
 	public ResponseData customerKYCUpgradeBvn(RequestData requestBody) {
-		ResponseData responseData = new ResponseData();
+		ResponseData response = new ResponseData();
 		try {
 			logger.info("Request : " + requestBody);
 			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
 			logger.info("Request Json String : " + jsonString);
-			JSONObject jsonObject = new JSONObject(jsonString);
+			JSONObject reqJson = new JSONObject(jsonString);
 
-			JSONObject sendGetRequest = ekycPostingService.sendPostRequest(jsonObject.toString(),
-					"CUSTOMER_KYC_UPGRADE_BVN_URL");
-			// need to write business code here
-			if (sendGetRequest.getString("respcode").equalsIgnoreCase("200")) {
-				responseData.setResponseCode(CoreConstant.SUCCESS_CODE);
-				responseData.setResponseMessage(CoreConstant.SUCCESS);
-				responseData.setResponseData(sendGetRequest.toMap());
+
+			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
+			 JSONObject callService = service.callService(reqJson);
+			System.out.println("Response " + response.toString());
+			
+			if (callService.getString("respCode").equals("00")) {
+				response.setResponseCode(CoreConstant.SUCCESS_CODE);
+				response.setResponseMessage(CoreConstant.SUCCESS);
+				response.setResponseData(callService.toMap());
 			} else {
-				responseData.setResponseMessage(sendGetRequest.getString("respmsg"));
-				responseData.setResponseCode(sendGetRequest.getString("respcode"));
-				return responseData;
+				response.setResponseCode(CoreConstant.FAILURE_CODE);
+				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			responseData.setResponseMessage(CoreConstant.ERROR);
-			responseData.setResponseCode("500");
-			return responseData;
+			response.setResponseMessage(CoreConstant.ERROR);
+			response.setResponseCode("500");
+			return response;
 		}
-		return responseData;
+		return response;
 	}
 
 	public ResponseData customerAddressVerification(RequestData requestBody) {
-		ResponseData responseData = new ResponseData();
+		ResponseData response = new ResponseData();
 		try {
 			logger.info("Request : " + requestBody);
 			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
 			logger.info("Request Json String : " + jsonString);
-			JSONObject jsonObject = new JSONObject(jsonString);
+			JSONObject reqJson = new JSONObject(jsonString);
 
-			JSONObject sendGetRequest = ekycPostingService.sendPostRequest(jsonObject.toString(),
-					"CUSTOMER_ADDRESS_VERIFICATION_URL");
-			// need to write business code here
-			if (sendGetRequest.getString("respcode").equalsIgnoreCase("200")) {
-				responseData.setResponseCode(CoreConstant.SUCCESS_CODE);
-				responseData.setResponseMessage(CoreConstant.SUCCESS);
-				responseData.setResponseData(sendGetRequest.toMap());
+
+			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
+			 JSONObject callService = service.callService(reqJson);
+			System.out.println("Response " + response.toString());
+			
+			if (callService.getString("respCode").equals("00")) {
+				response.setResponseCode(CoreConstant.SUCCESS_CODE);
+				response.setResponseMessage(CoreConstant.SUCCESS);
+				response.setResponseData(callService.toMap());
 			} else {
-				responseData.setResponseMessage(sendGetRequest.getString("respmsg"));
-				responseData.setResponseCode(sendGetRequest.getString("respcode"));
-				return responseData;
+				response.setResponseCode(CoreConstant.FAILURE_CODE);
+				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			responseData.setResponseMessage(CoreConstant.ERROR);
-			responseData.setResponseCode("500");
-			return responseData;
+			response.setResponseMessage(CoreConstant.ERROR);
+			response.setResponseCode("500");
+			return response;
 		}
-		return responseData;
+		return response;
 	}
 
 }

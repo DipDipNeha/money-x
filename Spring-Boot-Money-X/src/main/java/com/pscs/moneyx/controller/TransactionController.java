@@ -58,5 +58,25 @@ public class TransactionController {
 	}
 	
 	
+	// Wallet to Wallet Transfers
+			@PostMapping("/transferWallet")
+			public ResponseEntity<ResponseData> transferWallet(@RequestBody RequestData requestBody) {
+				ResponseData response = transactionService.transferWallet(requestBody);
+				return new ResponseEntity<>(response, HttpStatus.OK);
+			}
 
+
+//		    Wallet to Wallet Requery
+			@PostMapping("/requeryWalletTrans")
+			public ResponseEntity<ResponseData> requeryWalletTrans(@RequestBody RequestData requestBody) {
+				ResponseData response = transactionService.requeryWalletTrans(requestBody);
+				return new ResponseEntity<>(response, HttpStatus.OK);
+			}
+
+		// Reverse Transaction
+		@PostMapping("/reverseTxn")
+		public ResponseEntity<ResponseData> reverseTxn(@RequestBody RequestData requestBody) {
+			ResponseData response = transactionService.reverseTxn(requestBody);
+			return new ResponseEntity<>(response, HttpStatus.OK);
+		}
 }
