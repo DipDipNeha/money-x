@@ -19,7 +19,7 @@ public class TransactionService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 
@@ -49,7 +49,7 @@ public class TransactionService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 
@@ -79,7 +79,7 @@ public class TransactionService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 
@@ -109,7 +109,7 @@ public class TransactionService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 
@@ -140,7 +140,7 @@ public class TransactionService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -169,7 +169,7 @@ public class TransactionService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -198,7 +198,7 @@ public class TransactionService {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
