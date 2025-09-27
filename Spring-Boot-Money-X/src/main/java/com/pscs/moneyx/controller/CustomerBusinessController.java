@@ -278,7 +278,7 @@ public class CustomerBusinessController {
 	}
 
 	// Get All Customer types
-	@PostMapping("/GetAllCustomerTypes")
+	@PostMapping("/getAllCustomerTypes")
 	public ResponseEntity<ResponseData> GetAllCustomerTypes(@RequestBody RequestData requestBody) {
 
 		ResponseData response = customerBusinessService.GetAllCustomerTypes(requestBody);
