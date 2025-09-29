@@ -38,7 +38,7 @@ public class ServiceBusinessService {
         System.out.println("Request Body: " + requestJson.toString());
 
         String accountNumber = requestJson.getString("accountNumber");
-        WalletAcctData wallet = walletRepo.findByAcctNo(accountNumber);
+        WalletAcctData wallet = null;//walletRepo.findByAcctNo(accountNumber);
 
         if (wallet == null) {
             response.setResponseCode(CoreConstant.FAILURE_CODE);
@@ -48,8 +48,6 @@ public class ServiceBusinessService {
             response.setResponseCode(CoreConstant.SUCCESS_CODE);
             response.setResponseMessage(CoreConstant.SUCCESS);
             JSONObject balance = new JSONObject();
-            balance.put("balance", wallet.getBalance());
-            balance.put("accountNumber", wallet.getAcctNo());
             response.setResponseData(balance.toMap());
         }
         }catch(Exception e) {

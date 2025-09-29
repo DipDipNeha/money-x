@@ -1158,11 +1158,37 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				
 				MoneyXBusiness byCustomerId = moneyXBusinessRepo.findByCustomerId(reqJson.getJSONObject("jbody").getString("customerId"));
+				JSONObject data=callService.getJSONObject("data");
+
+				byCustomerId.setAccountNumber(data.getJSONObject("virtualAccount").getString("accountNumber"));
+				byCustomerId.setAccountType("WALLET");
+				byCustomerId.setCurrency(data.getString("currencyId"));
 				
-				
-				
-				
-				
+				moneyXBusinessRepo.save(byCustomerId);
+				 WalletAcctData wallet=new WalletAcctData() ;
+				 wallet.setAccountNumber(data.getJSONObject("virtualAccount").getString("accountNumber"));
+					wallet.setAvailableBalance(data.optDoubleObject("availableBalance"));
+					wallet.setLedgerBalance(data.optDoubleObject("ledgerBalance"));
+					wallet.setCurrencyId(data.getString("currencyId"));
+					wallet.setCustomerId(reqJson.getJSONObject("jbody").getString("customerId"));
+					wallet.setCustomerTypeId(data.getString("customerTypeId"));
+					wallet.setIsDefault(data.getBoolean("isDefault"));
+					wallet.setIsInternal(data.getBoolean("isInternal"));
+					wallet.setMobNum(data.optString("mobNum"));
+					wallet.setName(data.getString("name"));
+					wallet.setOverdraft(data.optDoubleObject("overdraft"));
+					wallet.setWalletClassificationId("WALLET");
+					wallet.setWalletRestrictionId(data.optString("walletRestrictionId"));
+					wallet.setBankCode(data.getJSONObject("virtualAccount").getString("bankCode"));
+					wallet.setBankName(data.getJSONObject("virtualAccount").getString("bankName"));
+
+					WalletAcctData save = walletAcctDataRepository.save(wallet);
+					if (save == null) {
+						response.setResponseCode(CoreConstant.FAILURE_CODE);
+						response.setResponseMessage(CoreConstant.FAILED + " to create wallet");
+						return response;
+					}
+				 
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
 				response.setResponseData(callService.toMap());
