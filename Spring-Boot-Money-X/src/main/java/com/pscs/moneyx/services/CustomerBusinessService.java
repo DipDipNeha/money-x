@@ -1166,7 +1166,7 @@ public class CustomerBusinessService {
 				
 				moneyXBusinessRepo.save(byCustomerId);
 				 WalletAcctData wallet=new WalletAcctData() ;
-				 wallet.setAccountNumber(data.getJSONObject("virtualAccount").getString("accountNumber"));
+				 	wallet.setAccountNumber(data.getJSONObject("virtualAccount").getString("accountNumber"));
 					wallet.setAvailableBalance(data.optDoubleObject("availableBalance"));
 					wallet.setLedgerBalance(data.optDoubleObject("ledgerBalance"));
 					wallet.setCurrencyId(data.getString("currencyId"));
