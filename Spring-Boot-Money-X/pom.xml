@@ -126,6 +126,14 @@
 			<scope>system</scope>
 			<systemPath>D:\pscs-workspace\lib\embedly-service-integration.0.0.01v.jar</systemPath>
 		</dependency>
+		<dependency>
+			<groupId>com.pscs</groupId>
+			<artifactId>commondb-utils</artifactId>
+			<version>0.1</version>
+			<scope>system</scope>
+			<systemPath>D:\pscs-workspace\lib\commondb-utils.jar</systemPath>
+		</dependency>
+		
 <dependency>
     <groupId>org.apache.httpcomponents</groupId>
     <artifactId>httpclient</artifactId>
