@@ -5,6 +5,7 @@ package com.pscs.moneyx.entity;
 
 import java.util.Date;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,7 +23,9 @@ public class RequestLog {
 	private String channel;
 	private String username;
 	private String reqType;
+	@Column(length=4000)
 	private String request;
+	@Column(length=4000)
 	private String response;
 	private String responseCode;
 	private String responseMessage;
