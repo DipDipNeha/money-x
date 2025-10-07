@@ -100,7 +100,7 @@ public class CommonUtils {
 
 	public static void main(String args[]) {
 
-		System.out.println(b64_sha256("osato.izegbuwa@gmail.com"));
+		System.out.println(b64_sha256("osato.izegbuwa"));
 		System.out.println(getSHA256("12345"));
 
 		System.out.println(getMobileNo("2349177796541"));
