@@ -246,6 +246,9 @@ public class CustomerBusinessService {
 			JSONObject jsonObject = new JSONObject(jsonString);
 			System.out.println("Request Body: " + jsonObject.toString());
 
+
+			otpDataTablRepo.updateOtpStatusByUserId(jHeader.getString("userid"), "E");
+			
 			String otp = CommonUtils.createRandomNumber(6);
 			String encryptedOtp = CommonUtils.b64_sha256(otp);
 			// generate otp by using random
@@ -255,6 +258,8 @@ public class CustomerBusinessService {
 			otpDataTabl.setTransType(jHeader.getString("requestType"));
 			otpDataTabl.setMobileNo(jsonObject.getString("mobileNumber"));
 			otpDataTabl.setEmailId(jsonObject.getString("email"));
+			
+			
 			
 			//get email from db if email is blank
 			if (otpDataTabl.getEmailId() == null || otpDataTabl.getEmailId().isEmpty()) {
@@ -270,8 +275,6 @@ public class CustomerBusinessService {
 					otpDataTabl.setMobileNo(business.getMobileNumber());
 				}
 			}
-			
-			
 			
 			
 			
@@ -346,7 +349,7 @@ public class CustomerBusinessService {
 			String username = requestJson.getString("username");
 			String mobileNumber = requestJson.getString("mobileNumber");
 
-			OtpDataTabl otpDataTabl = otpDataTablRepo.findByUserIdAndOtp(username, CommonUtils.b64_sha256(otp));
+			OtpDataTabl otpDataTabl = otpDataTablRepo.findByUserIdAndOtpAndOtpStatus(username, CommonUtils.b64_sha256(otp),"A");
 
 			// Check if the OTP is older than 2 minutes
 
