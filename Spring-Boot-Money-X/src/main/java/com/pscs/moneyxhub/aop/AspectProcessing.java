@@ -16,7 +16,6 @@ import org.springframework.stereotype.Component;
 
 import com.pscs.moneyxhub.model.RequestData;
 import com.pscs.moneyxhub.model.ResponseData;
-import com.pscs.moneyxhub.services.CustomerBusinessService;
 import com.pscs.moneyxhub.services.RequestLogService;
 
 /**
@@ -31,7 +30,7 @@ public class AspectProcessing {
 	@Autowired
 	private RequestLogService requestLogService;
 
-	@Pointcut("execution(* com.pscs.moneyx.controller.*.*(..))")
+	@Pointcut("execution(* com.pscs.moneyxhub.controller.*.*(..))")
 	public void executeAspects() {
 	};
 

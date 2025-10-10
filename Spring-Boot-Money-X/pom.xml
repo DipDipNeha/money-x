@@ -10,9 +10,10 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.pscs.moneyxhub</groupId>
-	<artifactId>Moneyxhub</artifactId>
+	<artifactId>moneyxhub</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Spring-Boot-jwt-security</name>
+	<packaging>war</packaging>
 	<description>Internet banking service </description>
 	<url />
 	<licenses>
