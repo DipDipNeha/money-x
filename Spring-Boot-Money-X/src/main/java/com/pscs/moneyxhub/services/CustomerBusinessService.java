@@ -879,7 +879,7 @@ public class CustomerBusinessService {
 			response.setResponseCode(CoreConstant.FAILURE_CODE);
 			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
 		}
-		return null;
+		return response;
 	}
 
 
