@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import com.pscs.embedly.caller.EmbedlyServiceCaller;
+import com.pscs.moneyxhub.entity.Country;
 import com.pscs.moneyxhub.entity.CustomerDocInfo;
 import com.pscs.moneyxhub.entity.CustomerLogin;
 import com.pscs.moneyxhub.entity.MoneyXBusiness;
@@ -2388,6 +2389,28 @@ public class CustomerBusinessService {
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
 			}
 			
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		return response;
+	}
+
+	public ResponseData fetchCountryDialCode() {
+		ResponseData response = new ResponseData();
+		try {
+			List<Country> countries = countryRepo.findAll();
+			
+			
+			if (countries.isEmpty()) {
+				response.setResponseCode(CoreConstant.FAILURE_CODE);
+				response.setResponseMessage("No countries found");
+			} else {
+				response.setResponseCode(CoreConstant.SUCCESS_CODE);
+				response.setResponseMessage(CoreConstant.SUCCESS);
+				response.setResponseData(countries);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			response.setResponseCode(CoreConstant.FAILURE_CODE);

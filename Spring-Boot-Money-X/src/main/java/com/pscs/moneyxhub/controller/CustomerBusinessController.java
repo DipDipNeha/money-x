@@ -107,6 +107,13 @@ public class CustomerBusinessController {
 		ResponseData response = customerBusinessService.fetchCountry(requestBody);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
+	//fetch country dial code
+	@PostMapping("/fetchcountrydialcode")
+	public ResponseEntity<ResponseData> fetchCountryDialCode(@RequestBody RequestData requestBody) {
+		ResponseData response = customerBusinessService.fetchCountryDialCode();
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
 
 	// fetch business type
 	@PostMapping("/fetchbusinesstype")
