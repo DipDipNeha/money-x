@@ -3,9 +3,6 @@
  */
 package com.pscs.moneyxhub.controller;
 
-import java.util.Collections;
-import java.util.Optional;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.pscs.moneyxhub.entity.Role;
 import com.pscs.moneyxhub.entity.UserEntity;
 import com.pscs.moneyxhub.helper.ConvertRequestUtils;
 import com.pscs.moneyxhub.model.RequestData;
@@ -64,24 +60,24 @@ public class AuthenticationController {
 		ResponseData responseData = new ResponseData();
 		UserEntity entity = new UserEntity();
 		
-		UserEntity userEntity = ConvertRequestUtils.convertValue(requestBody.getJbody(), UserEntity.class);
-		if (userRepo.existsByUsername(userEntity.getUsername())) {
-			responseData.setResponseCode("01");
-			responseData.setResponseMessage("User Already Registered!");
-			return new ResponseEntity<>(responseData, HttpStatus.BAD_REQUEST);
-		}
-
-		entity.setUsername(userEntity.getUsername());
-		entity.setPassword(passwordEncoder.encode(userEntity.getPassword()));
-		Optional<Role> roleList = roleRepo.findByName("USER");
-		Role role = null;
-		if (roleList.isPresent()) {
-			role = roleList.get();
-		}
-		entity.setRole(Collections.singletonList(role));
-		userRepo.save(entity);
-		responseData.setResponseCode("00");
-		responseData.setResponseMessage("User Registered Successfully!");
+//		UserEntity userEntity = ConvertRequestUtils.convertValue(requestBody.getJbody(), UserEntity.class);
+//		if (userRepo.existsByUsername(userEntity.getUsername())) {
+//			responseData.setResponseCode("01");
+//			responseData.setResponseMessage("User Already Registered!");
+//			return new ResponseEntity<>(responseData, HttpStatus.BAD_REQUEST);
+//		}
+//
+//		entity.setUsername(userEntity.getUsername());
+//		entity.setPassword(passwordEncoder.encode(userEntity.getPassword()));
+//		Optional<Role> roleList = roleRepo.findByName("USER");
+//		Role role = null;
+//		if (roleList.isPresent()) {
+//			role = roleList.get();
+//		}
+//		entity.setRole(Collections.singletonList(role));
+//		userRepo.save(entity);
+		responseData.setResponseCode("01");
+		responseData.setResponseMessage("User Registration is disabled!");
 		return new ResponseEntity<>(responseData, HttpStatus.OK);
 	}
 

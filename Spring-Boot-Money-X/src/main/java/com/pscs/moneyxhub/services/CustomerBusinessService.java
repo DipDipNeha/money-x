@@ -5,11 +5,11 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import com.pscs.embedly.caller.EmbedlyServiceCaller;
-import com.pscs.moneyxhub.entity.Country;
 import com.pscs.moneyxhub.entity.CustomerDocInfo;
 import com.pscs.moneyxhub.entity.CustomerLogin;
 import com.pscs.moneyxhub.entity.MoneyXBusiness;
@@ -201,9 +201,15 @@ public class CustomerBusinessService {
 			customerLogin.setTxnPin(jsonObject.getString("txnPin"));
 			customerLogin.setAuthType(jsonObject.getString("authType"));
 			customerLogin.setAuthValue(jsonObject.getString("authValue"));
-			customerLogin.setCustomerType(jsonObject.getString("customerType"));
-			customerLogin.setCustomerId(jsonObject.getString("customerId"));
+			customerLogin.setCustomerType(jsonObject.has("customerType") ?  jsonObject.getString("customerType"):"");
+			customerLogin.setCustomerId(jsonObject.has("customerId") ?jsonObject.getString("customerId"):"");
 
+			
+			ResponseData validateOtp = validateOtp(request);	
+			if (!validateOtp.getResponseCode().equals(CoreConstant.SUCCESS_CODE)) {
+				return validateOtp; // Return if OTP validation fails
+			}else {
+			
 			customerLogin.setIsActive("A");
 			customerLogin.setIsLocked("N");
 			customerLogin.setIsLoginAttemptActive("Y");
@@ -212,20 +218,54 @@ public class CustomerBusinessService {
 
 			MoneyXBusiness customer = moneyXBusinessRepo.findByEmailAddressOrUserName(jsonObject.getString("emailAddress"),jsonObject.getString("userName"));
 			if (customer == null) {
-				customer = moneyXBusinessRepo.save(customerLogin);
-				if (customer == null) {
-					response.setResponseCode(CoreConstant.FAILURE_CODE);
-					response.setResponseMessage(CoreConstant.FAILED + " to Create Profile");
+				
+				String requestJson = ConvertRequestUtils.getJsonString(request);
 
+				JSONObject reqJson = new JSONObject(requestJson);
+				
+				
+
+				
+				EmbedlyServiceCaller service = new EmbedlyServiceCaller();
+				 JSONObject callService = service.callService(reqJson);
+				
+				if (callService.getString("respCode").equals("00")) {
+					
+					
+					JSONObject responseData = callService.getJSONObject("data");
+					
+					customerLogin.setCustomerId(responseData.getString("id"));
+					
+					
+					customer = moneyXBusinessRepo.save(customerLogin);
+					if (customer == null) {
+						response.setResponseCode(CoreConstant.FAILURE_CODE);
+						response.setResponseMessage(CoreConstant.FAILED + " to Create Profile");
+
+					} else {
+						response.setResponseCode(CoreConstant.SUCCESS_CODE);
+						response.setResponseMessage(CoreConstant.SUCCESS + " Profile Created Successfully");
+					}
+					buildResponseData(response, callService);
 				} else {
-					response.setResponseCode(CoreConstant.SUCCESS_CODE);
-					response.setResponseMessage(CoreConstant.SUCCESS + " Profile Created Successfully");
-					response.setResponseData(customer);
+					response.setResponseCode(CoreConstant.FAILURE_CODE);
+					response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
 				}
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(
 						CoreConstant.RECORD_ALREADY_EXISTS+":" + jsonObject.getString("accountNumber"));
+			}
 			}
 
 		} catch (Exception e) {
@@ -249,7 +289,7 @@ public class CustomerBusinessService {
 
 			otpDataTablRepo.updateOtpStatusByUserId(jHeader.getString("userid"), "E");
 			
-			String otp = CommonUtils.createRandomNumber(6);
+			String otp = "221232" ;// CommonUtils.createRandomNumber(6);
 			String encryptedOtp = CommonUtils.b64_sha256(otp);
 			// generate otp by using random
 			OtpDataTabl otpDataTabl = new OtpDataTabl();
@@ -341,15 +381,16 @@ public class CustomerBusinessService {
 
 			System.out.println("Request : " + request);
 			String jsonString = ConvertRequestUtils.getJsonString(request.getJbody());
-
+			String strJheader = ConvertRequestUtils.getJsonString(request.getJheader());
+			JSONObject jHeader = new JSONObject(strJheader);
 			JSONObject requestJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + requestJson.toString());
 
 			String otp = requestJson.getString("authValue");
-			String username = requestJson.getString("username");
+			String username = jHeader.getString("userid");
 			String mobileNumber = requestJson.getString("mobileNumber");
 
-			OtpDataTabl otpDataTabl = otpDataTablRepo.findByUserIdAndOtpAndOtpStatus(username, CommonUtils.b64_sha256(otp),"A");
+			OtpDataTabl otpDataTabl = otpDataTablRepo.findByMobileNoAndOtpAndOtpStatus(mobileNumber, CommonUtils.b64_sha256(otp),"A");
 
 			// Check if the OTP is older than 2 minutes
 
@@ -468,7 +509,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -608,7 +649,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -639,7 +680,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -672,7 +713,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -703,7 +744,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -735,7 +776,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -767,7 +808,11 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				
+				
+				buildResponseData(response, callService);
+				
+				
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -780,6 +825,30 @@ public class CustomerBusinessService {
 			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
 		}
 		return response;
+	}
+	
+	
+	public static void buildResponseData(ResponseData response, JSONObject callService) {
+		Object data = callService.get("data");
+
+		if (data instanceof JSONObject) {
+		    response.setResponseData(((JSONObject) data).toMap());
+		} else if (data instanceof JSONArray) {
+		    JSONArray jsonArray = (JSONArray) data;
+		    List<Object> list = new ArrayList<>();
+		    for (int i = 0; i < jsonArray.length(); i++) {
+		        Object element = jsonArray.get(i);
+		        if (element instanceof JSONObject) {
+		            list.add(((JSONObject) element).toMap());
+		        } else {
+		            list.add(element);
+		        }
+		    }
+		    response.setResponseData(list);
+		} else {
+		    response.setResponseData(callService.toMap());
+		}
+
 	}
 
 	
@@ -799,7 +868,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -830,7 +899,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -860,7 +929,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -889,7 +958,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -921,7 +990,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -951,7 +1020,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -981,7 +1050,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -1011,7 +1080,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -1041,7 +1110,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -1071,7 +1140,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -1101,7 +1170,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -1131,7 +1200,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -1194,7 +1263,7 @@ public class CustomerBusinessService {
 				 
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -1225,7 +1294,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -1256,7 +1325,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -1287,7 +1356,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -1317,7 +1386,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -1348,7 +1417,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -1380,7 +1449,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -1410,7 +1479,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -1440,7 +1509,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -1471,7 +1540,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -1500,7 +1569,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -1529,7 +1598,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -1560,7 +1629,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -1590,7 +1659,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -1620,7 +1689,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -1651,7 +1720,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -1681,7 +1750,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -1711,7 +1780,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -1741,7 +1810,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -1771,7 +1840,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -1801,7 +1870,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -1831,7 +1900,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -1861,7 +1930,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -1891,7 +1960,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -1921,7 +1990,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -1951,7 +2020,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -1981,7 +2050,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -2011,7 +2080,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -2041,7 +2110,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -2071,7 +2140,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -2101,7 +2170,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -2131,7 +2200,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -2162,7 +2231,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -2192,7 +2261,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -2222,7 +2291,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -2252,7 +2321,7 @@ public class CustomerBusinessService {
 		if (callService.getString("respCode").equals("00")) {
 			response.setResponseCode(CoreConstant.SUCCESS_CODE);
 			response.setResponseMessage(CoreConstant.SUCCESS);
-			response.setResponseData(callService.toMap());
+			buildResponseData(response, callService);
 		} else {
 			response.setResponseCode(CoreConstant.FAILURE_CODE);
 			response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -2283,7 +2352,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -2313,7 +2382,7 @@ public class CustomerBusinessService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));

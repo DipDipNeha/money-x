@@ -2,10 +2,13 @@ package com.pscs.moneyxhub.services;
 
 
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
@@ -281,7 +284,7 @@ public class EkycService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -313,7 +316,7 @@ public class EkycService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -344,7 +347,7 @@ public class EkycService {
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
-				response.setResponseData(callService.toMap());
+				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
@@ -359,4 +362,26 @@ public class EkycService {
 		return response;
 	}
 
+	public static void buildResponseData(ResponseData response, JSONObject callService) {
+		Object data = callService.get("data");
+
+		if (data instanceof JSONObject) {
+		    response.setResponseData(((JSONObject) data).toMap());
+		} else if (data instanceof JSONArray) {
+		    JSONArray jsonArray = (JSONArray) data;
+		    List<Object> list = new ArrayList<>();
+		    for (int i = 0; i < jsonArray.length(); i++) {
+		        Object element = jsonArray.get(i);
+		        if (element instanceof JSONObject) {
+		            list.add(((JSONObject) element).toMap());
+		        } else {
+		            list.add(element);
+		        }
+		    }
+		    response.setResponseData(list);
+		} else {
+		    response.setResponseData(callService.toMap());
+		}
+
+	}
 }

@@ -27,6 +27,7 @@ public interface OtpDataTablRepo extends JpaRepository<OtpDataTabl, Long> {
 	int updateOtpStatusByUserId(String userId, String newStatus);
 
 	OtpDataTabl findByUserIdAndOtpAndOtpStatus(String username, String b64_sha256, String string);
+	OtpDataTabl findByMobileNoAndOtpAndOtpStatus(String mobileno, String b64_sha256, String string);
 
 	
 
