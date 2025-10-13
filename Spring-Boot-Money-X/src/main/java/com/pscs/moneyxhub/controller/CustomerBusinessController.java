@@ -561,5 +561,10 @@ public class CustomerBusinessController {
 		ResponseData response = customerBusinessService.mapPhysAfrigoCard(requestBody);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-
+	//get OrganizationId
+    @PostMapping("/getOrgId")
+	public ResponseEntity<ResponseData> getOrgId(@RequestBody RequestData requestBody) {
+		ResponseData response = customerBusinessService.getOrgId(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 }

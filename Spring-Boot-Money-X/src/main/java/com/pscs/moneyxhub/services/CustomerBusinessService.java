@@ -3,6 +3,7 @@ package com.pscs.moneyxhub.services;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.ResourceBundle;
 
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
@@ -38,6 +39,7 @@ import jakarta.transaction.Transactional;
 @Service
 public class CustomerBusinessService {
 	private static final Logger logger = Logger.getLogger(CustomerBusinessService.class);
+	private ResourceBundle bundle = ResourceBundle.getBundle("embedlyservice");
 	private final CustomerLoginRepo customerLoginRepo;
 	private final CountryRepo countryRepo;
 	private final BusinessTypeRepo businessTypeRepo;
@@ -265,7 +267,7 @@ public class CustomerBusinessService {
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(
-						CoreConstant.RECORD_ALREADY_EXISTS+":" + jsonObject.getString("accountNumber"));
+						CoreConstant.RECORD_ALREADY_EXISTS+":" + jsonObject.getString("emailAddress"));
 			}
 			}
 
@@ -2416,6 +2418,24 @@ public class CustomerBusinessService {
 			response.setResponseCode(CoreConstant.FAILURE_CODE);
 			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
 		}
+		return response;
+	}
+
+	public ResponseData getOrgId(RequestData requestBody) {
+	ResponseData response = new ResponseData();
+	try {
+		
+		List<String> orgIds =new ArrayList<>();
+		orgIds.add(bundle.getString("ORG_ID"));
+		response.setResponseCode(CoreConstant.SUCCESS_CODE);
+		response.setResponseMessage(CoreConstant.SUCCESS);
+		response.setResponseData(orgIds);
+	}
+	catch (Exception e) {
+		e.printStackTrace();
+		response.setResponseCode(CoreConstant.FAILURE_CODE);
+		response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+	}
 		return response;
 	}
 

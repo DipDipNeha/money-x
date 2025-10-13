@@ -40,11 +40,11 @@ public class RequestLogService {
 		JSONObject requestJson = ConvertRequestUtils.convertRequestDataToJson(response);
 		JSONObject responseJson = ConvertRequestUtils.convertRequestDataToJson(request);
 		
-		requestLog.setResponse(requestJson.toString());
+		requestLog.setResponse(requestJson.toString().length() > 4000 ? requestJson.toString().substring(0, 3999) : requestJson.toString());
 		
 		requestLog.setResponseCode(response.getResponseCode());
 		requestLog.setResponseMessage(response.getResponseMessage());
-		requestLog.setRequest(responseJson.toString());
+		requestLog.setRequest(responseJson.toString().length() > 4000 ? responseJson.toString().substring(0, 3999) : responseJson.toString());
 		
 		requestLogRepo.save(requestLog);
 	} catch (Exception e) {
