@@ -1,5 +1,7 @@
 package com.pscs.moneyxhub.entity;
 
+import java.util.Date;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -30,6 +32,22 @@ public class WalletAcctData {
 	private String bankCode;
 	private String bankName;	
 	private String accountNumber;
+	private String walletId;
+	private Date createdAt;
+	
+	
+	public Date getCreatedAt() {
+		return createdAt;
+	}
+	public void setCreatedAt(Date createdAt) {
+		this.createdAt = createdAt;
+	}
+	public String getWalletId() {
+		return walletId;
+	}
+	public void setWalletId(String walletId) {
+		this.walletId = walletId;
+	}
 	public Long getId() {
 		return id;
 	}
@@ -139,9 +157,9 @@ public class WalletAcctData {
 				+ ", walletRestrictionId=" + walletRestrictionId + ", walletClassificationId=" + walletClassificationId
 				+ ", currencyId=" + currencyId + ", isInternal=" + isInternal + ", isDefault=" + isDefault + ", name="
 				+ name + ", overdraft=" + overdraft + ", mobNum=" + mobNum + ", customerTypeId=" + customerTypeId
-				+ ", bankCode=" + bankCode + ", bankName=" + bankName + ", accountNumber=" + accountNumber + "]";
+				+ ", bankCode=" + bankCode + ", bankName=" + bankName + ", accountNumber=" + accountNumber
+				+ ", walletId=" + walletId + "]";
 	}
-	
 	
 	
 }

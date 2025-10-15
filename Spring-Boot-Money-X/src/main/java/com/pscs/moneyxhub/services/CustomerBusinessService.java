@@ -132,9 +132,26 @@ public class CustomerBusinessService {
 				} else {
 					checkCustomerres.setLastLoginTime(new Date() + "");
 
+					
+					
 					response.setResponseCode(CoreConstant.SUCCESS_CODE);
 					response.setResponseMessage(CoreConstant.LOGIN_SUCCESSFUL);
-					response.setResponseData(checkCustomerres);
+					
+					String customerResponse = ConvertRequestUtils.getJsonString(checkCustomerres);
+					JSONObject customerJson = new JSONObject(customerResponse);
+					
+					WalletAcctData walletAcctData = walletAcctDataRepository
+							.findByCustomerId(checkCustomerres.getCustomerId());
+					if (walletAcctData != null) {
+							customerJson.put("walletId",walletAcctData.getWalletId());
+						
+						} else {
+							customerJson.put("walletId", "");
+							
+						}
+					
+					
+					response.setResponseData(customerJson.toMap());
 					if (isLoginAttemptActive.equals("Y")) {
 						moneyXBusinessRepo.resetRetryLoginAttempt(checkCustomerres.getUserName());
 					}
@@ -1330,7 +1347,9 @@ public class CustomerBusinessService {
 					wallet.setWalletRestrictionId(data.optString("walletRestrictionId"));
 					wallet.setBankCode(data.getJSONObject("virtualAccount").getString("bankCode"));
 					wallet.setBankName(data.getJSONObject("virtualAccount").getString("bankName"));
-
+					wallet.setWalletId(data.getString("id"));
+					wallet.setCreatedAt(new Date());
+					
 					WalletAcctData save = walletAcctDataRepository.save(wallet);
 					if (save == null) {
 						response.setResponseCode(CoreConstant.FAILURE_CODE);
