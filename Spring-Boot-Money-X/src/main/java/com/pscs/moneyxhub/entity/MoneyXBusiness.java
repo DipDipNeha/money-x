@@ -31,13 +31,23 @@ public class MoneyXBusiness {
 	private String customerTypeId;
 	private String address;
 	private String city;
+	private String gender;
+	private String nationality;
+	private String stateOfResidence;
+	private String marital_status;
+	private String lgaOfResidence;
 	
+
+	private String occupation;
 	private String countryId;
 	
 	
 	private String alias;
 	private String bvn;
+	private boolean bvnVerified;
+	
 	private String nin;
+	private boolean ninVerified;
 	private String meterNumber;
 	private String houseAddress;
 	
@@ -258,21 +268,81 @@ public class MoneyXBusiness {
 	public void setIsLoginAttemptActive(String isLoginAttemptActive) {
 		this.isLoginAttemptActive = isLoginAttemptActive;
 	}
+	public String getGender() {
+		return gender;
+	}
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+	
+	
+	public String getOccupation() {
+		return occupation;
+	}
+
+	public void setOccupation(String occupation) {
+		this.occupation = occupation;
+	}
+
+	public boolean isBvnVerified() {
+		return bvnVerified;
+	}
+
+	public void setBvnVerified(boolean bvnVerified) {
+		this.bvnVerified = bvnVerified;
+	}
+
+	public boolean isNinVerified() {
+		return ninVerified;
+	}
+
+	public void setNinVerified(boolean ninVerified) {
+		this.ninVerified = ninVerified;
+	}	
+	
+	
+	public String getNationality() {
+		return nationality;
+	}
+	public void setNationality(String nationality) {
+		this.nationality = nationality;
+	}
+	public String getStateOfResidence() {
+		return stateOfResidence;
+	}
+	public void setStateOfResidence(String stateOfResidence) {
+		this.stateOfResidence = stateOfResidence;
+	}
+	public String getMarital_status() {
+		return marital_status;
+	}
+	public void setMarital_status(String marital_status) {
+		this.marital_status = marital_status;
+	}
+	
+	public String getLgaOfResidence() {
+		return lgaOfResidence;
+	}
+
+	public void setLgaOfResidence(String lgaOfResidence) {
+		this.lgaOfResidence = lgaOfResidence;
+	}
 	@Override
 	public String toString() {
 		return "MoneyXBusiness [id=" + id + ", organizationId=" + organizationId + ", firstName=" + firstName
 				+ ", lastName=" + lastName + ", middleName=" + middleName + ", emailAddress=" + emailAddress
 				+ ", mobileNumber=" + mobileNumber + ", dob=" + dob + ", customerTypeId=" + customerTypeId
-				+ ", address=" + address + ", city=" + city + ", countryId=" + countryId + ", alias=" + alias + ", bvn="
-				+ bvn + ", nin=" + nin + ", meterNumber=" + meterNumber + ", houseAddress=" + houseAddress
-				+ ", accountNumber=" + accountNumber + ", accountType=" + accountType + ", currency=" + currency
-				+ ", userName=" + userName + ", password=" + password + ", txnPin=" + txnPin + ", authType=" + authType
-				+ ", authValue=" + authValue + ", customerType=" + customerType + ", customerId=" + customerId
-				+ ", docInfo=" + docInfo + ", retryLoginAttempt=" + retryLoginAttempt + ", isLocked=" + isLocked
-				+ ", isActive=" + isActive + ", lastLoginTime=" + lastLoginTime + ", isLoginAttemptActive="
-				+ isLoginAttemptActive + "]";
+				+ ", address=" + address + ", city=" + city + ", gender=" + gender + ", nationality=" + nationality
+				+ ", stateOfResidence=" + stateOfResidence + ", marital_status=" + marital_status + ", lgaOfResidence="
+				+ lgaOfResidence + ", occupation=" + occupation + ", countryId=" + countryId + ", alias=" + alias
+				+ ", bvn=" + bvn + ", bvnVerified=" + bvnVerified + ", nin=" + nin + ", ninVerified=" + ninVerified
+				+ ", meterNumber=" + meterNumber + ", houseAddress=" + houseAddress + ", accountNumber=" + accountNumber
+				+ ", accountType=" + accountType + ", currency=" + currency + ", userName=" + userName + ", password="
+				+ password + ", txnPin=" + txnPin + ", authType=" + authType + ", authValue=" + authValue
+				+ ", customerType=" + customerType + ", customerId=" + customerId + ", docInfo=" + docInfo
+				+ ", retryLoginAttempt=" + retryLoginAttempt + ", isLocked=" + isLocked + ", isActive=" + isActive
+				+ ", lastLoginTime=" + lastLoginTime + ", isLoginAttemptActive=" + isLoginAttemptActive + "]";
 	}
-	
 	
 	
 	

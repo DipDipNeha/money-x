@@ -13,10 +13,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import com.pscs.moneyxhub.repo.MoneyXBusinessRepo;
+
 @Service
 public class EkycPostingService {
 
 	private ResourceBundle bundle = ResourceBundle.getBundle("ekyc");
+	
 
 	public JSONObject sendPostRequest(String jsonBody, String urlType) {
 		JSONObject responseJson = new JSONObject();

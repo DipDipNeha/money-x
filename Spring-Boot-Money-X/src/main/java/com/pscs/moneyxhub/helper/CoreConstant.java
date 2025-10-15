@@ -70,5 +70,6 @@ public interface CoreConstant {
 	String ORDER_PLACED = "Order Placed Successfully";
 	String PROFILE_LOCKED = "Profile is Locked, Please Contact Support";
 	String USER_EXIST="User already Exist";
+	String INVALID_USERNAME = "Invalid Username";
 
 }

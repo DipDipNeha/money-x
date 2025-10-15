@@ -23,8 +23,8 @@ public interface OtpDataTablRepo extends JpaRepository<OtpDataTabl, Long> {
 	OtpDataTabl findByUserIdAndOtpAndChannel(String userId, String otp, String channel);
 	@Modifying
 	@Transactional
-	@Query("UPDATE OtpDataTabl u SET u.otpStatus = :newStatus WHERE u.userId = :userId AND u.otpStatus = 'A'")
-	int updateOtpStatusByUserId(String userId, String newStatus);
+	@Query("UPDATE OtpDataTabl u SET u.otpStatus = :newStatus WHERE u.mobileNo = :mobileNo AND u.otpStatus = 'A'")
+	int updateMobileNoandOtpStatus(String mobileNo, String newStatus);
 
 	OtpDataTabl findByUserIdAndOtpAndOtpStatus(String username, String b64_sha256, String string);
 	OtpDataTabl findByMobileNoAndOtpAndOtpStatus(String mobileno, String b64_sha256, String string);

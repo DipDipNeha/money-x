@@ -85,6 +85,12 @@ public class CustomerBusinessService {
 			
 			MoneyXBusiness checkCustomerres = moneyXBusinessRepo.findByUserName(requestJson.getString("username"));
 			if (checkCustomerres != null) {
+				
+//				ResponseData validateOtp = validateOtp(request);
+				
+				
+				
+				
 				isLoginAttemptActive = checkCustomerres.getIsLoginAttemptActive();
 				retryLoginAttempt = checkCustomerres.getRetryLoginAttempt();
 
@@ -255,14 +261,7 @@ public class CustomerBusinessService {
 					response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
 				}
 				
-				
-				
-				
-				
-				
-				
-				
-				
+			
 				
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
@@ -281,6 +280,8 @@ public class CustomerBusinessService {
 		ResponseData response = new ResponseData();
 		try {
 
+			String mobileNumber = "";
+			String email = "";
 			System.out.println("Request : " + request);
 			String jsonString = ConvertRequestUtils.getJsonString(request.getJbody());
 			String strJheader = ConvertRequestUtils.getJsonString(request.getJheader());
@@ -288,9 +289,23 @@ public class CustomerBusinessService {
 
 			JSONObject jsonObject = new JSONObject(jsonString);
 			System.out.println("Request Body: " + jsonObject.toString());
-
-
-			otpDataTablRepo.updateOtpStatusByUserId(jHeader.getString("userid"), "E");
+			
+			String requestType = jHeader.getString("requestType");
+			
+			if (requestType.equals("LOGIN_OTP")) {
+				
+				MoneyXBusiness byUserName = moneyXBusinessRepo.findByUserName(jsonObject.getString("username"));
+				mobileNumber= byUserName != null ? byUserName.getMobileNumber():"";
+				email = byUserName != null ? byUserName.getEmailAddress():"";
+				
+			}
+			else {
+				mobileNumber = jsonObject.getString("mobileNumber");
+				email = jsonObject.has("email")?   jsonObject.getString("email"):"";
+			}
+			
+			
+			otpDataTablRepo.updateMobileNoandOtpStatus(mobileNumber, "E");
 			
 			String otp = "221232" ;// CommonUtils.createRandomNumber(6);
 			String encryptedOtp = CommonUtils.b64_sha256(otp);
@@ -299,8 +314,8 @@ public class CustomerBusinessService {
 			otpDataTabl.setOtp(encryptedOtp);
 			otpDataTabl.setUserId(jHeader.getString("userid"));
 			otpDataTabl.setTransType(jHeader.getString("requestType"));
-			otpDataTabl.setMobileNo(jsonObject.getString("mobileNumber"));
-			otpDataTabl.setEmailId(jsonObject.getString("email"));
+			otpDataTabl.setMobileNo(mobileNumber);
+			otpDataTabl.setEmailId(email);
 			
 			
 			
@@ -332,9 +347,9 @@ public class CustomerBusinessService {
 				return response;
 			} else {
 				JSONObject smsRequest = new JSONObject();
-				if (jsonObject.getString("mobileNumber").startsWith("234")) {
+				if (mobileNumber.startsWith("234")) {
 
-					smsRequest.put("messages", ConvertRequestUtils.generateSMSJson(jsonObject.getString("mobileNumber"),
+					smsRequest.put("messages", ConvertRequestUtils.generateSMSJson(mobileNumber,
 							jHeader.getString("requestType"), otp));
 
 				} else {
@@ -381,6 +396,9 @@ public class CustomerBusinessService {
 	public ResponseData validateOtp(RequestData request) {
 		ResponseData response = new ResponseData();
 		try {
+			
+			String mobileNumber = "";
+			String email = "";
 
 			System.out.println("Request : " + request);
 			String jsonString = ConvertRequestUtils.getJsonString(request.getJbody());
@@ -388,14 +406,31 @@ public class CustomerBusinessService {
 			JSONObject jHeader = new JSONObject(strJheader);
 			JSONObject requestJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + requestJson.toString());
+			
+			String requestType = jHeader.getString("requestType");
+			
+			
+			if (requestType.equals("LOGIN")) {
+
+				MoneyXBusiness byUserName = moneyXBusinessRepo.findByUserName(requestJson.getString("username"));
+				mobileNumber = byUserName != null ? byUserName.getMobileNumber() : "";
+				email = byUserName != null ? byUserName.getEmailAddress() : "";
+
+			} else {
+				mobileNumber = requestJson.getString("mobileNumber");
+				email = requestJson.has("email") ? requestJson.getString("email") : "";
+			}
+			
 
 			String otp = requestJson.getString("authValue");
 			String username = jHeader.getString("userid");
-			String mobileNumber = requestJson.getString("mobileNumber");
+//			String mobileNumber = requestJson.getString("mobileNumber");
+			String encryptedOtp = CommonUtils.b64_sha256(otp);
+			
+			
+			
+			OtpDataTabl otpDataTabl = otpDataTablRepo.findByMobileNoAndOtpAndOtpStatus(mobileNumber, encryptedOtp,"A");
 
-			OtpDataTabl otpDataTabl = otpDataTablRepo.findByMobileNoAndOtpAndOtpStatus(mobileNumber, CommonUtils.b64_sha256(otp),"A");
-
-			// Check if the OTP is older than 2 minutes
 
 			if (otpDataTabl != null) {
 				long otpCreationTime = otpDataTabl.getTransDttm().getTime();
@@ -463,11 +498,11 @@ public class CustomerBusinessService {
 				String oldPassword = CommonUtils.b64_sha256(requestJson.getString("password"));
 				String newPassword = CommonUtils.b64_sha256(requestJson.getString("newPassword"));
 				// find customer login by username
-				MoneyXBusiness customerLogin = moneyXBusinessRepo.findByUserNameAndPassword(username, oldPassword);
+				MoneyXBusiness customerLogin = moneyXBusinessRepo.findByUserName(username);
 
 				if (customerLogin == null) {
 					response.setResponseCode(CoreConstant.FAILURE_CODE);
-					response.setResponseMessage(CoreConstant.INVALID_CREDENTIALS);
+					response.setResponseMessage(CoreConstant.INVALID_USERNAME);
 
 				} else {
 					customerLogin.setPassword(newPassword);
@@ -767,7 +802,9 @@ public class CustomerBusinessService {
 		try {
 			System.out.println("Request : " + requestBody);
 			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
+	        String jsonStringHeader = ConvertRequestUtils.getJsonString(requestBody.getJheader());
 
+	        JSONObject jsonHeader = new JSONObject(jsonStringHeader);
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
 
@@ -777,6 +814,31 @@ public class CustomerBusinessService {
 			System.out.println("Response " + response.toString());
 			
 			if (callService.getString("respCode").equals("00")) {
+				
+				
+				String userId = jsonHeader.optString("userid");
+	            MoneyXBusiness byUserName = moneyXBusinessRepo.findByUserName(userId);
+
+				if (byUserName == null) {
+					response.setResponseCode(CoreConstant.FAILURE_CODE);
+					response.setResponseMessage(CoreConstant.USER_NOT_FOUND + ": " + userId);
+					return response;
+				}
+	            byUserName.setFirstName(reqJson.optString("firstName", byUserName.getFirstName()));
+	            byUserName.setLastName(reqJson.optString("lastName", byUserName.getLastName()));
+	            byUserName.setMiddleName(reqJson.optString("middleName", byUserName.getMiddleName()));
+	            byUserName.setDob(reqJson.optString("dob", byUserName.getDob()));
+	            byUserName.setCity(reqJson.optString("city", byUserName.getCity()));
+	            byUserName.setAddress(reqJson.optString("address", byUserName.getAddress()));
+	            byUserName.setOccupation(reqJson.optString("occupation", byUserName.getOccupation()));
+				byUserName.setGender(reqJson.optString("gender", byUserName.getGender()));
+	            byUserName.setBvn(reqJson.optString("bvn", byUserName.getBvn()));
+	            byUserName.setNin(reqJson.optString("nin", byUserName.getNin()));
+	            byUserName.setBvnVerified(reqJson.optBoolean("bvnVerified", byUserName.isBvnVerified()));
+	            byUserName.setNinVerified(reqJson.optBoolean("ninVerified", byUserName.isNinVerified()));
+	            moneyXBusinessRepo.save(byUserName);
+	            
+				
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
 				buildResponseData(response, callService);
@@ -800,6 +862,9 @@ public class CustomerBusinessService {
 		try {
 			System.out.println("Request : " + requestBody);
 			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
+			 String jsonStringHeader = ConvertRequestUtils.getJsonString(requestBody.getJheader());
+
+		        JSONObject jsonHeader = new JSONObject(jsonStringHeader);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -809,6 +874,15 @@ public class CustomerBusinessService {
 			System.out.println("Response " + response.toString());
 			
 			if (callService.getString("respCode").equals("00")) {
+				
+				
+				String userId = jsonHeader.optString("userid");
+	            MoneyXBusiness byUserName = moneyXBusinessRepo.findByUserName(userId);
+				byUserName.setMobileNumber(reqJson.optString("mobileNumber", byUserName.getMobileNumber()));
+				byUserName.setEmailAddress(reqJson.optString("emailAddress", byUserName.getEmailAddress()));
+				moneyXBusinessRepo.save(byUserName);
+				
+	            
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
 				

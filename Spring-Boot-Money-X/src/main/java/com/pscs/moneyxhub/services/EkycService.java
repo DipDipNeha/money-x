@@ -13,10 +13,12 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import com.pscs.embedly.caller.EmbedlyServiceCaller;
+import com.pscs.moneyxhub.entity.MoneyXBusiness;
 import com.pscs.moneyxhub.helper.ConvertRequestUtils;
 import com.pscs.moneyxhub.helper.CoreConstant;
 import com.pscs.moneyxhub.model.RequestData;
 import com.pscs.moneyxhub.model.ResponseData;
+import com.pscs.moneyxhub.repo.MoneyXBusinessRepo;
 import com.pscs.moneyxhub.services.post.EkycPostingService;
 
 /**
@@ -26,18 +28,29 @@ import com.pscs.moneyxhub.services.post.EkycPostingService;
 public class EkycService {
 	private static Logger logger = Logger.getLogger(EkycService.class);
 	private final EkycPostingService ekycPostingService;
-
-	public EkycService(EkycPostingService ekycPostingService) {
+private final MoneyXBusinessRepo moneyXBusinessRepo;
+	
+	
+	
+	public EkycService(EkycPostingService ekycPostingService, MoneyXBusinessRepo moneyXBusinessRepo) {
 		this.ekycPostingService = ekycPostingService;
+		this.moneyXBusinessRepo = moneyXBusinessRepo;
 	}
 
 	public ResponseData doEkyc(RequestData request) {
+	    ResponseData responseData = new ResponseData();
 	    try {
 	        logger.info("Request: " + request);
-	        String jsonString = ConvertRequestUtils.getJsonString(request.getJbody());
-	        logger.info("Request JSON String: " + jsonString);
 
+	        String jrequest = ConvertRequestUtils.getJsonString(request);
+	        JSONObject jrequestjson = new JSONObject(jrequest);
+
+	        String jsonString = ConvertRequestUtils.getJsonString(request.getJbody());
+	        String jsonStringHeader = ConvertRequestUtils.getJsonString(request.getJheader());
+
+	        JSONObject jsonHeader = new JSONObject(jsonStringHeader);
 	        JSONObject jsonObject = new JSONObject(jsonString);
+
 	        String ekycNumber = jsonObject.optString("ekycNumber");
 	        String ekycType = jsonObject.optString("ekycType");
 	        String businessCountry = jsonObject.optString("businessCountry");
@@ -46,29 +59,89 @@ public class EkycService {
 	        if (isNullOrEmpty(businessCountry)) {
 	            return createErrorResponse("Business Country is missing", "400");
 	        }
-
 	        if (isNullOrEmpty(ekycType)) {
 	            return createErrorResponse("Ekyc Type is missing", "400");
 	        }
-
-	        // Determine URL and parameters based on country and ekyc type
-	        String urlType = getUrlType(businessCountry, ekycType);
-	        if (urlType == null) {
-	            return createErrorResponse("Invalid Ekyc Type or Business Country", "400");
+	        if (isNullOrEmpty(ekycNumber)) {
+	            return createErrorResponse("Ekyc Number is missing", "400");
 	        }
 
-	        String params = getParams(ekycType, ekycNumber, jsonObject);
-	        if (params == null) {
-	            return createErrorResponse("Invalid parameters for Ekyc Type", "400");
+	        // Placeholder for Embedly or API call response
+	        JSONObject apiResponse;
+	     // Process the request
+	        // JSONObject apiResponse = ekycPostingService.sendGetRequest(jsonString, urlType, params); 
+	        // return processApiResponse(apiResponse);
+	        if ("NIN".equalsIgnoreCase(ekycType)) {
+	            apiResponse = customerKycUpgrade(jrequestjson);
+	        } else {
+	            apiResponse = premiumEkyc(jrequestjson);
 	        }
 
-	        // Process the request
-	        JSONObject apiResponse = ekycPostingService.sendGetRequest(jsonString, urlType, params);
-	        return processApiResponse(apiResponse);
+	        logger.info("API Response: " + apiResponse);
+
+	        String respCode = apiResponse.optString("respCode", "99");
+	        if ("00".equalsIgnoreCase(respCode)) {
+	        	
+	        	
+	        	
+	        	
+	        	
+	        	
+	            String userId = jsonHeader.optString("userid");
+	            MoneyXBusiness byUserName = moneyXBusinessRepo.findByUserName(userId);
+
+	            if (byUserName != null) {
+	                if ("NIN".equalsIgnoreCase(ekycType)) {
+	                    byUserName.setNin(ekycNumber);
+	                } else {
+	                	
+	                	JSONObject data = apiResponse.optJSONObject("data");
+	    	        	JSONObject bvnResponse = data.getJSONObject("response");
+	    	        	JSONObject bvn = bvnResponse.getJSONObject("bvn");
+	    	        	
+	                    
+	                    JSONObject summary = bvnResponse.optJSONObject("summary");
+	                    JSONObject bvn_check = summary.optJSONObject("bvn_check");
+	                    
+	                    String status= bvn_check.optString("status");
+//						if ("MATCH".equalsIgnoreCase(status)) {
+							String gender= bvn.optString("gender");
+		    	        	 String nationality = bvn.optString("nationality");
+		    	        	 String stateOfResidence= bvn.optString("state_of_residence");
+		    	        	 String marital_status= bvn.optString("marital_status");
+		    	        	 String lgaOfResidence= bvn.optString("lga_of_residence");
+		    	        	
+		                	
+		                    byUserName.setBvn(ekycNumber);
+		                    byUserName.setGender(gender);
+		                    byUserName.setNationality(nationality);
+		                    byUserName.setStateOfResidence(stateOfResidence);
+		                    byUserName.setMarital_status(marital_status);
+		                    byUserName.setLgaOfResidence(lgaOfResidence);
+		                    byUserName.setBvnVerified(true);
+//						}
+	                    
+	                    
+	                }
+	                moneyXBusinessRepo.save(byUserName);
+	            } else {
+	                logger.warn("User not found for ID: " + userId);
+	            }
+
+	            responseData.setResponseCode(CoreConstant.SUCCESS_CODE);
+	            responseData.setResponseMessage(CoreConstant.SUCCESS);
+	            responseData.setResponseData(apiResponse.getJSONObject("data").toMap());
+	        } else {
+	            responseData.setResponseCode(CoreConstant.FAILURE_CODE);
+	            responseData.setResponseMessage("EKYC Failed: " + apiResponse.optString("respmsg", "Unknown error"));
+	            responseData.setResponseData(apiResponse.toMap());
+	        }
+
+	        return responseData;
 
 	    } catch (Exception e) {
-	        logger.error("Error processing ekyc", e);
-	        return createErrorResponse("Failed to process ekyc", "500");
+	        logger.error("Error processing EKYC", e);
+	        return createErrorResponse("Failed to process EKYC: " + e.getMessage(), "500");
 	    }
 	}
 
@@ -384,4 +457,74 @@ public class EkycService {
 		}
 
 	}
+	
+	
+	public static JSONObject customerKycUpgrade(JSONObject jrequest) {
+	    JSONObject response = new JSONObject();
+	    try {
+	        JSONObject rjheader = jrequest.getJSONObject("jheader");
+	        JSONObject rjbody = jrequest.getJSONObject("jbody");
+
+	        JSONObject request = new JSONObject();
+	        JSONObject jheader = new JSONObject();
+
+	        jheader.put("userid", rjheader.optString("userid"));
+	        jheader.put("ip", rjheader.optString("ip"));
+	        jheader.put("timestamp", rjheader.optString("timestamp"));
+	        jheader.put("requestType", "CUST_KYC_UPGRADE");
+	        jheader.put("channel", rjheader.optString("channel"));
+	        request.put("jheader", jheader);
+
+	        JSONObject jbody = new JSONObject();
+	        jbody.put("nin", rjbody.optString("ekycNumber"));
+	        jbody.put("customerId", rjbody.optString("customerId"));
+	        jbody.put("firstname", rjbody.optString("firstname"));
+	        jbody.put("lastname", rjbody.optString("lastname"));
+	        jbody.put("dob", rjbody.optString("dob"));
+	        request.put("jbody", jbody);
+
+	        logger.info("Request: " + request);
+	        EmbedlyServiceCaller service = new EmbedlyServiceCaller();
+	        response = service.callService(request);
+	        logger.info("Response: " + response);
+	    } catch (Exception e) {
+	        logger.error("Error in customerKycUpgrade", e);
+	    }
+	    return response;
+	}
+
+	
+	
+	//premium ekyc - bvn
+	public static JSONObject premiumEkyc(JSONObject jrequest) {
+	    JSONObject response = new JSONObject();
+	    try {
+	        JSONObject rjheader = jrequest.getJSONObject("jheader");
+	        JSONObject rjbody = jrequest.getJSONObject("jbody");
+
+	        JSONObject request = new JSONObject();
+	        JSONObject jheader = new JSONObject();
+
+	        jheader.put("userid", rjheader.optString("userid"));
+	        jheader.put("ip", rjheader.optString("ip"));
+	        jheader.put("timestamp", rjheader.optString("timestamp"));
+	        jheader.put("requestType", "CUST_PREMIUM_KYC");
+	        jheader.put("channel", rjheader.optString("channel"));
+	        request.put("jheader", jheader);
+
+	        JSONObject jbody = new JSONObject();
+	        jbody.put("customerId", rjbody.optString("customerId"));
+	        jbody.put("bvn", rjbody.optString("ekycNumber"));
+	        request.put("jbody", jbody);
+
+	        logger.info("Request: " + request);
+	        EmbedlyServiceCaller service = new EmbedlyServiceCaller();
+	        response = service.callService(request);
+	        logger.info("Response: " + response);
+	    } catch (Exception e) {
+	        logger.error("Error in premiumEkyc", e);
+	    }
+	    return response;
+	}
+
 }
