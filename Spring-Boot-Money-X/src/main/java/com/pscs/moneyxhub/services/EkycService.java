@@ -92,6 +92,17 @@ private final MoneyXBusinessRepo moneyXBusinessRepo;
 
 	            if (byUserName != null) {
 	                if ("NIN".equalsIgnoreCase(ekycType)) {
+	                	
+	                	
+	                	JSONObject data = apiResponse.optJSONObject("data");
+	                    JSONObject summary = data.optJSONObject("summary");
+	                    JSONObject nin_check = summary.optJSONObject("nin_check");
+	                    
+	                    String status= nin_check.optString("status");
+//						if ("EXACT_MATCH".equalsIgnoreCase(status)) {
+							
+		                    byUserName.setBvnVerified(true);
+	                	
 	                    byUserName.setNin(ekycNumber);
 	                } else {
 	                	
@@ -104,7 +115,7 @@ private final MoneyXBusinessRepo moneyXBusinessRepo;
 	                    JSONObject bvn_check = summary.optJSONObject("bvn_check");
 	                    
 	                    String status= bvn_check.optString("status");
-//						if ("MATCH".equalsIgnoreCase(status)) {
+//						if ("EXACT_MATCH".equalsIgnoreCase(status)) {
 							String gender= bvn.optString("gender");
 		    	        	 String nationality = bvn.optString("nationality");
 		    	        	 String stateOfResidence= bvn.optString("state_of_residence");
