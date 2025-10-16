@@ -140,13 +140,15 @@ public class CustomerBusinessService {
 					String customerResponse = ConvertRequestUtils.getJsonString(checkCustomerres);
 					JSONObject customerJson = new JSONObject(customerResponse);
 					
-					WalletAcctData walletAcctData = walletAcctDataRepository
-							.findByCustomerId(checkCustomerres.getCustomerId());
+					
+					
+					WalletAcctData walletAcctData = walletAcctDataRepository.findByCustomerId(checkCustomerres.getCustomerId());
 					if (walletAcctData != null) {
 							customerJson.put("walletId",walletAcctData.getWalletId());
 						
 						} else {
-							customerJson.put("walletId", "");
+							customerJson.put("walletId", "NA");
+							customerJson.put("accountNumber", "NA");
 							
 						}
 					
@@ -275,7 +277,7 @@ public class CustomerBusinessService {
 					buildResponseData(response, callService);
 				} else {
 					response.setResponseCode(CoreConstant.FAILURE_CODE);
-					response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+					response.setResponseMessage(CoreConstant.FAILED +" " + callService.getString("respmsg"));
 				}
 				
 			
@@ -559,7 +561,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -567,7 +569,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +" " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -699,7 +701,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -707,7 +709,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +" " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -730,7 +732,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -738,7 +740,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 			
@@ -763,7 +765,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -771,7 +773,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 			
@@ -794,7 +796,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -802,7 +804,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		}
@@ -828,7 +830,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				
@@ -861,7 +863,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 
@@ -888,7 +890,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				
@@ -909,7 +911,7 @@ public class CustomerBusinessService {
 				
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		}
@@ -957,7 +959,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -965,7 +967,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -988,7 +990,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -996,7 +998,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -1018,7 +1020,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -1026,7 +1028,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -1047,7 +1049,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -1055,7 +1057,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -1079,7 +1081,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -1087,7 +1089,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -1109,7 +1111,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -1117,7 +1119,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -1139,7 +1141,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -1147,7 +1149,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -1169,7 +1171,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -1177,7 +1179,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -1199,7 +1201,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -1207,7 +1209,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -1229,7 +1231,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -1237,7 +1239,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -1259,7 +1261,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -1267,7 +1269,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -1289,7 +1291,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -1297,7 +1299,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -1319,7 +1321,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				
@@ -1362,7 +1364,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 			
@@ -1385,7 +1387,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -1393,7 +1395,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -1416,7 +1418,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -1424,7 +1426,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 
@@ -1447,7 +1449,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -1455,7 +1457,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -1477,7 +1479,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -1485,7 +1487,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -1508,7 +1510,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -1516,7 +1518,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -1540,7 +1542,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -1548,7 +1550,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -1570,7 +1572,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -1578,7 +1580,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -1600,7 +1602,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -1608,7 +1610,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -1631,7 +1633,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -1639,7 +1641,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -1660,7 +1662,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -1668,7 +1670,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -1689,7 +1691,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -1697,7 +1699,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -1720,7 +1722,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -1728,7 +1730,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -1750,7 +1752,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -1758,7 +1760,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -1780,7 +1782,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -1788,7 +1790,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -1811,7 +1813,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -1819,7 +1821,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -1841,7 +1843,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -1849,7 +1851,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -1871,7 +1873,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -1879,7 +1881,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -1901,7 +1903,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -1909,7 +1911,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -1931,7 +1933,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -1939,7 +1941,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -1961,7 +1963,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -1969,7 +1971,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -1991,7 +1993,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -1999,7 +2001,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -2021,7 +2023,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -2029,7 +2031,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -2051,7 +2053,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -2059,7 +2061,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -2081,7 +2083,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -2089,7 +2091,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -2111,7 +2113,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -2119,7 +2121,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -2141,7 +2143,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -2149,7 +2151,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -2171,7 +2173,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -2179,7 +2181,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -2201,7 +2203,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -2209,7 +2211,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -2231,7 +2233,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -2239,7 +2241,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -2261,7 +2263,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -2269,7 +2271,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -2291,7 +2293,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -2299,7 +2301,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -2322,7 +2324,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -2330,7 +2332,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -2352,7 +2354,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -2360,7 +2362,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -2382,7 +2384,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -2390,7 +2392,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -2412,7 +2414,7 @@ public class CustomerBusinessService {
 
 		EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 		 JSONObject callService = service.callService(reqJson);
-		System.out.println("Response " + response.toString());
+		System.out.println("Response " + callService);
 		
 		if (callService.getString("respCode").equals("00")) {
 			response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -2420,7 +2422,7 @@ public class CustomerBusinessService {
 			buildResponseData(response, callService);
 		} else {
 			response.setResponseCode(CoreConstant.FAILURE_CODE);
-			response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+			response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 		}
 		
 	} catch (Exception e) {
@@ -2443,7 +2445,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -2451,7 +2453,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -2473,7 +2475,7 @@ public class CustomerBusinessService {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + response.toString());
+			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -2481,7 +2483,7 @@ public class CustomerBusinessService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
