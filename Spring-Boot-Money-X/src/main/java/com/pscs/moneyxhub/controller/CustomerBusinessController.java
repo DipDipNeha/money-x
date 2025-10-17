@@ -299,7 +299,12 @@ public class CustomerBusinessController {
 		ResponseData response = customerBusinessService.createWallet(requestBody);
 		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
-
+	// get wallet id
+		@PostMapping("/getwalletid")
+		public ResponseEntity<ResponseData> getwalletid(@RequestBody RequestData requestBody) {
+			ResponseData response = customerBusinessService.getWalletId(requestBody);
+			return new ResponseEntity<>(response, HttpStatus.CREATED);
+		}
 	// Create Corporate Customer Wallet
 	@PostMapping("/createCustWallet")
 	public ResponseEntity<ResponseData> createCustWallet(@RequestBody RequestData requestBody) {
