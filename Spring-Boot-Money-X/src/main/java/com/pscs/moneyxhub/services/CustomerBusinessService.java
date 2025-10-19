@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import com.pscs.embedly.caller.EmbedlyServiceCaller;
+import com.pscs.moneyxhub.entity.CorporateCustomer;
 import com.pscs.moneyxhub.entity.Country;
 import com.pscs.moneyxhub.entity.CustomerDocInfo;
 import com.pscs.moneyxhub.entity.CustomerLogin;
@@ -24,6 +25,7 @@ import com.pscs.moneyxhub.model.RequestData;
 import com.pscs.moneyxhub.model.ResponseData;
 import com.pscs.moneyxhub.repo.BusinessRoleRepo;
 import com.pscs.moneyxhub.repo.BusinessTypeRepo;
+import com.pscs.moneyxhub.repo.CorporateCustomerRepo;
 import com.pscs.moneyxhub.repo.CountryRepo;
 import com.pscs.moneyxhub.repo.CustomerDocInfoRepo;
 import com.pscs.moneyxhub.repo.CustomerLoginRepo;
@@ -50,12 +52,13 @@ public class CustomerBusinessService {
 	private final EmailAndSMSPostingService smsPostingService;
 	private final MoneyXBusinessRepo moneyXBusinessRepo;
 	private final WalletAcctDataRepository walletAcctDataRepository;
+	private final CorporateCustomerRepo corporateCustomerRepo;
 
 	public CustomerBusinessService(CustomerLoginRepo customerLoginRepo, CountryRepo countryRepo,
 			BusinessTypeRepo businessTypeRepo, BusinessRoleRepo businessRoleRepo,
 			CustomerDocInfoRepo customerDocInfoRepo, DocumentRepo documentRepo, OtpDataTablRepo otpDataTablRepo,
 			EmailAndSMSPostingService smsPostingService, MoneyXBusinessRepo moneyXBusinessRepo,
-			WalletAcctDataRepository walletAcctDataRepository) {
+			WalletAcctDataRepository walletAcctDataRepository, CorporateCustomerRepo corporateCustomerRepo) {
 		this.customerLoginRepo = customerLoginRepo;
 		this.countryRepo = countryRepo;
 		this.businessTypeRepo = businessTypeRepo;
@@ -66,6 +69,7 @@ public class CustomerBusinessService {
 		this.smsPostingService = smsPostingService;
 		this.moneyXBusinessRepo = moneyXBusinessRepo;
 		this.walletAcctDataRepository = walletAcctDataRepository;
+		this.corporateCustomerRepo = corporateCustomerRepo;
 	}
 
 	// find by username
@@ -83,6 +87,12 @@ public class CustomerBusinessService {
 			JSONObject requestJson = new JSONObject(jsonString);
 			logger.info("Request Body: " + requestJson.toString());
 			
+			String customerType = requestJson.has("customerType") ? requestJson.getString("customerType") : "INDIVIDUAL";
+			
+			if (customerType.toUpperCase().equals("CORPORATE")) {
+
+				return corporateCustomerLogin(request);
+			}else {
 			MoneyXBusiness checkCustomerres = moneyXBusinessRepo.findByUserName(requestJson.getString("username"));
 			if (checkCustomerres != null) {
 				
@@ -164,6 +174,8 @@ public class CustomerBusinessService {
 				response.setResponseMessage(CoreConstant.USER_NOT_FOUND);
 				return response;
 			}
+			
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -173,6 +185,112 @@ public class CustomerBusinessService {
 		return response;
 	}
 
+
+	private ResponseData corporateCustomerLogin(RequestData request) {
+		ResponseData response = new ResponseData();
+		String isLoginAttemptActive = "N";
+		int maxRetryLoginAttempt = 3;
+		int retryLoginAttempt = 0;
+		try {
+			
+			logger.info("Request : " + request);
+			String jsonString = ConvertRequestUtils.getJsonString(request.getJbody());
+			// Convert the request body to a JSON object
+			JSONObject requestJson = new JSONObject(jsonString);
+			logger.info("Request Body: " + requestJson.toString());
+			
+		
+			CorporateCustomer checkCustomerres = corporateCustomerRepo.findByUserName(requestJson.getString("username"));
+			if (checkCustomerres != null) {
+				
+//				ResponseData validateOtp = validateOtp(request);
+				
+				
+				
+				
+				isLoginAttemptActive = checkCustomerres.getIsLoginAttemptActive();
+				retryLoginAttempt = checkCustomerres.getRetryLoginAttempt();
+
+				if (checkCustomerres.getIsActive().equals("N")) {
+					response.setResponseCode(CoreConstant.FAILURE_CODE);
+					response.setResponseMessage(CoreConstant.INACTIVE_AC);
+					return response;
+				}
+				if (checkCustomerres.getIsLocked().equals("L")) {
+					response.setResponseCode(CoreConstant.FAILURE_CODE);
+					response.setResponseMessage(CoreConstant.ACCOUNT_LOCKED);
+					return response;
+				}
+
+				checkCustomerres = corporateCustomerRepo.findByUserNameAndPassword(requestJson.getString("username"),
+						CommonUtils.b64_sha256(requestJson.getString("password")));
+				// check if user exist
+				if (checkCustomerres == null) {
+
+					response.setResponseCode(CoreConstant.FAILURE_CODE);
+					response.setResponseMessage(CoreConstant.INVALID_CREDENTIALS);
+
+					if (isLoginAttemptActive.equals("Y")) {
+
+						if (retryLoginAttempt >= maxRetryLoginAttempt) {
+							corporateCustomerRepo.updateIsLockedByUserName("L", requestJson.getString("username"));
+							response.setResponseCode(CoreConstant.FAILURE_CODE);
+							response.setResponseMessage(CoreConstant.ACCOUNT_LOCKED);
+							return response;
+						} else {
+							response.setResponseMessage("Invalid Username or Password You Have "
+									+ (maxRetryLoginAttempt - retryLoginAttempt) + " Attempt Left");
+							corporateCustomerRepo.incrementRetryLoginAttemptNative(requestJson.getString("username"));
+						}
+
+						return response;
+					}
+
+				} else {
+					checkCustomerres.setLastLoginTime(new Date() + "");
+
+					
+					
+					response.setResponseCode(CoreConstant.SUCCESS_CODE);
+					response.setResponseMessage(CoreConstant.LOGIN_SUCCESSFUL);
+					
+					String customerResponse = ConvertRequestUtils.getJsonString(checkCustomerres);
+					JSONObject customerJson = new JSONObject(customerResponse);
+					
+					
+					
+					WalletAcctData walletAcctData = walletAcctDataRepository.findByCustomerId(checkCustomerres.getCustomerId());
+					if (walletAcctData != null) {
+							customerJson.put("walletId",walletAcctData.getWalletId());
+						
+						} else {
+							customerJson.put("walletId", "NA");
+							customerJson.put("accountNumber", "NA");
+							
+						}
+					
+					
+					response.setResponseData(customerJson.toMap());
+					if (isLoginAttemptActive.equals("Y")) {
+						corporateCustomerRepo.resetRetryLoginAttempt(checkCustomerres.getUserName());
+					}
+				}
+
+			} else {
+				response.setResponseCode(CoreConstant.FAILURE_CODE);
+				response.setResponseMessage(CoreConstant.USER_NOT_FOUND);
+				return response;
+			}
+			
+		
+		} catch (Exception e) {
+			e.printStackTrace();
+
+		}
+
+		return response;
+
+	}
 
 	public ResponseData checkUserName(RequestData request) {
 		ResponseData response = new ResponseData();
@@ -231,6 +349,10 @@ public class CustomerBusinessService {
 			customerLogin.setAuthValue(jsonObject.getString("authValue"));
 			customerLogin.setCustomerType(jsonObject.has("customerType") ?  jsonObject.getString("customerType"):"");
 			customerLogin.setCustomerId(jsonObject.has("customerId") ?jsonObject.getString("customerId"):"");
+			customerLogin.setCuntry(jsonObject.has("cuntry") ? jsonObject.getString("cuntry") :"");
+			
+			
+			
 
 			
 			ResponseData validateOtp = validateOtp(request);	
@@ -979,27 +1101,106 @@ public class CustomerBusinessService {
 	}
 
 
-	public ResponseData CreateCorporateCustomer(RequestData requestBody) {
+	public ResponseData CreateCorporateCustomer(RequestData request) {
 		ResponseData response = new ResponseData();
 		try {
-			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
+			logger.info("Request : " + request);
+			String jsonString = ConvertRequestUtils.getJsonString(request.getJbody());
 
-			JSONObject reqJson = new JSONObject(jsonString);
-			System.out.println("Request Body: " + reqJson.toString());
+			JSONObject jsonObject = new JSONObject(jsonString);
+			logger.info("Request Body: " + jsonObject.toString());
 
-			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
-			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + callService);
+			CorporateCustomer customerLogin = new CorporateCustomer();
+
 			
-			if (callService.getString("respCode").equals("00")) {
-				response.setResponseCode(CoreConstant.SUCCESS_CODE);
-				response.setResponseMessage(CoreConstant.SUCCESS);
-				buildResponseData(response, callService);
+
+//	      
+			customerLogin
+					.setOrganizationId(jsonObject.has("organizationId") ? jsonObject.getString("organizationId") : "");
+			customerLogin
+					.setCustomerTypeId(jsonObject.has("customerTypeId") ? jsonObject.getString("customerTypeId") : "");
+			customerLogin.setCustomerType(jsonObject.has("customerType") ? jsonObject.getString("customerType") : "");
+			customerLogin.setCity(jsonObject.has("city") ? jsonObject.getString("city") : "");
+			customerLogin.setRcNumber(jsonObject.has("rcNumber") ? jsonObject.getString("rcNumber") : "");
+			customerLogin.setFullBusinessName(
+					jsonObject.has("fullBusinessName") ? jsonObject.getString("fullBusinessName") : "");
+			customerLogin.setWalletPreferredName(
+					jsonObject.has("walletPreferredName") ? jsonObject.getString("walletPreferredName") : "");
+			customerLogin.setTin(jsonObject.has("tin") ? jsonObject.getString("tin") : "");
+			customerLogin.setBusinessAddress(
+					jsonObject.has("businessAddress") ? jsonObject.getString("businessAddress") : "");
+			customerLogin.setCountryId(jsonObject.has("countryId") ? jsonObject.getString("countryId") : "");
+			customerLogin.setEmail(jsonObject.has("emailAddress") ? jsonObject.getString("emailAddress") : jsonObject.has("email") ? jsonObject.getString("email"):"" );
+			customerLogin.setUserName(jsonObject.has("userName") ? jsonObject.getString("userName") : "");
+			customerLogin.setPassword(
+					jsonObject.has("password") ? CommonUtils.b64_sha256(jsonObject.getString("password")) : "");
+			customerLogin.setTxnPin(
+					jsonObject.has("txnPin") ? CommonUtils.b64_sha256(jsonObject.getString("txnPin")) : "");
+			customerLogin.setMobileNumber(jsonObject.has("mobileNumber") ? jsonObject.getString("mobileNumber") : "");
+			customerLogin.setCountry(jsonObject.has("cuntry") ? jsonObject.getString("cuntry") : "");
+			
+			
+			
+			
+
+			
+			ResponseData validateOtp = validateOtp(request);	
+			if (!validateOtp.getResponseCode().equals(CoreConstant.SUCCESS_CODE)) {
+				return validateOtp; // Return if OTP validation fails
+			}else {
+			
+			customerLogin.setIsActive("A");
+			customerLogin.setIsLocked("N");
+			customerLogin.setIsLoginAttemptActive("Y");
+			customerLogin.setRetryLoginAttempt(0);
+			
+			String email=jsonObject.has("emailAddress") ? jsonObject.getString("emailAddress") : jsonObject.has("email") ? jsonObject.getString("email"):"" ;
+
+			CorporateCustomer customer = corporateCustomerRepo.findByEmailOrUserName(email,jsonObject.getString("userName"));
+			if (customer == null) {
+				
+				String requestJson = ConvertRequestUtils.getJsonString(request);
+
+				JSONObject reqJson = new JSONObject(requestJson);
+				
+				
+
+				
+				EmbedlyServiceCaller service = new EmbedlyServiceCaller();
+				 JSONObject callService = service.callService(reqJson);
+				
+				if (callService.getString("respCode").equals("00")) {
+					
+					
+					JSONObject responseData = callService.getJSONObject("data");
+					
+					customerLogin.setCustomerId(responseData.getString("id"));
+					
+					
+					customer = corporateCustomerRepo.save(customerLogin);
+					if (customer == null) {
+						response.setResponseCode(CoreConstant.FAILURE_CODE);
+						response.setResponseMessage(CoreConstant.FAILED + " to Create Profile");
+
+					} else {
+						response.setResponseCode(CoreConstant.SUCCESS_CODE);
+						response.setResponseMessage(CoreConstant.SUCCESS + " Profile Created Successfully");
+					}
+					buildResponseData(response, callService);
+				} else {
+					response.setResponseCode(CoreConstant.FAILURE_CODE);
+					response.setResponseMessage(CoreConstant.FAILED +" " + callService.getString("respmsg"));
+				}
+				
+			
+				
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
+				response.setResponseMessage(
+						CoreConstant.RECORD_ALREADY_EXISTS+":" + jsonObject.getString("emailAddress"));
 			}
+			}
+
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1318,6 +1519,13 @@ public class CustomerBusinessService {
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
+			JSONObject requestJson = reqJson.getJSONObject("jbody");
+			
+			String customerType =	 requestJson.has("customerType") ? requestJson.getString("customerType") : "INDIVIDUAL";
+			
+			if (customerType.toUpperCase().equals("CORPORATE")) {
+				createCorpWallet(requestBody);
+			}else {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
@@ -1366,6 +1574,7 @@ public class CustomerBusinessService {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
+			}
 			
 			
 		} catch (Exception e) {
@@ -1376,7 +1585,7 @@ public class CustomerBusinessService {
 		return response;
 	}
 
-	public ResponseData createCustWallet(RequestData requestBody) {
+	public ResponseData createCorpWallet(RequestData requestBody) {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
@@ -1384,12 +1593,53 @@ public class CustomerBusinessService {
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
-
+			JSONObject requestJson = reqJson.getJSONObject("jbody");
+			JSONObject jheader = reqJson.getJSONObject("jheader");
+			jheader.put("requestType", "CREATE_CORP_CUST_WALLET");
+			requestJson.put("jheader", jheader);
+			String customerType =	 requestJson.has("customerType") ? requestJson.getString("customerType") : "INDIVIDUAL";
+			
+		
+			
+			
+			
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
 			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
+				
+				CorporateCustomer byCustomerId = corporateCustomerRepo.findByCustomerId(reqJson.getJSONObject("jbody").getString("customerId"));
+				JSONObject data=callService.getJSONObject("data");
+
+				byCustomerId.setAccountNumber(data.getJSONObject("virtualAccount").getString("accountNumber"));
+				byCustomerId.setAccountType("WALLET");
+				byCustomerId.setCurrency(data.getString("currencyId"));
+				byCustomerId.setCurrency(reqJson.getJSONObject("jbody").getString("name"));
+				
+				corporateCustomerRepo.save(byCustomerId);
+				 WalletAcctData wallet=new WalletAcctData() ;
+				 	wallet.setAccountNumber(data.getJSONObject("virtualAccount").getString("accountNumber"));
+					wallet.setAvailableBalance(data.has("availableBalance")?  data.optDoubleObject("availableBalance"): 0.0);
+					wallet.setLedgerBalance(data.has("availableBalance")? data.optDoubleObject("ledgerBalance"): 0.0);
+					wallet.setCurrencyId(data.getString("currencyId"));
+					wallet.setCustomerId(reqJson.getJSONObject("jbody").getString("customerId"));
+					wallet.setCustomerTypeId(data.getString("customerTypeId"));
+					wallet.setName(data.getString("name"));
+					wallet.setWalletClassificationId("WALLET");
+//					wallet.setWalletRestrictionId(data.optString("walletRestrictionId"));
+					wallet.setBankCode(data.getJSONObject("virtualAccount").getString("bankCode"));
+					wallet.setBankName(data.getJSONObject("virtualAccount").getString("bankName"));
+					wallet.setWalletId(data.getString("id"));
+					wallet.setCreatedAt(new Date());
+					
+					WalletAcctData save = walletAcctDataRepository.save(wallet);
+					if (save == null) {
+						response.setResponseCode(CoreConstant.FAILURE_CODE);
+						response.setResponseMessage(CoreConstant.FAILED + " to create wallet");
+						return response;
+					}
+				 
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
 				buildResponseData(response, callService);
@@ -1397,6 +1647,8 @@ public class CustomerBusinessService {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
 			}
+			
+			
 			
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -209,7 +209,7 @@ public class CustomerBusinessController {
 	}
 
 	// Create Corporate Customer
-	@PostMapping("/CreateCorporateCustomer")
+	@PostMapping("/registercorpcustomer")
 	public ResponseEntity<ResponseData> CreateCorporateCustomer(@RequestBody RequestData requestBody) {
 
 		ResponseData response = customerBusinessService.CreateCorporateCustomer(requestBody);
@@ -218,7 +218,7 @@ public class CustomerBusinessController {
 	}
 
 	// Get A Corporate Customer
-	@PostMapping("/GetACorporateCustomer")
+	@PostMapping("/getcorpcustdetails")
 	public ResponseEntity<ResponseData> GetACorporateCustomer(@RequestBody RequestData requestBody) {
 
 		ResponseData response = customerBusinessService.GetACorporateCustomer(requestBody);
@@ -227,7 +227,7 @@ public class CustomerBusinessController {
 	}
 
 	// Update Corporate Customer
-	@PostMapping("/updateCorpCustomer")
+	@PostMapping("/updatecorpcustomer")
 	public ResponseEntity<ResponseData> updateCorpCustomer(@RequestBody RequestData requestBody) {
 
 		ResponseData response = customerBusinessService.updateCorpCustomer(requestBody);
@@ -236,49 +236,49 @@ public class CustomerBusinessController {
 	}
 
 	// Add Director to Corporate Customer
-	@PostMapping("/addDirector")
+	@PostMapping("/adddirector")
 	public ResponseEntity<ResponseData> addDirector(@RequestBody RequestData requestBody) {
 		ResponseData response = customerBusinessService.addDirector(requestBody);
 		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 
 	// Get A Corporate Customer Director
-	@PostMapping("/getCorpDirector")
+	@PostMapping("/getcorpdirector")
 	public ResponseEntity<ResponseData> getCorpDirector(@RequestBody RequestData requestBody) {
 		ResponseData response = customerBusinessService.getCorpDirector(requestBody);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
 	// Get All Corporate Customer Directors
-	@PostMapping("/getAllCorpDirectors")
+	@PostMapping("/getallcorpdirectors")
 	public ResponseEntity<ResponseData> getAllCorpDirectors(@RequestBody RequestData requestBody) {
 		ResponseData response = customerBusinessService.getAllCorpDirectors(requestBody);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
 	// Update Corporate Customer Director
-	@PostMapping("/updateCorpDirector")
+	@PostMapping("/updatecorpdirector")
 	public ResponseEntity<ResponseData> updateCorpDirector(@RequestBody RequestData requestBody) {
 		ResponseData response = customerBusinessService.updateCorpDirector(requestBody);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
 	// Upload Corporate Customer Documents
-	@PostMapping("/uploadCorpDocuments")
+	@PostMapping("/uploadcorpdocuments")
 	public ResponseEntity<ResponseData> uploadCorpDocuments(@RequestBody RequestData requestBody) {
 		ResponseData response = customerBusinessService.uploadCorpDocuments(requestBody);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
 	// Update Corporate Customer Documents
-	@PostMapping("/updateCorpDocuments")
+	@PostMapping("/updatecorpdocuments")
 	public ResponseEntity<ResponseData> updateCorpDocuments(@RequestBody RequestData requestBody) {
 		ResponseData response = customerBusinessService.updateCorpDocuments(requestBody);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
 	// Get Corporate Customer Documents
-	@PostMapping("/getCorpDocuments")
+	@PostMapping("/getcorpdocuments")
 	public ResponseEntity<ResponseData> getCorpDocuments(@RequestBody RequestData requestBody) {
 		ResponseData response = customerBusinessService.getCorpDocuments(requestBody);
 		return new ResponseEntity<>(response, HttpStatus.OK);
@@ -308,7 +308,7 @@ public class CustomerBusinessController {
 	// Create Corporate Customer Wallet
 	@PostMapping("/createCustWallet")
 	public ResponseEntity<ResponseData> createCustWallet(@RequestBody RequestData requestBody) {
-		ResponseData response = customerBusinessService.createCustWallet(requestBody);
+		ResponseData response = customerBusinessService.createCorpWallet(requestBody);
 		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 

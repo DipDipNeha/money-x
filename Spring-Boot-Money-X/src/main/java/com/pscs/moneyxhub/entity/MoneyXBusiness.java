@@ -3,15 +3,11 @@
  */
 package com.pscs.moneyxhub.entity;
 
-import java.util.Date;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 
 /**
  * 
@@ -40,6 +36,7 @@ public class MoneyXBusiness {
 
 	private String occupation;
 	private String countryId;
+	private String cuntry;
 	
 	
 	private String alias;
@@ -55,11 +52,14 @@ public class MoneyXBusiness {
 	private String accountType;
 	private String currency;
 	
+	
 	private String userName;
 	private String password;
 	private String txnPin;
 	private String authType;
 	private String authValue;
+	
+	
 	private String customerType;
 	private String customerId;
 	
@@ -326,6 +326,14 @@ public class MoneyXBusiness {
 
 	public void setLgaOfResidence(String lgaOfResidence) {
 		this.lgaOfResidence = lgaOfResidence;
+	}
+	
+	
+	public String getCuntry() {
+		return cuntry;
+	}
+	public void setCuntry(String cuntry) {
+		this.cuntry = cuntry;
 	}
 	@Override
 	public String toString() {
