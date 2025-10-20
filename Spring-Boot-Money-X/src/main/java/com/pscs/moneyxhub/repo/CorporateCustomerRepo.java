@@ -31,12 +31,16 @@ public interface CorporateCustomerRepo extends JpaRepository<CorporateCustomer, 
 
 
 	@Modifying
+	@Transactional
 	@Query(value = "UPDATE CORP_CUSTOMER_MASTER_TBL SET retry_login_attempt = retry_login_attempt + 1 WHERE user_name = :userName", nativeQuery = true)
 	int incrementRetryLoginAttemptNative(@Param("userName") String userName);
 
+    @Modifying
+    @Transactional
     @Query(value = "UPDATE CORP_CUSTOMER_MASTER_TBL SET retry_login_attempt = 0 WHERE user_name = :userName", nativeQuery = true)
     int resetRetryLoginAttempt(@Param("userName") String userName);
 
+    
     CorporateCustomer findByEmailOrUserName(String string, String string2);
 
     CorporateCustomer findByCustomerId(String customerId);

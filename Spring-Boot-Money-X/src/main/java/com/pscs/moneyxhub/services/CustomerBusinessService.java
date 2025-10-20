@@ -353,6 +353,7 @@ public class CustomerBusinessService {
 			
 			
 			
+			
 
 			
 			ResponseData validateOtp = validateOtp(request);	
@@ -385,7 +386,7 @@ public class CustomerBusinessService {
 					JSONObject responseData = callService.getJSONObject("data");
 					
 					customerLogin.setCustomerId(responseData.getString("id"));
-					
+					customerLogin.setCustomerTierId(responseData.has("customerTierId") ? responseData.getInt("customerTierId")+"" :"");
 					
 					customer = moneyXBusinessRepo.save(customerLogin);
 					if (customer == null) {
@@ -1176,7 +1177,7 @@ public class CustomerBusinessService {
 					
 					customerLogin.setCustomerId(responseData.getString("id"));
 					
-					
+					customerLogin.setCustomerTierId(responseData.has("customerTierId") ? responseData.getInt("customerTierId")+"" :"");
 					customer = corporateCustomerRepo.save(customerLogin);
 					if (customer == null) {
 						response.setResponseCode(CoreConstant.FAILURE_CODE);

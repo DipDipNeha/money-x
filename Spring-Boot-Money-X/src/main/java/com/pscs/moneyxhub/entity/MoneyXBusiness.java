@@ -70,6 +70,21 @@ public class MoneyXBusiness {
 	private String lastLoginTime;
 	@Column(name = "retry_login_active")
 	private String isLoginAttemptActive;
+	
+	private String customerTierId;
+	
+	
+	
+	
+
+    // ===== Getters and Setters =====
+	public String getCustomerTierId() {
+		return customerTierId;
+	}
+	public void setCustomerTierId(String customerTierId) {
+		this.customerTierId = customerTierId;
+		
+	}
 	public Long getId() {
 		return id;
 	}

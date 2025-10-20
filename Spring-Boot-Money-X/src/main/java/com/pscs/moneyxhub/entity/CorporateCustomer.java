@@ -15,19 +15,19 @@ public class CorporateCustomer  {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id ;
 
-    @Column(name = "ORGANIZATION_ID", length = 36)
+    @Column(name = "ORGANIZATION_ID", length = 100)
     private String organizationId;
 
-    @Column(name = "CUSTOMER_TYPE_ID", length = 36)
+    @Column(name = "CUSTOMER_TYPE_ID", length = 100)
     private String customerTypeId;
 
-    @Column(name = "CUSTOMER_TYPE", length = 50)
+    @Column(name = "CUSTOMER_TYPE", length = 100)
     private String customerType;
 
     @Column(name = "CITY", length = 100)
     private String city;
 
-    @Column(name = "RC_NUMBER", length = 50)
+    @Column(name = "RC_NUMBER", length = 100)
     private String rcNumber;
 
     @Column(name = "FULL_BUSINESS_NAME", length = 200)
@@ -36,19 +36,19 @@ public class CorporateCustomer  {
     @Column(name = "WALLET_PREFERRED_NAME", length = 200)
     private String walletPreferredName;
 
-    @Column(name = "TIN", length = 50)
+    @Column(name = "TIN", length = 100)
     private String tin;
 
     @Column(name = "BUSINESS_ADDRESS", length = 300)
     private String businessAddress;
 
-    @Column(name = "COUNTRY_ID", length = 36)
+    @Column(name = "COUNTRY_ID", length = 100)
     private String countryId;
 
     @Column(name = "CUNTRY", length = 100)  // as per your JSON key typo
     private String cuntry;
 
-    @Column(name = "EMAIL", length = 150)
+    @Column(name = "EMAIL", length = 100)
     private String email;
 
     @Column(name = "USER_NAME", length = 100)
@@ -57,13 +57,13 @@ public class CorporateCustomer  {
     @Column(name = "PASSWORD", length = 100)
     private String password;
 
-    @Column(name = "TXN_PIN", length = 10)
+    @Column(name = "TXN_PIN", length = 100)
     private String txnPin;
 
-    @Column(name = "AUTH_TYPE", length = 20)
+    @Column(name = "AUTH_TYPE", length = 100)
     private String authType;
 
-    @Column(name = "AUTH_VALUE", length = 20)
+    @Column(name = "AUTH_VALUE", length = 100)
     private String authValue;
 
     @Column(name = "MOBILE_NUMBER", length = 20)
@@ -81,11 +81,20 @@ public class CorporateCustomer  {
 	private String currency;
 	private String customerId;
 	private String  country;
+	private String customerTierId;
+	
 	
 	
 	
 
     // ===== Getters and Setters =====
+	public String getCustomerTierId() {
+		return customerTierId;
+	}
+	public void setCustomerTierId(String customerTierId) {
+		this.customerTierId = customerTierId;
+		
+	}
 	
 
     public String getCountry() {
