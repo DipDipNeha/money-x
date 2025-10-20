@@ -96,7 +96,7 @@ public class ServiceBusinessService {
         	String jsonString = ConvertRequestUtils.getJsonString(request.getJbody());
             JSONObject requestJson = new JSONObject(jsonString);
             System.out.println("Request Body: " + requestJson.toString());
-        List<Transactions> all =transactionsRepo.findByAcctNoAndTxnDate(requestJson.getString("accountNumber"), requestJson.getString("txnDate"));
+        List<Transactions> all =null;//transactionsRepo.findByAcctNoAndTxnDate(requestJson.getString("accountNumber"), requestJson.getString("txnDate"));
         
 		if (all.isEmpty()) {
 			response.setResponseCode(CoreConstant.FAILURE_CODE);

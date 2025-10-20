@@ -1,11 +1,15 @@
 package com.pscs.moneyxhub.entity;
 
+import java.util.Date;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
-@Entity(name = "transactions_TBL")
+@Entity(name = "transactions_logs_TBL")
+@Table(name = "transactions_logs_TBL")
 public class Transactions {
 	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -14,11 +18,11 @@ public class Transactions {
 	private String txnType;
 	private double amount;
 	private String currency;
-	private String txnDate;
+	private Date txnDate;
 	private String paymentReference;
 	private String responseCode;
 	private String responseMessage;
-	private String createdDate;
+	private Date createdDate;
 	private String status;
 	private String accountType;
 	private String userId;
@@ -60,10 +64,10 @@ public class Transactions {
 	public void setCurrency(String currency) {
 		this.currency = currency;
 	}
-	public String getTxnDate() {
+	public Date getTxnDate() {
 		return txnDate;
 	}
-	public void setTxnDate(String txnDate) {
+	public void setTxnDate(Date txnDate) {
 		this.txnDate = txnDate;
 	}
 	public String getPaymentReference() {
@@ -84,10 +88,10 @@ public class Transactions {
 	public void setResponseMessage(String responseMessage) {
 		this.responseMessage = responseMessage;
 	}
-	public String getCreatedDate() {
+	public Date getCreatedDate() {
 		return createdDate;
 	}
-	public void setCreatedDate(String createdDate) {
+	public void setCreatedDate(Date createdDate) {
 		this.createdDate = createdDate;
 	}
 	public String getStatus() {

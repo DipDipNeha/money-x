@@ -1525,7 +1525,7 @@ public class CustomerBusinessService {
 			String customerType =	 requestJson.has("customerType") ? requestJson.getString("customerType") : "INDIVIDUAL";
 			
 			if (customerType.toUpperCase().equals("CORPORATE")) {
-				createCorpWallet(requestBody);
+				return createCorpWallet(requestBody);
 			}else {
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
