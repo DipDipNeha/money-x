@@ -17,6 +17,7 @@ import com.pscs.moneyxhub.entity.CustomerDocInfo;
 import com.pscs.moneyxhub.entity.CustomerLogin;
 import com.pscs.moneyxhub.entity.MoneyXBusiness;
 import com.pscs.moneyxhub.entity.OtpDataTabl;
+import com.pscs.moneyxhub.entity.Transactions;
 import com.pscs.moneyxhub.entity.WalletAcctData;
 import com.pscs.moneyxhub.helper.ConvertRequestUtils;
 import com.pscs.moneyxhub.helper.CoreConstant;
@@ -32,6 +33,7 @@ import com.pscs.moneyxhub.repo.CustomerLoginRepo;
 import com.pscs.moneyxhub.repo.DocumentRepo;
 import com.pscs.moneyxhub.repo.MoneyXBusinessRepo;
 import com.pscs.moneyxhub.repo.OtpDataTablRepo;
+import com.pscs.moneyxhub.repo.TransactionsRepo;
 import com.pscs.moneyxhub.repo.WalletAcctDataRepository;
 import com.pscs.moneyxhub.services.post.EmailAndSMSPostingService;
 import com.pscs.moneyxhub.utils.CommonUtils;
@@ -53,12 +55,13 @@ public class CustomerBusinessService {
 	private final MoneyXBusinessRepo moneyXBusinessRepo;
 	private final WalletAcctDataRepository walletAcctDataRepository;
 	private final CorporateCustomerRepo corporateCustomerRepo;
+	private final TransactionsRepo transactionsRepo;
 
 	public CustomerBusinessService(CustomerLoginRepo customerLoginRepo, CountryRepo countryRepo,
 			BusinessTypeRepo businessTypeRepo, BusinessRoleRepo businessRoleRepo,
 			CustomerDocInfoRepo customerDocInfoRepo, DocumentRepo documentRepo, OtpDataTablRepo otpDataTablRepo,
 			EmailAndSMSPostingService smsPostingService, MoneyXBusinessRepo moneyXBusinessRepo,
-			WalletAcctDataRepository walletAcctDataRepository, CorporateCustomerRepo corporateCustomerRepo) {
+			WalletAcctDataRepository walletAcctDataRepository, CorporateCustomerRepo corporateCustomerRepo, TransactionsRepo transactionsRepo) {
 		this.customerLoginRepo = customerLoginRepo;
 		this.countryRepo = countryRepo;
 		this.businessTypeRepo = businessTypeRepo;
@@ -70,6 +73,7 @@ public class CustomerBusinessService {
 		this.moneyXBusinessRepo = moneyXBusinessRepo;
 		this.walletAcctDataRepository = walletAcctDataRepository;
 		this.corporateCustomerRepo = corporateCustomerRepo;
+		this.transactionsRepo = transactionsRepo;
 	}
 
 	// find by username
@@ -1720,37 +1724,6 @@ public class CustomerBusinessService {
 		}
 		return response;
 	}
-
-	public ResponseData getOrgWalletTrans(RequestData requestBody) {
-		ResponseData response = new ResponseData();
-		try {
-			System.out.println("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
-
-			JSONObject reqJson = new JSONObject(jsonString);
-			System.out.println("Request Body: " + reqJson.toString());
-
-			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
-			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + callService);
-			
-			if (callService.getString("respCode").equals("00")) {
-				response.setResponseCode(CoreConstant.SUCCESS_CODE);
-				response.setResponseMessage(CoreConstant.SUCCESS);
-				buildResponseData(response, callService);
-			} else {
-				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
-			}
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-			response.setResponseCode(CoreConstant.FAILURE_CODE);
-			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
-		}
-		return response;
-	}
-
 	
 	public ResponseData walletHistory(RequestData requestBody) {
 		ResponseData response = new ResponseData();
@@ -1783,6 +1756,8 @@ public class CustomerBusinessService {
 	}
 
 	
+	
+
 
 	public ResponseData closeWallet(RequestData requestBody) {
 		ResponseData response = new ResponseData();
@@ -2809,9 +2784,36 @@ public class CustomerBusinessService {
 			response.setResponseCode(CoreConstant.SUCCESS_CODE);
 			response.setResponseMessage(CoreConstant.SUCCESS);
 			response.setResponseData(respJson.toMap());
-			
-			
-			
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		return response;
+	}
+	public ResponseData validateTxnPin(String  txnpin, String  userName) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request For Pin Validate : " +userName);
+
+			MoneyXBusiness byUserName = moneyXBusinessRepo.findByUserName(userName);
+			if (byUserName == null) {
+				response.setResponseCode(CoreConstant.FAILURE_CODE);
+				response.setResponseMessage("No wallet found for userName " + userName);
+				return response;
+			}
+			if (byUserName.getTxnPin().equals(txnpin)) {
+				response.setResponseCode(CoreConstant.SUCCESS_CODE);
+				response.setResponseMessage("Transaction Pin validated successfully");
+				
+			} else {
+
+				response.setResponseCode(CoreConstant.FAILURE_CODE);
+				response.setResponseMessage("Invalid Transaction Pin");
+				return response;
+			}
+
 			
 
 		} catch (Exception e) {
@@ -2821,9 +2823,52 @@ public class CustomerBusinessService {
 		}
 		return response;
 	}
+	// view wallet transaction history
 
+	public ResponseData getTxnByReference(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+			Transactions byPaymentReference = transactionsRepo.findByPaymentReference(reqJson.getString("transactionReference"));
+			if (byPaymentReference == null) {
+				response.setResponseCode(CoreConstant.FAILURE_CODE);
+				response.setResponseMessage(
+						"No transaction found for reference " + reqJson.getString("transactionReference"));
+				return response;
+			}
+			JSONObject respJson = new JSONObject();
+			respJson.put("transactionReference", byPaymentReference.getPaymentReference());
+			respJson.put("amount", byPaymentReference.getAmount());
+			respJson.put("status", byPaymentReference.getStatus());
+			respJson.put("currency", byPaymentReference.getCurrency());
+			respJson.put("txnDate", byPaymentReference.getTxnDate());
+			respJson.put("acctNo", byPaymentReference.getAcctNo());
+			respJson.put("txnType", byPaymentReference.getTxnType());
+			respJson.put("responseCode", byPaymentReference.getResponseCode());
+			respJson.put("responseMessage", byPaymentReference.getResponseMessage());
+			respJson.put("createdDate", byPaymentReference.getCreatedDate());
+			respJson.put("beneficiaryaccount", byPaymentReference.getBeneficiaryaccount());
+			respJson.put("beneficiaryname", byPaymentReference.getBeneficiaryname());
+			respJson.put("beneficiarybank", byPaymentReference.getBeneficiarybank());
+			respJson.put("remarks", byPaymentReference.getRemarks());
+			respJson.put("channel", byPaymentReference.getChannel());
+			respJson.put("drnarration",byPaymentReference.getDrnarration());
+			
+			response.setResponseCode(CoreConstant.SUCCESS_CODE);
+			response.setResponseMessage(CoreConstant.SUCCESS);
+			response.setResponseData(respJson.toMap());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		return response;
+	}
 	
 	
-
-
 }

@@ -26,59 +26,68 @@ import com.pscs.moneyxhub.services.TransactionService;
 @RestController
 @RequestMapping("/api/transactions")
 public class TransactionController {
-	
+
 	private final TransactionService transactionService;
 
 	public TransactionController(TransactionService transactionService) {
 		this.transactionService = transactionService;
 	}
-	
-	//	Get Banks
+
+	// Get Banks
 	@PostMapping("/getbank")
 	public ResponseEntity<ResponseData> getBanks(@RequestBody RequestData requestBody) {
 		ResponseData response = transactionService.getBanks(requestBody);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	//Bank Account Name Enquiry
+
+	// Bank Account Name Enquiry
 	@PostMapping("/accountnameenquiry")
 	public ResponseEntity<ResponseData> accountNameEnquiry(@RequestBody RequestData requestBody) {
 		ResponseData response = transactionService.accountNameEnquiry(requestBody);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
-	//Inter Bank Transfer
+
+	// Inter Bank Transfer
 	@PostMapping("/interbanktransfer")
 	public ResponseEntity<ResponseData> interBankTransfer(@RequestBody RequestData requestBody) {
 		ResponseData response = transactionService.interBankTransfer(requestBody);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	//Transaction Status Re-Query
+
+	// Transaction Status Re-Query
 	@PostMapping("/transactionstatus")
 	public ResponseEntity<ResponseData> transactionStatus(@RequestBody RequestData requestBody) {
 		ResponseData response = transactionService.transactionStatus(requestBody);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
-	
-	
-	// Wallet to Wallet Transfers
-			@PostMapping("/transferWallet")
-			public ResponseEntity<ResponseData> transferWallet(@RequestBody RequestData requestBody) {
-				ResponseData response = transactionService.transferWallet(requestBody);
-				return new ResponseEntity<>(response, HttpStatus.OK);
-			}
 
+	// Wallet to Wallet Transfers
+	@PostMapping("/transferWallet")
+	public ResponseEntity<ResponseData> transferWallet(@RequestBody RequestData requestBody) {
+		ResponseData response = transactionService.transferWallet(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 
 //		    Wallet to Wallet Requery
-			@PostMapping("/requeryWalletTrans")
-			public ResponseEntity<ResponseData> requeryWalletTrans(@RequestBody RequestData requestBody) {
-				ResponseData response = transactionService.requeryWalletTrans(requestBody);
-				return new ResponseEntity<>(response, HttpStatus.OK);
-			}
+	@PostMapping("/requeryWalletTrans")
+	public ResponseEntity<ResponseData> requeryWalletTrans(@RequestBody RequestData requestBody) {
+		ResponseData response = transactionService.requeryWalletTrans(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 
-		// Reverse Transaction
-		@PostMapping("/reverseTxn")
-		public ResponseEntity<ResponseData> reverseTxn(@RequestBody RequestData requestBody) {
-			ResponseData response = transactionService.reverseTxn(requestBody);
-			return new ResponseEntity<>(response, HttpStatus.OK);
-		}
+	// Reverse Transaction
+	@PostMapping("/reverseTxn")
+	public ResponseEntity<ResponseData> reverseTxn(@RequestBody RequestData requestBody) {
+		ResponseData response = transactionService.reverseTxn(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	// Get Organization Wallet Transactions
+	@PostMapping("/getOrgWalletTrans")
+	public ResponseEntity<ResponseData> getOrgWalletTrans(@RequestBody RequestData requestBody) {
+		ResponseData response = transactionService.getOrgWalletTrans(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+
 }

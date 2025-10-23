@@ -327,20 +327,14 @@ public class CustomerBusinessController {
 	}
 
 
-	// Get Organization Wallet Transactions
-	@PostMapping("/getOrgWalletTrans")
-	public ResponseEntity<ResponseData> getOrgWalletTrans(@RequestBody RequestData requestBody) {
-		ResponseData response = customerBusinessService.getOrgWalletTrans(requestBody);
-		return new ResponseEntity<>(response, HttpStatus.OK);
-	}
-	
 
 	// Wallet History
-	@PostMapping("/walletHistory")
+	@PostMapping("/getstatement")
 	public ResponseEntity<ResponseData> walletHistory(@RequestBody RequestData requestBody) {
 		ResponseData response = customerBusinessService.walletHistory(requestBody);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
+	
 	
 
 	// Close Wallet
@@ -572,4 +566,11 @@ public class CustomerBusinessController {
 		ResponseData response = customerBusinessService.getOrgId(requestBody);
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
+    //get txn by reference
+    @PostMapping("/gettxnbypayref")
+        public ResponseEntity<ResponseData> getTxnByReference(@RequestBody RequestData requestBody) {
+			ResponseData response = customerBusinessService.getTxnByReference(requestBody);
+			return new ResponseEntity<>(response, HttpStatus.OK);
+    
+    }
 }

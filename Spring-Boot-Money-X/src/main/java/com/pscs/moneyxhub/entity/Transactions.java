@@ -15,6 +15,7 @@ public class Transactions {
     @GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 	private String acctNo;
+	private String sourceAccountName;
 	private String txnType;
 	private double amount;
 	private String currency;
@@ -29,11 +30,49 @@ public class Transactions {
 	private String beneficiaryaccount;
 	private String beneficiaryname;
 	private String beneficiarybank;
+	private String destinationBankCode;
 	private String remarks;
 	private String channel;
 	private String country;
 	private String requestJbody;
 	private String responseJbody;
+	private String crnarration;
+	private String drnarration;
+	private String webhookUrl;
+	
+	
+	
+	
+	public String getSourceAccountName() {
+		return sourceAccountName;
+	}
+	public void setSourceAccountName(String sourceAccountName) {
+		this.sourceAccountName = sourceAccountName;
+	}
+	public String getDestinationBankCode() {
+		return destinationBankCode;
+	}
+	public void setDestinationBankCode(String destinationBankCode) {
+		this.destinationBankCode = destinationBankCode;
+	}
+	public String getWebhookUrl() {
+		return webhookUrl;
+	}
+	public void setWebhookUrl(String webhookUrl) {
+		this.webhookUrl = webhookUrl;
+	}
+	public String getCrnarration() {
+		return crnarration;
+	}
+	public void setCrnarration(String crnarration) {
+		this.crnarration = crnarration;
+	}
+	public String getDrnarration() {
+		return drnarration;
+	}
+	public void setDrnarration(String drnarration) {
+		this.drnarration = drnarration;
+	}
 	public long getId() {
 		return id;
 	}
