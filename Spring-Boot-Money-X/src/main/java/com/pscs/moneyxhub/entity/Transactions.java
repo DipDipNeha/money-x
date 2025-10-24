@@ -2,43 +2,105 @@ package com.pscs.moneyxhub.entity;
 
 import java.util.Date;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 
 @Entity(name = "transactions_logs_TBL")
 @Table(name = "transactions_logs_TBL")
 public class Transactions {
-	@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-	private long id;
-	private String acctNo;
-	private String sourceAccountName;
-	private String txnType;
-	private double amount;
-	private String currency;
-	private Date txnDate;
-	private String paymentReference;
-	private String responseCode;
-	private String responseMessage;
-	private Date createdDate;
-	private String status;
-	private String accountType;
-	private String userId;
-	private String beneficiaryaccount;
-	private String beneficiaryname;
-	private String beneficiarybank;
-	private String destinationBankCode;
-	private String remarks;
-	private String channel;
-	private String country;
-	private String requestJbody;
-	private String responseJbody;
-	private String crnarration;
-	private String drnarration;
-	private String webhookUrl;
+@Id
+@GeneratedValue(strategy = GenerationType.AUTO)
+private long id;
+
+@Column(length = 20, nullable = false)
+private String acctNo;
+
+@Column(length = 100)
+private String sourceAccountName;
+
+@Column(length = 20)
+private String txnType;
+
+private double amount;
+
+@Column(length = 50)
+private String currency;
+
+@Temporal(TemporalType.TIMESTAMP)
+private Date txnDate;
+
+@Column(length = 50)
+private String paymentReference;
+
+@Column(length = 20)
+private String responseCode;
+
+@Column(length = 200)
+private String responseMessage;
+
+@Temporal(TemporalType.TIMESTAMP)
+private Date createdDate;
+
+@Column(length = 20)
+private String status;
+
+@Column(length = 20)
+private String accountType;
+
+@Column(length = 50)
+private String userId;
+
+@Column(length = 20)
+private String beneficiaryaccount;
+
+@Column(length = 100)
+private String beneficiaryname;
+
+@Column(length = 100)
+private String beneficiarybank;
+
+@Column(length = 20)
+private String destinationBankCode;
+
+@Column(length = 200)
+private String remarks;
+
+@Column(length = 50)
+private String channel;
+
+@Column(length = 50)
+private String country;
+
+@Column(length = 4000)
+private String requestJbody;
+
+@Column(length = 4000)
+private String responseJbody;
+
+@Column(length = 200)
+private String crnarration;
+
+@Column(length = 200)
+private String drnarration;
+
+@Column(length = 500)
+private String webhookUrl;
+
+private String debitCreditIndicator;
+
+public String getDebitCreditIndicator() {
+	return debitCreditIndicator;
+}
+public void setDebitCreditIndicator(String debitCreditIndicator) {
+		this.debitCreditIndicator = debitCreditIndicator;		
+}
+
 	
 	
 	

@@ -51,7 +51,7 @@ public class TransactionService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respmsg"));
+				response.setResponseMessage(CoreConstant.FAILED +" "+ callService.getString("respmsg"));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -85,7 +85,7 @@ public class TransactionService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respmsg"));
+				response.setResponseMessage(CoreConstant.FAILED +" "+ callService.getString("respmsg"));
 			}
 
 		} catch (Exception e) {
@@ -101,10 +101,21 @@ public class TransactionService {
 		try {
 			System.out.println("Request : " + requestBody);
 			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
-
 			JSONObject reqJson = new JSONObject(jsonString);
-			String jbody = ConvertRequestUtils.getJsonString(requestBody.getJbody());
-			JSONObject jbodyJson = new JSONObject(jbody);
+			System.out.println("Request Body: " + reqJson);
+			
+//			JSONObject jbodyJson = new JSONObject();
+//			jbodyJson =  reqJson.getJSONObject("jbody");
+			 Object jbodyObj = reqJson.get("jbody");
+		        JSONObject jbodyJson;
+		        if (jbodyObj instanceof String) {
+		            jbodyJson = new JSONObject((String) jbodyObj); 
+		        } else {
+		            jbodyJson = (JSONObject) jbodyObj;
+		        }
+			
+			System.out.println("Request Body: " + jbodyJson);
+			
 			jbodyJson.put("customerTransactionReference", System.currentTimeMillis()+"");
 			jbodyJson.put("narration", jbodyJson.getString("remarks"));
 			jbodyJson.put("transactionTypeId", System.nanoTime()+"");
@@ -148,8 +159,8 @@ public class TransactionService {
 				txn.setBeneficiaryaccount(jbodyJson.getString("destinationAccountNumber"));
 				txn.setBeneficiarybank(jbodyJson.getString("beneficiaryBank"));
 				txn.setBeneficiaryname(jbodyJson.getString("destinationAccountName"));
-				txn.setResponseJbody(callService.toString());
-				txn.setRequestJbody(reqJson.toString());
+				txn.setResponseJbody(callService.toString().length()>4000 ? callService.toString().substring(0,4000):callService.toString());
+				txn.setRequestJbody(reqJson.toString().length()>4000 ? reqJson.toString().substring(0,4000):reqJson.toString());
 				txn.setResponseCode(callService.getString("respCode"));
 				txn.setResponseMessage(callService.getString("respmsg"));
 				txn.setRemarks(jbodyJson.getString("remarks"));
@@ -158,6 +169,7 @@ public class TransactionService {
 				txn.setDestinationBankCode(jbodyJson.getString("destinationBankCode"));
 				txn.setWebhookUrl(jbodyJson.getString("webhookUrl"));
 				txn.setStatus("SUCCESS");
+				txn.setDebitCreditIndicator("D");
 				transactionsRepo.save(txn);
 				
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -166,7 +178,7 @@ public class TransactionService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respmsg"));
+				response.setResponseMessage(CoreConstant.FAILED +" "+ callService.getString("respmsg"));
 			}
 
 		} catch (Exception e) {
@@ -197,7 +209,7 @@ public class TransactionService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respmsg"));
+				response.setResponseMessage(CoreConstant.FAILED +" "+ callService.getString("respmsg"));
 			}
 
 		} catch (Exception e) {
@@ -214,20 +226,35 @@ public class TransactionService {
 		try {
 			System.out.println("Request : " + requestBody);
 			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
-			String jbody = ConvertRequestUtils.getJsonString(requestBody.getJbody());
-			JSONObject jbodyJson = new JSONObject(jbody);
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson);
+			
+//			JSONObject jbodyJson = new JSONObject();
+//			jbodyJson =  reqJson.getJSONObject("jbody");
+			 Object jbodyObj = reqJson.get("jbody");
+		        JSONObject jbodyJson;
+		        if (jbodyObj instanceof String) {
+		            jbodyJson = new JSONObject((String) jbodyObj); 
+		        } else {
+		            jbodyJson = (JSONObject) jbodyObj;
+		        }
+			
+			System.out.println("Request Body: " + jbodyJson);
+			
+			
 			
 			jbodyJson.put("transactionReference", System.currentTimeMillis()+"");
-			jbodyJson.put("narration", jbodyJson.getString("remarks"));
-			jbodyJson.put("transactionTypeId", System.nanoTime()+"");
-			
+			jbodyJson.put("narration", jbodyJson.optString("remarks",""));
+			jbodyJson.put("transactionTypeId", 1);
+			jbodyJson.put("toAccount", jbodyJson.getString("destinationAccountNumber"));			
 			
 			
 
-			JSONObject reqJson = new JSONObject(jsonString);
+		
 			System.out.println("Request Body: " + reqJson.toString());
-			reqJson.put("jbody", jbodyJson);
 			
+			reqJson.put("jbody", jbodyJson);
+			System.out.println("Request Body: " + jbodyJson.toString());
 			String jheader = ConvertRequestUtils.getJsonString(requestBody.getJheader());
 			JSONObject jheaderJson = new JSONObject(jheader);
 			String userName = jheaderJson.getString("userid");
@@ -265,23 +292,27 @@ public class TransactionService {
 				txn.setBeneficiaryaccount(jbodyJson.getString("destinationAccountNumber"));
 				txn.setBeneficiarybank(jbodyJson.has("beneficiaryBank") ?jbodyJson.getString("beneficiaryBank"):"");
 				txn.setBeneficiaryname(jbodyJson.has("beneficiaryName") ?jbodyJson.getString("beneficiaryName"):"");
-				txn.setResponseJbody(callService.toString());
-				txn.setRequestJbody(reqJson.toString());
+				txn.setResponseJbody(callService.toString().length()>4000 ? callService.toString().substring(0,4000):callService.toString());
+				txn.setRequestJbody(reqJson.toString().length()>4000 ? reqJson.toString().substring(0,4000):reqJson.toString());
 				txn.setResponseCode(callService.getString("respCode"));
 				txn.setResponseMessage(callService.getString("respmsg"));
-				txn.setRemarks(jbodyJson.getString("remarks"));
+				txn.setRemarks( jbodyJson.optString("remarks",""));
 				txn.setDrnarration(jbodyJson.getString("narration"));
 				txn.setCrnarration(jbodyJson.getString("narration"));
 				txn.setStatus("SUCCESS");
+				txn.setDebitCreditIndicator("D");
 				transactionsRepo.save(txn);
 				
+				
+				callService.put("transactionReference", jbodyJson.getString("transactionReference"));
+				callService.put("Status", "SUCCESS");
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
 				response.setResponseData(callService.toMap());
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respmsg"));
+				response.setResponseMessage(CoreConstant.FAILED +" "+ callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -311,7 +342,7 @@ public class TransactionService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respmsg"));
+				response.setResponseMessage(CoreConstant.FAILED +" "+ callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {
@@ -341,7 +372,7 @@ public class TransactionService {
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respmsg"));
+				response.setResponseMessage(CoreConstant.FAILED +" "+ callService.getString("respmsg"));
 			}
 			
 		} catch (Exception e) {

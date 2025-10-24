@@ -20,14 +20,20 @@ public class RequestLog {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private Date requestTime;
+	@Column(length=50)
 	private String channel;
+	@Column(length=50)
 	private String username;
+	@Column(length=50)
 	private String reqType;
 	@Column(length=4000)
 	private String request;
+	
 	@Column(length=4000)
 	private String response;
+	@Column(length=10)
 	private String responseCode;
+	@Column(length=200)
 	private String responseMessage;
 	public Long getId() {
 		return id;

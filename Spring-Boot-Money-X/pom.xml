@@ -150,12 +150,12 @@
         <artifactId>postgresql</artifactId>
         <scope>runtime</scope>
     </dependency>
-<dependency>
-    <groupId>org.apache.httpcomponents</groupId>
-    <artifactId>httpclient</artifactId>
-    <version>4.5.14</version>
-</dependency>
 
+	   <dependency>
+       <groupId>org.apache.httpcomponents.client5</groupId>
+       <artifactId>httpclient5</artifactId>
+       <version>5.4</version> <!-- Use the latest version -->
+   </dependency>
 	</dependencies>
 
 	<build>
