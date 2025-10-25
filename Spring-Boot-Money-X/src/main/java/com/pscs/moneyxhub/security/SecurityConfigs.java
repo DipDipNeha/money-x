@@ -38,7 +38,8 @@ public class SecurityConfigs {
 		.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 		.and()
 		.authorizeHttpRequests(auth -> auth
-	            .requestMatchers("/api/auth/**").permitAll() 
+	            .requestMatchers("/api/auth/**", "/sms/callback")
+	            .permitAll() 
 	            .anyRequest().authenticated())
 		.httpBasic();
 		httpSecurity.addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter.class);

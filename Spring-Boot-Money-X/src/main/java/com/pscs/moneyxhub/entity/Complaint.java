@@ -1,7 +1,10 @@
 package com.pscs.moneyxhub.entity;
 
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 @Entity(name = "complaint_tbl")
 public class Complaint {
