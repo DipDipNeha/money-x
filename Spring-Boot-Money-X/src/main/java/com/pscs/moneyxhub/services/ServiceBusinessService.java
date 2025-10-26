@@ -7,7 +7,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.pscs.moneyxhub.entity.Transactions;
-import com.pscs.moneyxhub.entity.WalletAcctData;
+import com.pscs.moneyxhub.entity.WalletAcctData_old;
 import com.pscs.moneyxhub.helper.ConvertRequestUtils;
 import com.pscs.moneyxhub.helper.CoreConstant;
 import com.pscs.moneyxhub.model.RequestData;
@@ -38,7 +38,7 @@ public class ServiceBusinessService {
         System.out.println("Request Body: " + requestJson.toString());
 
         String accountNumber = requestJson.getString("accountNumber");
-        WalletAcctData wallet = null;//walletRepo.findByAcctNo(accountNumber);
+        WalletAcctData_old wallet = null;//walletRepo.findByAcctNo(accountNumber);
 
         if (wallet == null) {
             response.setResponseCode(CoreConstant.FAILURE_CODE);

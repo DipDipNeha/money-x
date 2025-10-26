@@ -1,5 +1,6 @@
 package com.pscs.moneyxhub.services;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -19,6 +20,7 @@ import com.pscs.moneyxhub.entity.MoneyXBusiness;
 import com.pscs.moneyxhub.entity.OtpDataTabl;
 import com.pscs.moneyxhub.entity.Transactions;
 import com.pscs.moneyxhub.entity.WalletAcctData;
+import com.pscs.moneyxhub.entity.WalletAcctData_old;
 import com.pscs.moneyxhub.helper.ConvertRequestUtils;
 import com.pscs.moneyxhub.helper.CoreConstant;
 import com.pscs.moneyxhub.model.ImageUpload;
@@ -156,9 +158,10 @@ public class CustomerBusinessService {
 					
 					
 					
-					WalletAcctData walletAcctData = walletAcctDataRepository.findByCustomerId(checkCustomerres.getCustomerId());
+					WalletAcctData walletAcctData = walletAcctDataRepository.findByCustId(checkCustomerres.getCustomerId());
 					if (walletAcctData != null) {
 							customerJson.put("walletId",walletAcctData.getWalletId());
+							customerJson.put("accountNumber", walletAcctData.getAcctNo());
 						
 						} else {
 							customerJson.put("walletId", "NA");
@@ -263,10 +266,10 @@ public class CustomerBusinessService {
 					
 					
 					
-					WalletAcctData walletAcctData = walletAcctDataRepository.findByCustomerId(checkCustomerres.getCustomerId());
+					WalletAcctData walletAcctData = walletAcctDataRepository.findByCustId(checkCustomerres.getCustomerId());
 					if (walletAcctData != null) {
 							customerJson.put("walletId",walletAcctData.getWalletId());
-						
+							customerJson.put("accountNumber", walletAcctData.getAcctNo());
 						} else {
 							customerJson.put("walletId", "NA");
 							customerJson.put("accountNumber", "NA");
@@ -1547,17 +1550,13 @@ public class CustomerBusinessService {
 				
 				moneyXBusinessRepo.save(byCustomerId);
 				 WalletAcctData wallet=new WalletAcctData() ;
-				 	wallet.setAccountNumber(data.getJSONObject("virtualAccount").getString("accountNumber"));
-					wallet.setAvailableBalance(data.optDoubleObject("availableBalance"));
-					wallet.setLedgerBalance(data.optDoubleObject("ledgerBalance"));
+				 	wallet.setAcctNo(data.getJSONObject("virtualAccount").getString("accountNumber"));
+					wallet.setBalance( new BigDecimal( data.optDoubleObject("availableBalance")));
+					wallet.setLedgerBal(new BigDecimal( data.optDoubleObject("ledgerBalance")));
 					wallet.setCurrencyId(data.getString("currencyId"));
-					wallet.setCustomerId(reqJson.getJSONObject("jbody").getString("customerId"));
+					wallet.setCustId(reqJson.getJSONObject("jbody").getString("customerId"));
 					wallet.setCustomerTypeId(data.getString("customerTypeId"));
-					wallet.setIsDefault(data.getBoolean("isDefault"));
-					wallet.setIsInternal(data.getBoolean("isInternal"));
-					wallet.setMobNum(data.optString("mobNum"));
-					wallet.setName(data.getString("name"));
-					wallet.setOverdraft(data.optDoubleObject("overdraft"));
+					wallet.setAcctName(data.getString("name"));
 					wallet.setWalletClassificationId("WALLET");
 					wallet.setWalletRestrictionId(data.optString("walletRestrictionId"));
 					wallet.setBankCode(data.getJSONObject("virtualAccount").getString("bankCode"));
@@ -1624,13 +1623,15 @@ public class CustomerBusinessService {
 				
 				corporateCustomerRepo.save(byCustomerId);
 				 WalletAcctData wallet=new WalletAcctData() ;
-				 	wallet.setAccountNumber(data.getJSONObject("virtualAccount").getString("accountNumber"));
-					wallet.setAvailableBalance(data.has("availableBalance")?  data.optDoubleObject("availableBalance"): 0.0);
-					wallet.setLedgerBalance(data.has("availableBalance")? data.optDoubleObject("ledgerBalance"): 0.0);
+				 	wallet.setAcctNo(data.getJSONObject("virtualAccount").getString("accountNumber"));
+				   double balance=	data.has("availableBalance")?  data.optDoubleObject("availableBalance"): 0.0;
+					wallet.setBalance(new BigDecimal(balance));
+					double ledgerBalance= data.has("ledgerBalance")? data.optDoubleObject("ledgerBalance"): 0.0;
+					wallet.setLedgerBal(new BigDecimal(ledgerBalance));
 					wallet.setCurrencyId(data.getString("currencyId"));
-					wallet.setCustomerId(reqJson.getJSONObject("jbody").getString("customerId"));
+					wallet.setCustId(reqJson.getJSONObject("jbody").getString("customerId"));
 					wallet.setCustomerTypeId(data.getString("customerTypeId"));
-					wallet.setName(data.getString("name"));
+					wallet.setAcctName(data.getString("name"));
 					wallet.setWalletClassificationId("WALLET");
 //					wallet.setWalletRestrictionId(data.optString("walletRestrictionId"));
 					wallet.setBankCode(data.getJSONObject("virtualAccount").getString("bankCode"));
@@ -2770,7 +2771,7 @@ public class CustomerBusinessService {
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
-			WalletAcctData byCustomerId = walletAcctDataRepository.findByCustomerId(reqJson.getString("customerId"));
+			WalletAcctData byCustomerId = walletAcctDataRepository.findByCustId(reqJson.getString("customerId"));
 			if (byCustomerId == null) {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage("No wallet found for customerId " + reqJson.getString("customerId"));
@@ -2778,8 +2779,9 @@ public class CustomerBusinessService {
 			}
 			JSONObject respJson = new JSONObject();
 			respJson.put("walletId", byCustomerId.getWalletId());
-			respJson.put("customerId", byCustomerId.getCustomerId());
-			respJson.put("accountNumber", byCustomerId.getAccountNumber());
+			respJson.put("customerId", byCustomerId.getCustId());
+			respJson.put("accountNumber", byCustomerId.getAcctNo());
+			
 			
 			response.setResponseCode(CoreConstant.SUCCESS_CODE);
 			response.setResponseMessage(CoreConstant.SUCCESS);
