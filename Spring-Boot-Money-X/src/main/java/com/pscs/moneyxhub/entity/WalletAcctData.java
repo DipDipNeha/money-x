@@ -21,8 +21,9 @@ public class WalletAcctData {
 
 	@Column(name = "CUST_ID")
 	String custId;
-	@Column(name = "WALLET_ID")
-	private String walletId;
+	
+	@Column(name = "WALLET_ACCT_ID")
+	private String walletAcctId;
 
 	@Column(name = "ACCT_NO")
 	String acctNo;
@@ -162,18 +163,18 @@ public class WalletAcctData {
 		return id;
 	}
 
-	public String getWalletId() {
-		return walletId;
-	}
-
-	public void setWalletId(String walletId) {
-		this.walletId = walletId;
-	}
-
 	public void setId(Long id) {
 		this.id = id;
 	}
 
+	public String getWalletAcctId() {
+		return walletAcctId;
+	}
+
+	public void setWalletAcctId(String walletAcctId) {
+		this.walletAcctId = walletAcctId;
+	}
+	
 	private String customerTypeId;
 	private String currencyId;
 	private String walletRestrictionId;
@@ -506,6 +507,8 @@ public class WalletAcctData {
 	public void setApiCode(String apiCode) {
 		this.apiCode = apiCode;
 	}
+	
+	
 
 	@Override
 	public String toString() {

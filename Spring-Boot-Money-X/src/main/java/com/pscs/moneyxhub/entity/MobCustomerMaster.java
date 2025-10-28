@@ -1,5 +1,6 @@
 package com.pscs.moneyxhub.entity;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 import jakarta.persistence.Column;
@@ -32,6 +33,8 @@ public class MobCustomerMaster {
 	@Column(name="LAST_NAME")
 	String lastName;
 	
+	
+	
 
 	@Column(name="GENDER")
 	String gender;
@@ -40,9 +43,9 @@ public class MobCustomerMaster {
 	@Column(name="EMAILID")
 	String emailAddress;
 	
-	@Temporal(TemporalType.TIMESTAMP)
+	@Temporal(TemporalType.DATE)
 	@Column(name="DOB")
-	Date dob;
+	LocalDate dob;
 	
 
 	@Column(name="DOCTYPE")
@@ -282,6 +285,8 @@ public class MobCustomerMaster {
 	
 	private String customerType;
 	private String customerId;
+	private String occupation;
+	
 	
 	private int retryLoginAttempt;
 	private String isLocked;
@@ -289,6 +294,7 @@ public class MobCustomerMaster {
 	private String lastLoginTime;
 	@Column(name = "retry_login_active")
 	private String isLoginAttemptActive;
+	
 	public Long getId() {
 		return id;
 	}
@@ -331,10 +337,10 @@ public class MobCustomerMaster {
 	public void setEmailAddress(String emailAddress) {
 		this.emailAddress = emailAddress;
 	}
-	public Date getDob() {
+	public LocalDate getDob() {
 		return dob;
 	}
-	public void setDob(Date dob) {
+	public void setDob(LocalDate dob) {
 		this.dob = dob;
 	}
 	public String getDocType() {
@@ -822,6 +828,14 @@ public class MobCustomerMaster {
 	}
 	public void setIsLoginAttemptActive(String isLoginAttemptActive) {
 		this.isLoginAttemptActive = isLoginAttemptActive;
+	}
+	
+	
+	public String getOccupation() {
+		return occupation;
+	}
+	public void setOccupation(String occupation) {
+		this.occupation = occupation;
 	}
 	@Override
 	public String toString() {

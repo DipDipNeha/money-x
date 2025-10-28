@@ -2,7 +2,11 @@ package com.pscs.moneyxhub.utils;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Base64;
+import java.util.Date;
 
 public class CommonUtils {
 	
@@ -105,6 +109,21 @@ public class CommonUtils {
 
 		System.out.println(getMobileNo("2349177796541"));
 		;
+	}
+	
+	
+	public static  LocalDate parseDateFromStr(String input) {
+		
+        LocalDate localDate = LocalDate.parse(input, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+        // Convert LocalDate to java.util.Date (if needed)
+        Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        System.out.println("LocalDate: " + localDate);
+        System.out.println("java.util.Date: " + date);
+        
+        return localDate;
+        
 	}
 
 }

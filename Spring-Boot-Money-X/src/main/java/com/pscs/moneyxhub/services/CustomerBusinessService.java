@@ -16,11 +16,11 @@ import com.pscs.moneyxhub.entity.CorporateCustomer;
 import com.pscs.moneyxhub.entity.Country;
 import com.pscs.moneyxhub.entity.CustomerDocInfo;
 import com.pscs.moneyxhub.entity.CustomerLogin;
-import com.pscs.moneyxhub.entity.MoneyXBusiness;
+import com.pscs.moneyxhub.entity.MobContactInfo;
+import com.pscs.moneyxhub.entity.MobCustomerMaster;
 import com.pscs.moneyxhub.entity.OtpDataTabl;
 import com.pscs.moneyxhub.entity.Transactions;
 import com.pscs.moneyxhub.entity.WalletAcctData;
-import com.pscs.moneyxhub.entity.WalletAcctData_old;
 import com.pscs.moneyxhub.helper.ConvertRequestUtils;
 import com.pscs.moneyxhub.helper.CoreConstant;
 import com.pscs.moneyxhub.model.ImageUpload;
@@ -33,7 +33,8 @@ import com.pscs.moneyxhub.repo.CountryRepo;
 import com.pscs.moneyxhub.repo.CustomerDocInfoRepo;
 import com.pscs.moneyxhub.repo.CustomerLoginRepo;
 import com.pscs.moneyxhub.repo.DocumentRepo;
-import com.pscs.moneyxhub.repo.MoneyXBusinessRepo;
+import com.pscs.moneyxhub.repo.MobContactInfoRepo;
+import com.pscs.moneyxhub.repo.MobCustomerMasterRepo;
 import com.pscs.moneyxhub.repo.OtpDataTablRepo;
 import com.pscs.moneyxhub.repo.TransactionsRepo;
 import com.pscs.moneyxhub.repo.WalletAcctDataRepository;
@@ -54,16 +55,22 @@ public class CustomerBusinessService {
 	private final DocumentRepo documentRepo;
 	private final OtpDataTablRepo otpDataTablRepo;
 	private final EmailAndSMSPostingService smsPostingService;
-	private final MoneyXBusinessRepo moneyXBusinessRepo;
+	private final MobCustomerMasterRepo mobCustomerMasterRepo;
+	private final MobContactInfoRepo mobContactInfoRepo;
+	
 	private final WalletAcctDataRepository walletAcctDataRepository;
 	private final CorporateCustomerRepo corporateCustomerRepo;
 	private final TransactionsRepo transactionsRepo;
 
+	
+
 	public CustomerBusinessService(CustomerLoginRepo customerLoginRepo, CountryRepo countryRepo,
 			BusinessTypeRepo businessTypeRepo, BusinessRoleRepo businessRoleRepo,
 			CustomerDocInfoRepo customerDocInfoRepo, DocumentRepo documentRepo, OtpDataTablRepo otpDataTablRepo,
-			EmailAndSMSPostingService smsPostingService, MoneyXBusinessRepo moneyXBusinessRepo,
-			WalletAcctDataRepository walletAcctDataRepository, CorporateCustomerRepo corporateCustomerRepo, TransactionsRepo transactionsRepo) {
+			EmailAndSMSPostingService smsPostingService, MobCustomerMasterRepo mobCustomerMasterRepo,
+			MobContactInfoRepo mobContactInfoRepo, WalletAcctDataRepository walletAcctDataRepository,
+			CorporateCustomerRepo corporateCustomerRepo, TransactionsRepo transactionsRepo) {
+		super();
 		this.customerLoginRepo = customerLoginRepo;
 		this.countryRepo = countryRepo;
 		this.businessTypeRepo = businessTypeRepo;
@@ -72,11 +79,13 @@ public class CustomerBusinessService {
 		this.documentRepo = documentRepo;
 		this.otpDataTablRepo = otpDataTablRepo;
 		this.smsPostingService = smsPostingService;
-		this.moneyXBusinessRepo = moneyXBusinessRepo;
+		this.mobCustomerMasterRepo = mobCustomerMasterRepo;
+		this.mobContactInfoRepo = mobContactInfoRepo;
 		this.walletAcctDataRepository = walletAcctDataRepository;
 		this.corporateCustomerRepo = corporateCustomerRepo;
 		this.transactionsRepo = transactionsRepo;
 	}
+
 
 	// find by username
 	@Transactional
@@ -99,7 +108,7 @@ public class CustomerBusinessService {
 
 				return corporateCustomerLogin(request);
 			}else {
-			MoneyXBusiness checkCustomerres = moneyXBusinessRepo.findByUserName(requestJson.getString("username"));
+				MobCustomerMaster checkCustomerres = mobCustomerMasterRepo.findByUserName(requestJson.getString("username"));
 			if (checkCustomerres != null) {
 				
 //				ResponseData validateOtp = validateOtp(request);
@@ -121,7 +130,7 @@ public class CustomerBusinessService {
 					return response;
 				}
 
-				checkCustomerres = moneyXBusinessRepo.findByUserNameAndPassword(requestJson.getString("username"),
+				checkCustomerres = mobCustomerMasterRepo.findByUserNameAndPassword(requestJson.getString("username"),
 						CommonUtils.b64_sha256(requestJson.getString("password")));
 				// check if user exist
 				if (checkCustomerres == null) {
@@ -132,14 +141,14 @@ public class CustomerBusinessService {
 					if (isLoginAttemptActive.equals("Y")) {
 
 						if (retryLoginAttempt >= maxRetryLoginAttempt) {
-							moneyXBusinessRepo.updateIsLockedByUserName("L", requestJson.getString("username"));
+							mobCustomerMasterRepo.updateIsLockedByUserName("L", requestJson.getString("username"));
 							response.setResponseCode(CoreConstant.FAILURE_CODE);
 							response.setResponseMessage(CoreConstant.ACCOUNT_LOCKED);
 							return response;
 						} else {
 							response.setResponseMessage("Invalid Username or Password You Have "
 									+ (maxRetryLoginAttempt - retryLoginAttempt) + " Attempt Left");
-							moneyXBusinessRepo.incrementRetryLoginAttemptNative(requestJson.getString("username"));
+							mobCustomerMasterRepo.incrementRetryLoginAttemptNative(requestJson.getString("username"));
 						}
 
 						return response;
@@ -160,7 +169,7 @@ public class CustomerBusinessService {
 					
 					WalletAcctData walletAcctData = walletAcctDataRepository.findByCustId(checkCustomerres.getCustomerId());
 					if (walletAcctData != null) {
-							customerJson.put("walletId",walletAcctData.getWalletId());
+							customerJson.put("walletId",walletAcctData.getWalletAcctId());
 							customerJson.put("accountNumber", walletAcctData.getAcctNo());
 						
 						} else {
@@ -172,7 +181,7 @@ public class CustomerBusinessService {
 					
 					response.setResponseData(customerJson.toMap());
 					if (isLoginAttemptActive.equals("Y")) {
-						moneyXBusinessRepo.resetRetryLoginAttempt(checkCustomerres.getUserName());
+						mobCustomerMasterRepo.resetRetryLoginAttempt(checkCustomerres.getUserName());
 					}
 				}
 
@@ -268,7 +277,7 @@ public class CustomerBusinessService {
 					
 					WalletAcctData walletAcctData = walletAcctDataRepository.findByCustId(checkCustomerres.getCustomerId());
 					if (walletAcctData != null) {
-							customerJson.put("walletId",walletAcctData.getWalletId());
+							customerJson.put("walletId",walletAcctData.getWalletAcctId());
 							customerJson.put("accountNumber", walletAcctData.getAcctNo());
 						} else {
 							customerJson.put("walletId", "NA");
@@ -307,7 +316,7 @@ public class CustomerBusinessService {
 			// Convert the request body to a JSON object
 			JSONObject requestJson = new JSONObject(jsonString);
 			logger.info("Request Body: " + requestJson.toString());
-			MoneyXBusiness checkCustomerres = moneyXBusinessRepo.findByUserName(requestJson.getString("username"));
+			MobCustomerMaster checkCustomerres = mobCustomerMasterRepo.findByUserName(requestJson.getString("username"));
 			if (checkCustomerres != null) {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.USER_EXIST);
@@ -332,31 +341,34 @@ public class CustomerBusinessService {
 			JSONObject jsonObject = new JSONObject(jsonString);
 			logger.info("Request Body: " + jsonObject.toString());
 
-			MoneyXBusiness customerLogin = new MoneyXBusiness();
+			MobCustomerMaster customerMaster = new MobCustomerMaster();
 
 			
 
-			customerLogin.setOrganizationId(jsonObject.getString("organizationId"));
-			customerLogin.setFirstName(jsonObject.getString("firstName"));
-			customerLogin.setLastName(jsonObject.getString("lastName"));
-			customerLogin.setMiddleName(jsonObject.getString("middleName"));
-			customerLogin.setEmailAddress(jsonObject.getString("emailAddress"));
-			customerLogin.setMobileNumber(jsonObject.getString("mobileNumber"));
-			customerLogin.setDob(jsonObject.getString("dob"));
-			customerLogin.setCustomerTypeId(jsonObject.getString("customerTypeId"));
-			customerLogin.setAddress(jsonObject.getString("address"));
-			customerLogin.setCity(jsonObject.getString("city"));
-			customerLogin.setCountryId(jsonObject.getString("countryId"));
-			customerLogin.setAlias(jsonObject.getString("alias"));
-			customerLogin.setCurrency(jsonObject.has("currency") ?jsonObject.getString("currency"):"NGN");
-			customerLogin.setUserName(jsonObject.getString("userName"));
-			customerLogin.setPassword(CommonUtils.b64_sha256(jsonObject.getString("password")));
-			customerLogin.setTxnPin(jsonObject.getString("txnPin"));
-			customerLogin.setAuthType(jsonObject.getString("authType"));
-			customerLogin.setAuthValue(jsonObject.getString("authValue"));
-			customerLogin.setCustomerType(jsonObject.has("customerType") ?  jsonObject.getString("customerType"):"");
-			customerLogin.setCustomerId(jsonObject.has("customerId") ?jsonObject.getString("customerId"):"");
-			customerLogin.setCuntry(jsonObject.has("cuntry") ? jsonObject.getString("cuntry") :"");
+			customerMaster.setOrganizationId(jsonObject.getString("organizationId"));
+			customerMaster.setFirstName(jsonObject.getString("firstName"));
+			customerMaster.setLastName(jsonObject.getString("lastName"));
+			customerMaster.setMiddleName(jsonObject.getString("middleName"));
+			customerMaster.setEmailAddress(jsonObject.getString("emailAddress"));
+			customerMaster.setUserName(jsonObject.getString("userName"));
+			customerMaster.setPassword(CommonUtils.b64_sha256(jsonObject.getString("password")));
+			customerMaster.setTxnPin(jsonObject.getString("txnPin"));
+			customerMaster.setAuthType(jsonObject.getString("authType"));
+			customerMaster.setAuthValue(jsonObject.getString("authValue"));
+			customerMaster.setCustomerType(jsonObject.has("customerType") ?  jsonObject.getString("customerType"):"");
+			customerMaster.setCustomerId(jsonObject.has("customerId") ?jsonObject.getString("customerId"):"");
+			customerMaster.setDob(CommonUtils.parseDateFromStr(jsonObject.getString("dob")));
+			customerMaster.setCustomerTypeId(jsonObject.getString("customerTypeId"));
+			customerMaster.setAlias(jsonObject.getString("alias"));
+			
+			MobContactInfo contactInfo = new MobContactInfo();
+			contactInfo.setCustId(jsonObject.has("customerId") ?jsonObject.getString("customerId"):"");
+			contactInfo.setMobileNumber(jsonObject.getString("mobileNumber"));
+			contactInfo.setAddress(jsonObject.getString("address"));
+			contactInfo.setCity(jsonObject.getString("city"));
+			contactInfo.setCountryId(jsonObject.getString("countryId"));
+			
+			contactInfo.setNationality(jsonObject.has("cuntry") ? jsonObject.getString("cuntry") :"");
 			
 			
 			
@@ -368,13 +380,13 @@ public class CustomerBusinessService {
 				return validateOtp; // Return if OTP validation fails
 			}else {
 			
-			customerLogin.setIsActive("A");
-			customerLogin.setIsLocked("N");
-			customerLogin.setIsLoginAttemptActive("Y");
-			customerLogin.setRetryLoginAttempt(0);
+			customerMaster.setIsActive("A");
+			customerMaster.setIsLocked("N");
+			customerMaster.setIsLoginAttemptActive("Y");
+			customerMaster.setRetryLoginAttempt(0);
 			
 
-			MoneyXBusiness customer = moneyXBusinessRepo.findByEmailAddressOrUserName(jsonObject.getString("emailAddress"),jsonObject.getString("userName"));
+			MobCustomerMaster customer = mobCustomerMasterRepo.findByEmailAddressOrUserName(jsonObject.getString("emailAddress"),jsonObject.getString("userName"));
 			if (customer == null) {
 				
 				String requestJson = ConvertRequestUtils.getJsonString(request);
@@ -392,10 +404,11 @@ public class CustomerBusinessService {
 					
 					JSONObject responseData = callService.getJSONObject("data");
 					
-					customerLogin.setCustomerId(responseData.getString("id"));
-					customerLogin.setCustomerTierId(responseData.has("customerTierId") ? responseData.getInt("customerTierId")+"" :"");
+					customerMaster.setCustomerId(responseData.getString("id"));
+					customerMaster.setmPrdCode(responseData.has("customerTierId") ? responseData.getInt("customerTierId")+"" :"");
 					
-					customer = moneyXBusinessRepo.save(customerLogin);
+					customer = mobCustomerMasterRepo.save(customerMaster);
+					MobContactInfo contactInforespo = mobContactInfoRepo.save(contactInfo);
 					if (customer == null) {
 						response.setResponseCode(CoreConstant.FAILURE_CODE);
 						response.setResponseMessage(CoreConstant.FAILED + " to Create Profile");
@@ -431,6 +444,8 @@ public class CustomerBusinessService {
 
 			String mobileNumber = "";
 			String email = "";
+			MobContactInfo contactInfo =null;
+			MobCustomerMaster byUserName =null;
 			System.out.println("Request : " + request);
 			String jsonString = ConvertRequestUtils.getJsonString(request.getJbody());
 			String strJheader = ConvertRequestUtils.getJsonString(request.getJheader());
@@ -443,9 +458,18 @@ public class CustomerBusinessService {
 			
 			if (requestType.equals("LOGIN_OTP")) {
 				
-				MoneyXBusiness byUserName = moneyXBusinessRepo.findByUserName(jsonObject.getString("username"));
-				mobileNumber= byUserName != null ? byUserName.getMobileNumber():"";
-				email = byUserName != null ? byUserName.getEmailAddress():"";
+				 byUserName = mobCustomerMasterRepo.findByUserName(jsonObject.getString("username"));
+				if (byUserName == null) {
+					response.setResponseCode(CoreConstant.FAILURE_CODE);
+					response.setResponseMessage(CoreConstant.USER_NOT_FOUND);
+					return response;
+				}else {
+				    contactInfo = mobContactInfoRepo.findByCustId(byUserName.getCustomerId());
+					mobileNumber= byUserName != null ? contactInfo.getMobileNumber():"";
+					email = byUserName != null ? byUserName.getEmailAddress():"";
+					
+				}
+				
 				
 			}
 			else {
@@ -470,16 +494,14 @@ public class CustomerBusinessService {
 			
 			//get email from db if email is blank
 			if (otpDataTabl.getEmailId() == null || otpDataTabl.getEmailId().isEmpty()) {
-				MoneyXBusiness business = moneyXBusinessRepo.findByUserName(jHeader.getString("userid"));
-				if (business != null) {
-					otpDataTabl.setEmailId(business.getEmailAddress());
+				if (byUserName != null) {
+					otpDataTabl.setEmailId(byUserName.getEmailAddress());
 				}
 			}
 			// get phone from db if phone is blank
 			if (otpDataTabl.getMobileNo() == null || otpDataTabl.getMobileNo().isEmpty()) {
-				MoneyXBusiness business = moneyXBusinessRepo.findByUserName(jHeader.getString("userid"));
-				if (business != null) {
-					otpDataTabl.setMobileNo(business.getMobileNumber());
+				if (contactInfo != null) {
+					otpDataTabl.setMobileNo(contactInfo.getMobileNumber());
 				}
 			}
 			
@@ -561,10 +583,21 @@ public class CustomerBusinessService {
 			
 			if (requestType.equals("LOGIN")) {
 
-				MoneyXBusiness byUserName = moneyXBusinessRepo.findByUserName(requestJson.getString("username"));
-				mobileNumber = byUserName != null ? byUserName.getMobileNumber() : "";
-				email = byUserName != null ? byUserName.getEmailAddress() : "";
-
+				MobCustomerMaster byUserName = mobCustomerMasterRepo.findByUserName(requestJson.getString("username"));
+				if (byUserName == null) {
+					response.setResponseCode(CoreConstant.FAILURE_CODE);
+					response.setResponseMessage(CoreConstant.USER_NOT_FOUND);
+					return response;
+				}
+				else {
+					MobContactInfo contactInfo = mobContactInfoRepo.findByCustId(byUserName.getCustomerId());
+					if (contactInfo != null) {
+						mobileNumber = contactInfo.getMobileNumber();
+						email = byUserName.getEmailAddress();
+					}
+					
+				}
+			
 			} else {
 				mobileNumber = requestJson.getString("mobileNumber");
 				email = requestJson.has("email") ? requestJson.getString("email") : "";
@@ -647,7 +680,7 @@ public class CustomerBusinessService {
 				String oldPassword = CommonUtils.b64_sha256(requestJson.getString("password"));
 				String newPassword = CommonUtils.b64_sha256(requestJson.getString("newPassword"));
 				// find customer login by username
-				MoneyXBusiness customerLogin = moneyXBusinessRepo.findByUserName(username);
+				MobCustomerMaster customerLogin = mobCustomerMasterRepo.findByUserName(username);
 
 				if (customerLogin == null) {
 					response.setResponseCode(CoreConstant.FAILURE_CODE);
@@ -655,7 +688,7 @@ public class CustomerBusinessService {
 
 				} else {
 					customerLogin.setPassword(newPassword);
-					moneyXBusinessRepo.save(customerLogin);
+					mobCustomerMasterRepo.save(customerLogin);
 
 					response.setResponseCode(CoreConstant.SUCCESS_CODE);
 					response.setResponseMessage(CoreConstant.PASSWORD_CHANGED );
@@ -953,6 +986,8 @@ public class CustomerBusinessService {
 			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 	        String jsonStringHeader = ConvertRequestUtils.getJsonString(requestBody.getJheader());
 
+	        String jsonStrBody=  ConvertRequestUtils.getJsonString(requestBody.getJbody());
+	        JSONObject jbody=new JSONObject(jsonStrBody);
 	        JSONObject jsonHeader = new JSONObject(jsonStringHeader);
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -966,28 +1001,29 @@ public class CustomerBusinessService {
 				
 				
 				String userId = jsonHeader.optString("userid");
-	            MoneyXBusiness byUserName = moneyXBusinessRepo.findByUserName(userId);
+	            MobCustomerMaster byUserName = mobCustomerMasterRepo.findByUserName(userId);
 
 				if (byUserName == null) {
 					response.setResponseCode(CoreConstant.FAILURE_CODE);
 					response.setResponseMessage(CoreConstant.USER_NOT_FOUND + ": " + userId);
 					return response;
 				}
-	            byUserName.setFirstName(reqJson.optString("firstName", byUserName.getFirstName()));
-	            byUserName.setLastName(reqJson.optString("lastName", byUserName.getLastName()));
-	            byUserName.setMiddleName(reqJson.optString("middleName", byUserName.getMiddleName()));
-	            byUserName.setDob(reqJson.optString("dob", byUserName.getDob()));
-	            byUserName.setCity(reqJson.optString("city", byUserName.getCity()));
-	            byUserName.setAddress(reqJson.optString("address", byUserName.getAddress()));
-	            byUserName.setOccupation(reqJson.optString("occupation", byUserName.getOccupation()));
-				byUserName.setGender(reqJson.optString("gender", byUserName.getGender()));
-	            byUserName.setBvn(reqJson.optString("bvn", byUserName.getBvn()));
-	            byUserName.setNin(reqJson.optString("nin", byUserName.getNin()));
-	            byUserName.setBvnVerified(reqJson.optBoolean("bvnVerified", byUserName.isBvnVerified()));
-	            byUserName.setNinVerified(reqJson.optBoolean("ninVerified", byUserName.isNinVerified()));
-	            moneyXBusinessRepo.save(byUserName);
+	            byUserName.setFirstName(jbody.optString("firstName", byUserName.getFirstName()));
+	            byUserName.setLastName(jbody.optString("lastName", byUserName.getLastName()));
+	            byUserName.setMiddleName(jbody.optString("middleName", byUserName.getMiddleName()));
+	            byUserName.setDob( CommonUtils.parseDateFromStr(jbody.optString("dob")));
+	            byUserName.setOccupation(jbody.optString("occupation", byUserName.getOccupation()));
+				byUserName.setGender(jbody.optString("gender", byUserName.getGender()));
+	            byUserName.setBvn(jbody.optString("bvn", byUserName.getBvn()));
+	            byUserName.setNin(jbody.optString("nin", byUserName.getNin()));
+	            byUserName.setBvnVerified(jbody.optBoolean("bvnVerified", byUserName.isBvnVerified()));
+	            byUserName.setNinVerified(jbody.optBoolean("ninVerified", byUserName.isNinVerified()));
+	            mobCustomerMasterRepo.save(byUserName);
 	            
-				
+	            MobContactInfo contactInfo=mobContactInfoRepo.findByCustId(jbody.getString("customerId"));
+	            contactInfo.setCity(jbody.optString("city", contactInfo.getCity()));
+	            contactInfo.setAddress(jbody.optString("address", contactInfo.getAddress()));
+	            mobContactInfoRepo.save(contactInfo);
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
 				buildResponseData(response, callService);
@@ -1006,18 +1042,24 @@ public class CustomerBusinessService {
 		return response;
 	}
 
+	// craete date parser method for DOB input will be STring "dob": "1990-05-15",
+	
+	
 	public ResponseData UpdateCustomerContact(RequestData requestBody) {
 		ResponseData response = new ResponseData();
 		try {
 			System.out.println("Request : " + requestBody);
 			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 			 String jsonStringHeader = ConvertRequestUtils.getJsonString(requestBody.getJheader());
-
+			 String jsonStringBody = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			 
+			 JSONObject jbody= new JSONObject(jsonStringBody);
 		        JSONObject jsonHeader = new JSONObject(jsonStringHeader);
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
 
+			String customerId=jbody.getString("customerId");
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
 			System.out.println("Response " + callService);
@@ -1026,10 +1068,13 @@ public class CustomerBusinessService {
 				
 				
 				String userId = jsonHeader.optString("userid");
-	            MoneyXBusiness byUserName = moneyXBusinessRepo.findByUserName(userId);
-				byUserName.setMobileNumber(reqJson.optString("mobileNumber", byUserName.getMobileNumber()));
-				byUserName.setEmailAddress(reqJson.optString("emailAddress", byUserName.getEmailAddress()));
-				moneyXBusinessRepo.save(byUserName);
+	            MobContactInfo byUserName = mobContactInfoRepo.findByCustId(customerId);
+				byUserName.setMobileNumber(jbody.optString("mobileNumber", byUserName.getMobileNumber()));
+				MobCustomerMaster mobCustomerMaster = mobCustomerMasterRepo.findByUserName(userId);
+				
+				mobCustomerMaster.setEmailAddress(jbody.optString("emailAddress", mobCustomerMaster.getEmailAddress()));
+				mobContactInfoRepo.save(byUserName);
+				mobCustomerMasterRepo.save(mobCustomerMaster);
 				
 	            
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
@@ -1150,6 +1195,7 @@ public class CustomerBusinessService {
 			
 			
 			
+			
 
 			
 			ResponseData validateOtp = validateOtp(request);	
@@ -1183,7 +1229,7 @@ public class CustomerBusinessService {
 					JSONObject responseData = callService.getJSONObject("data");
 					
 					customerLogin.setCustomerId(responseData.getString("id"));
-					
+					customerLogin.setCustomerCode(jsonObject.has("id") ? jsonObject.getString("id") : "");
 					customerLogin.setCustomerTierId(responseData.has("customerTierId") ? responseData.getInt("customerTierId")+"" :"");
 					customer = corporateCustomerRepo.save(customerLogin);
 					if (customer == null) {
@@ -1541,14 +1587,8 @@ public class CustomerBusinessService {
 			
 			if (callService.getString("respCode").equals("00")) {
 				
-				MoneyXBusiness byCustomerId = moneyXBusinessRepo.findByCustomerId(reqJson.getJSONObject("jbody").getString("customerId"));
 				JSONObject data=callService.getJSONObject("data");
-
-				byCustomerId.setAccountNumber(data.getJSONObject("virtualAccount").getString("accountNumber"));
-				byCustomerId.setAccountType("WALLET");
-				byCustomerId.setCurrency(data.getString("currencyId"));
 				
-				moneyXBusinessRepo.save(byCustomerId);
 				 WalletAcctData wallet=new WalletAcctData() ;
 				 	wallet.setAcctNo(data.getJSONObject("virtualAccount").getString("accountNumber"));
 					wallet.setBalance( new BigDecimal( data.optDoubleObject("availableBalance")));
@@ -1561,7 +1601,7 @@ public class CustomerBusinessService {
 					wallet.setWalletRestrictionId(data.optString("walletRestrictionId"));
 					wallet.setBankCode(data.getJSONObject("virtualAccount").getString("bankCode"));
 					wallet.setBankName(data.getJSONObject("virtualAccount").getString("bankName"));
-					wallet.setWalletId(data.getString("id"));
+					wallet.setWalletAcctId(data.getString("id"));
 					wallet.setCreatedAt(new Date());
 					
 					WalletAcctData save = walletAcctDataRepository.save(wallet);
@@ -1636,7 +1676,7 @@ public class CustomerBusinessService {
 //					wallet.setWalletRestrictionId(data.optString("walletRestrictionId"));
 					wallet.setBankCode(data.getJSONObject("virtualAccount").getString("bankCode"));
 					wallet.setBankName(data.getJSONObject("virtualAccount").getString("bankName"));
-					wallet.setWalletId(data.getString("id"));
+					wallet.setWalletAcctId(data.getString("id"));
 					wallet.setCreatedAt(new Date());
 					
 					WalletAcctData save = walletAcctDataRepository.save(wallet);
@@ -2778,7 +2818,7 @@ public class CustomerBusinessService {
 				return response;
 			}
 			JSONObject respJson = new JSONObject();
-			respJson.put("walletId", byCustomerId.getWalletId());
+			respJson.put("walletId", byCustomerId.getWalletAcctId());
 			respJson.put("customerId", byCustomerId.getCustId());
 			respJson.put("accountNumber", byCustomerId.getAcctNo());
 			
@@ -2799,7 +2839,7 @@ public class CustomerBusinessService {
 		try {
 			System.out.println("Request For Pin Validate : " +userName);
 
-			MoneyXBusiness byUserName = moneyXBusinessRepo.findByUserName(userName);
+			MobCustomerMaster byUserName = mobCustomerMasterRepo.findByUserName(userName);
 			if (byUserName == null) {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage("No wallet found for userName " + userName);

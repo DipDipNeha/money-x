@@ -13,13 +13,17 @@ import org.json.JSONObject;
 import org.springframework.stereotype.Service;
 
 import com.pscs.embedly.caller.EmbedlyServiceCaller;
-import com.pscs.moneyxhub.entity.MoneyXBusiness;
+import com.pscs.moneyxhub.entity.MobContactInfo;
+import com.pscs.moneyxhub.entity.MobCustomerMaster;
 import com.pscs.moneyxhub.helper.ConvertRequestUtils;
 import com.pscs.moneyxhub.helper.CoreConstant;
 import com.pscs.moneyxhub.model.RequestData;
 import com.pscs.moneyxhub.model.ResponseData;
-import com.pscs.moneyxhub.repo.MoneyXBusinessRepo;
+import com.pscs.moneyxhub.repo.MobContactInfoRepo;
+import com.pscs.moneyxhub.repo.MobCustomerMasterRepo;
 import com.pscs.moneyxhub.services.post.EkycPostingService;
+
+import jakarta.transaction.Transactional;
 
 /**
  * 
@@ -28,15 +32,19 @@ import com.pscs.moneyxhub.services.post.EkycPostingService;
 public class EkycService {
 	private static Logger logger = Logger.getLogger(EkycService.class);
 	private final EkycPostingService ekycPostingService;
-private final MoneyXBusinessRepo moneyXBusinessRepo;
+private final MobCustomerMasterRepo mobCustomerMasterRepo;
+private final MobContactInfoRepo mobContactInfoRepo;
 	
 	
-	
-	public EkycService(EkycPostingService ekycPostingService, MoneyXBusinessRepo moneyXBusinessRepo) {
-		this.ekycPostingService = ekycPostingService;
-		this.moneyXBusinessRepo = moneyXBusinessRepo;
-	}
 
+	public EkycService(EkycPostingService ekycPostingService, MobCustomerMasterRepo mobCustomerMasterRepo,
+		MobContactInfoRepo mobContactInfoRepo) {
+	this.ekycPostingService = ekycPostingService;
+	this.mobCustomerMasterRepo = mobCustomerMasterRepo;
+	this.mobContactInfoRepo = mobContactInfoRepo;
+}
+
+	@Transactional
 	public ResponseData doEkyc(RequestData request) {
 	    ResponseData responseData = new ResponseData();
 	    try {
@@ -49,11 +57,12 @@ private final MoneyXBusinessRepo moneyXBusinessRepo;
 	        String jsonStringHeader = ConvertRequestUtils.getJsonString(request.getJheader());
 
 	        JSONObject jsonHeader = new JSONObject(jsonStringHeader);
-	        JSONObject jsonObject = new JSONObject(jsonString);
+	        JSONObject jsonBody = new JSONObject(jsonString);
 
-	        String ekycNumber = jsonObject.optString("ekycNumber");
-	        String ekycType = jsonObject.optString("ekycType");
-	        String businessCountry = jsonObject.optString("businessCountry");
+	        String ekycNumber = jsonBody.optString("ekycNumber");
+	        String ekycType = jsonBody.optString("ekycType");
+	        String businessCountry = jsonBody.optString("businessCountry");
+	        String customerId = jsonBody.optString("customerId");
 
 	        // Validate mandatory fields
 	        if (isNullOrEmpty(businessCountry)) {
@@ -88,9 +97,10 @@ private final MoneyXBusinessRepo moneyXBusinessRepo;
 	        	
 	        	
 	            String userId = jsonHeader.optString("userid");
-	            MoneyXBusiness byUserName = moneyXBusinessRepo.findByUserName(userId);
+	            MobCustomerMaster customerMaster = mobCustomerMasterRepo.findByUserName(userId);
+	            MobContactInfo contactInfo = mobContactInfoRepo.findByCustId(customerId);
 
-	            if (byUserName != null) {
+	            if (customerMaster != null) {
 	                if ("NIN".equalsIgnoreCase(ekycType)) {
 	                	
 	                	
@@ -101,9 +111,9 @@ private final MoneyXBusinessRepo moneyXBusinessRepo;
 	                    String status= nin_check.optString("status");
 //						if ("EXACT_MATCH".equalsIgnoreCase(status)) {
 							
-		                    byUserName.setBvnVerified(true);
+		                    customerMaster.setBvnVerified(true);
 	                	
-	                    byUserName.setNin(ekycNumber);
+		                    customerMaster.setNin(ekycNumber);
 	                } else {
 	                	
 	                	JSONObject data = apiResponse.optJSONObject("data");
@@ -123,18 +133,22 @@ private final MoneyXBusinessRepo moneyXBusinessRepo;
 		    	        	 String lgaOfResidence= bvn.optString("lga_of_residence");
 		    	        	
 		                	
-		                    byUserName.setBvn(ekycNumber);
-		                    byUserName.setGender(gender);
-		                    byUserName.setNationality(nationality);
-		                    byUserName.setStateOfResidence(stateOfResidence);
-		                    byUserName.setMarital_status(marital_status);
-		                    byUserName.setLgaOfResidence(lgaOfResidence);
-		                    byUserName.setBvnVerified(true);
+		    	        	 customerMaster.setBvn(ekycNumber);
+		    	        	 customerMaster.setGender(gender);
+		    	        	 customerMaster.setBvnVerified(true);
+		    	        	
+		    	        	 
+		    	        	 contactInfo.setNationality(nationality);
+		    	        	 contactInfo.setrState(stateOfResidence);
+		    	        	 contactInfo.setMaritalStatus(marital_status);
+		    	        	 contactInfo.setRlLga(lgaOfResidence);
+		                   
 //						}
 	                    
 	                    
 	                }
-	                moneyXBusinessRepo.save(byUserName);
+	                mobCustomerMasterRepo.save(customerMaster);
+	                mobContactInfoRepo.save(contactInfo);
 	            } else {
 	                logger.warn("User not found for ID: " + userId);
 	            }
