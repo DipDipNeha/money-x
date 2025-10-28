@@ -167,10 +167,24 @@ public class CustomerBusinessService {
 					
 					
 					
+					MobContactInfo contactInfo = mobContactInfoRepo.findByCustId(checkCustomerres.getCustomerId());
+					
+					if (contactInfo != null) {
+						customerJson.put("mobileNumber", contactInfo.getMobileNumber());
+						customerJson.put("businessAddress", contactInfo.getAddress());
+						customerJson.put("address", contactInfo.getAddress());
+						customerJson.put("city", contactInfo.getCity());
+						customerJson.put("cuntry", contactInfo.getNationality());
+					}
+					
+					
+					
+					
 					WalletAcctData walletAcctData = walletAcctDataRepository.findByCustId(checkCustomerres.getCustomerId());
 					if (walletAcctData != null) {
 							customerJson.put("walletId",walletAcctData.getWalletAcctId());
 							customerJson.put("accountNumber", walletAcctData.getAcctNo());
+							
 						
 						} else {
 							customerJson.put("walletId", "NA");
@@ -364,7 +378,7 @@ public class CustomerBusinessService {
 			MobContactInfo contactInfo = new MobContactInfo();
 			
 			contactInfo.setMobileNumber(jsonObject.getString("mobileNumber"));
-			contactInfo.setAddress(jsonObject.getString("address"));
+			contactInfo.setAddress(jsonObject.has("address") ? jsonObject.getString("address"):jsonObject.getString("businessAddress"));
 			contactInfo.setCity(jsonObject.getString("city"));
 			contactInfo.setCountryId(jsonObject.getString("countryId"));
 			
@@ -403,7 +417,7 @@ public class CustomerBusinessService {
 					
 					
 					JSONObject responseData = callService.getJSONObject("data");
-					contactInfo.setCustId(jsonObject.has("id") ?jsonObject.getString("id"):"");
+					contactInfo.setCustId(responseData.has("id") ?responseData.getString("id"):"");
 					customerMaster.setCustomerId(responseData.getString("id"));
 					customerMaster.setmPrdCode(responseData.has("customerTierId") ? responseData.getInt("customerTierId")+"" :"");
 					
