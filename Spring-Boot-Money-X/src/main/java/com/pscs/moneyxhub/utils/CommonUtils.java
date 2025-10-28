@@ -112,7 +112,7 @@ public class CommonUtils {
 	}
 	
 	
-	public static  LocalDate parseDateFromStr(String input) {
+	public static  Date parseDateFromStr(String input) {
 		
         LocalDate localDate = LocalDate.parse(input, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
@@ -122,7 +122,7 @@ public class CommonUtils {
         System.out.println("LocalDate: " + localDate);
         System.out.println("java.util.Date: " + date);
         
-        return localDate;
+        return date;
         
 	}
 

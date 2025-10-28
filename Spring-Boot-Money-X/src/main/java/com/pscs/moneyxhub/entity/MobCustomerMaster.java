@@ -43,9 +43,9 @@ public class MobCustomerMaster {
 	@Column(name="EMAILID")
 	String emailAddress;
 	
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="DOB")
-	LocalDate dob;
+	Date dob;
 	
 
 	@Column(name="DOCTYPE")
@@ -337,10 +337,10 @@ public class MobCustomerMaster {
 	public void setEmailAddress(String emailAddress) {
 		this.emailAddress = emailAddress;
 	}
-	public LocalDate getDob() {
+	public Date getDob() {
 		return dob;
 	}
-	public void setDob(LocalDate dob) {
+	public void setDob(Date dob) {
 		this.dob = dob;
 	}
 	public String getDocType() {

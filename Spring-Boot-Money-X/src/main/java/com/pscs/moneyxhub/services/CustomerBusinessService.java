@@ -362,7 +362,7 @@ public class CustomerBusinessService {
 			customerMaster.setAlias(jsonObject.getString("alias"));
 			
 			MobContactInfo contactInfo = new MobContactInfo();
-			contactInfo.setCustId(jsonObject.has("customerId") ?jsonObject.getString("customerId"):"");
+			
 			contactInfo.setMobileNumber(jsonObject.getString("mobileNumber"));
 			contactInfo.setAddress(jsonObject.getString("address"));
 			contactInfo.setCity(jsonObject.getString("city"));
@@ -403,7 +403,7 @@ public class CustomerBusinessService {
 					
 					
 					JSONObject responseData = callService.getJSONObject("data");
-					
+					contactInfo.setCustId(jsonObject.has("id") ?jsonObject.getString("id"):"");
 					customerMaster.setCustomerId(responseData.getString("id"));
 					customerMaster.setmPrdCode(responseData.has("customerTierId") ? responseData.getInt("customerTierId")+"" :"");
 					
