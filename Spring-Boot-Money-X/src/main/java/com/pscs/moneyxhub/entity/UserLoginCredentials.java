@@ -1,86 +1,78 @@
 package com.pscs.moneyxhub.entity;
 
-import java.sql.Timestamp;
+
+import java.util.Date;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 
 @Entity
 @Table(name = "USER_LOGIN_CREDENTIALS")
 public class UserLoginCredentials {
 	
+	@Id
+	@Column(name="LOGIN_USER_ID")
+	String loginUserId;
+	
+	@Column(name = "PASSWORD")
+	String password;
+	
+	@Column(name = "COMMON_ID")
+	String comonId;
+	
+	@Column(name = "OLD_PASSWORDS")
+	String oldPasswords;
+	
+	
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "LAST_PASSWD_CHANGE")
+	Date lastPasswdChange;
+	
+	@Column(name = "REASON_PWD_CHANGE")
+	String reasonPwdChange;
+	
+	
+	@Column(name = "STATUS")
+	String status;
+	
+	
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "LAST_LOGED_IN")
+	Date lastLogedIn;
+	
 
-    @Id
-    @Column(name = "LOGIN_USER_ID", length = 100)
-    private String loginUserId;
+	
+	@Column(name = "TXN_PIN")
+	String txnPin;
+	
+	@Column(name = "TXN_PIN_STATUS")
+	Integer txnPinStatus;
+	
+	@Column(name = "PREV_TXNPINS")
+	String prevTxnPins;
+	
+	@Column(name = "INCORRECT_TXNPIN_CNT")
+	Integer incorrectTxnPinCnt;
 
-    @Column(name = "PASSWORD", length = 200)
-    private String password;
+	@Temporal(TemporalType.TIMESTAMP)
+	@Column(name = "TXNPIN_CHANGE_DATE")
+	Date txnpinChangeDate;
+	
+	
 
-    @Column(name = "COMMON_ID", length = 200)
-    private String commonId;
+	private String applicationId;
 
-    @Column(name = "OLD_PASSWORDS", length = 2000)
-    private String oldPasswords;
+	public String getApplicationId() {
+		return applicationId;
+	}
 
-    @Column(name = "MAKER_ID", length = 20)
-    private String makerId;
-
-    @Column(name = "MAKER_DTTM")
-    private Timestamp makerDttm;
-
-    @Column(name = "APPL_CODE", length = 2000)
-    private String applCode;
-
-    @Column(name = "PREV_PASSWD", length = 200)
-    private String prevPasswd;
-
-    @Column(name = "LAST_PASSWD_CHANGE")
-    private Timestamp lastPasswdChange;
-
-    @Column(name = "INCORRECT_PASSWD_CNT")
-    private Short incorrectPasswdCnt;
-
-    @Column(name = "REASON_PWD_CHANGE", length = 200)
-    private String reasonPwdChange;
-
-    @Column(name = "PIN", length = 200)
-    private String pin;
-
-    @Column(name = "USER_LOCK_TIME")
-    private Timestamp userLockTime;
-
-    @Column(name = "AUTHID", length = 200)
-    private String authId;
-
-    @Column(name = "AUTHDTTM")
-    private Timestamp authDttm;
-
-    @Column(name = "STATUS", length = 5)
-    private String status;
-
-    @Column(name = "AUTH_FLAG", length = 5)
-    private String authFlag;
-
-    @Column(name = "REF_NUM", length = 20)
-    private String refNum;
-
-    @Column(name = "LAST_LOGED_IN")
-    private Timestamp lastLoggedIn;
-
-    @Column(name = "LAST_REQ_TIME", length = 200)
-    private String lastReqTime;
-
-    @Column(name = "IS_LOGGED_IN", length = 200)
-    private String isLoggedIn;
-
-    @Column(name = "PIN_STATUS")
-    private Integer pinStatus;
-
-    @Column(name = "USER_PASSWORD", length = 2000)
-    private String userPassword;
+	public void setApplicationId(String applicationId) {
+		this.applicationId = applicationId;
+	}
 
 	public String getLoginUserId() {
 		return loginUserId;
@@ -98,12 +90,12 @@ public class UserLoginCredentials {
 		this.password = password;
 	}
 
-	public String getCommonId() {
-		return commonId;
+	public String getComonId() {
+		return comonId;
 	}
 
-	public void setCommonId(String commonId) {
-		this.commonId = commonId;
+	public void setComonId(String comonId) {
+		this.comonId = comonId;
 	}
 
 	public String getOldPasswords() {
@@ -113,53 +105,12 @@ public class UserLoginCredentials {
 	public void setOldPasswords(String oldPasswords) {
 		this.oldPasswords = oldPasswords;
 	}
-
-	public String getMakerId() {
-		return makerId;
-	}
-
-	public void setMakerId(String makerId) {
-		this.makerId = makerId;
-	}
-
-	public Timestamp getMakerDttm() {
-		return makerDttm;
-	}
-
-	public void setMakerDttm(Timestamp makerDttm) {
-		this.makerDttm = makerDttm;
-	}
-
-	public String getApplCode() {
-		return applCode;
-	}
-
-	public void setApplCode(String applCode) {
-		this.applCode = applCode;
-	}
-
-	public String getPrevPasswd() {
-		return prevPasswd;
-	}
-
-	public void setPrevPasswd(String prevPasswd) {
-		this.prevPasswd = prevPasswd;
-	}
-
-	public Timestamp getLastPasswdChange() {
+	public Date getLastPasswdChange() {
 		return lastPasswdChange;
 	}
 
-	public void setLastPasswdChange(Timestamp lastPasswdChange) {
+	public void setLastPasswdChange(Date lastPasswdChange) {
 		this.lastPasswdChange = lastPasswdChange;
-	}
-
-	public Short getIncorrectPasswdCnt() {
-		return incorrectPasswdCnt;
-	}
-
-	public void setIncorrectPasswdCnt(Short incorrectPasswdCnt) {
-		this.incorrectPasswdCnt = incorrectPasswdCnt;
 	}
 
 	public String getReasonPwdChange() {
@@ -170,38 +121,6 @@ public class UserLoginCredentials {
 		this.reasonPwdChange = reasonPwdChange;
 	}
 
-	public String getPin() {
-		return pin;
-	}
-
-	public void setPin(String pin) {
-		this.pin = pin;
-	}
-
-	public Timestamp getUserLockTime() {
-		return userLockTime;
-	}
-
-	public void setUserLockTime(Timestamp userLockTime) {
-		this.userLockTime = userLockTime;
-	}
-
-	public String getAuthId() {
-		return authId;
-	}
-
-	public void setAuthId(String authId) {
-		this.authId = authId;
-	}
-
-	public Timestamp getAuthDttm() {
-		return authDttm;
-	}
-
-	public void setAuthDttm(Timestamp authDttm) {
-		this.authDttm = authDttm;
-	}
-
 	public String getStatus() {
 		return status;
 	}
@@ -210,73 +129,58 @@ public class UserLoginCredentials {
 		this.status = status;
 	}
 
-	public String getAuthFlag() {
-		return authFlag;
+	public Date getLastLogedIn() {
+		return lastLogedIn;
 	}
 
-	public void setAuthFlag(String authFlag) {
-		this.authFlag = authFlag;
+	public void setLastLogedIn(Date lastLogedIn) {
+		this.lastLogedIn = lastLogedIn;
 	}
 
-	public String getRefNum() {
-		return refNum;
+	public String getTxnPin() {
+		return txnPin;
 	}
 
-	public void setRefNum(String refNum) {
-		this.refNum = refNum;
+	public void setTxnPin(String txnPin) {
+		this.txnPin = txnPin;
 	}
 
-	public Timestamp getLastLoggedIn() {
-		return lastLoggedIn;
+	public Integer getTxnPinStatus() {
+		return txnPinStatus;
 	}
 
-	public void setLastLoggedIn(Timestamp lastLoggedIn) {
-		this.lastLoggedIn = lastLoggedIn;
+	public void setTxnPinStatus(Integer txnPinStatus) {
+		this.txnPinStatus = txnPinStatus;
 	}
 
-	public String getLastReqTime() {
-		return lastReqTime;
+	public String getPrevTxnPins() {
+		return prevTxnPins;
 	}
 
-	public void setLastReqTime(String lastReqTime) {
-		this.lastReqTime = lastReqTime;
+	public void setPrevTxnPins(String prevTxnPins) {
+		this.prevTxnPins = prevTxnPins;
 	}
 
-	public String getIsLoggedIn() {
-		return isLoggedIn;
+	public Integer getIncorrectTxnPinCnt() {
+		return incorrectTxnPinCnt;
 	}
 
-	public void setIsLoggedIn(String isLoggedIn) {
-		this.isLoggedIn = isLoggedIn;
+	public void setIncorrectTxnPinCnt(Integer incorrectTxnPinCnt) {
+		this.incorrectTxnPinCnt = incorrectTxnPinCnt;
 	}
 
-	public Integer getPinStatus() {
-		return pinStatus;
+	public Date getTxnpinChangeDate() {
+		return txnpinChangeDate;
 	}
 
-	public void setPinStatus(Integer pinStatus) {
-		this.pinStatus = pinStatus;
+	public void setTxnpinChangeDate(Date txnpinChangeDate) {
+		this.txnpinChangeDate = txnpinChangeDate;
 	}
+	
+	
+	
+	
+	
+	
 
-	public String getUserPassword() {
-		return userPassword;
-	}
-
-	public void setUserPassword(String userPassword) {
-		this.userPassword = userPassword;
-	}
-
-	@Override
-	public String toString() {
-		return "UserLoginCredentials [loginUserId=" + loginUserId + ", password=" + password + ", commonId=" + commonId
-				+ ", oldPasswords=" + oldPasswords + ", makerId=" + makerId + ", makerDttm=" + makerDttm + ", applCode="
-				+ applCode + ", prevPasswd=" + prevPasswd + ", lastPasswdChange=" + lastPasswdChange
-				+ ", incorrectPasswdCnt=" + incorrectPasswdCnt + ", reasonPwdChange=" + reasonPwdChange + ", pin=" + pin
-				+ ", userLockTime=" + userLockTime + ", authId=" + authId + ", authDttm=" + authDttm + ", status="
-				+ status + ", authFlag=" + authFlag + ", refNum=" + refNum + ", lastLoggedIn=" + lastLoggedIn
-				+ ", lastReqTime=" + lastReqTime + ", isLoggedIn=" + isLoggedIn + ", pinStatus=" + pinStatus
-				+ ", userPassword=" + userPassword + "]";
-	}
-
-    
 }

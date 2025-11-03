@@ -197,6 +197,8 @@ public class MobCustomerMaster {
 	
 	@Column(name="W_USSD_STATUS")
 	String wUssdStatus;
+	@Column(name="W_MOBILE_STATUS")
+	String wMobileStatus;
 	
 	@Column(name="W_CUST_TYPE")
 	String wCustType;
@@ -293,6 +295,16 @@ public class MobCustomerMaster {
 	private String lastLoginTime;
 	@Column(name = "retry_login_active")
 	private String isLoginAttemptActive;
+	
+	private String applicationId;
+
+	public String getApplicationId() {
+		return applicationId;
+	}
+
+	public void setApplicationId(String applicationId) {
+		this.applicationId = applicationId;
+	}
 	
 	public Long getId() {
 		return id;

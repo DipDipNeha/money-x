@@ -328,7 +328,15 @@ public class CorporateCustomer  {
 	private String customerId;
 	private String  country;
 	private String customerTierId;
-	
+	private String applicationId;
+
+	public String getApplicationId() {
+		return applicationId;
+	}
+
+	public void setApplicationId(String applicationId) {
+		this.applicationId = applicationId;
+	}
 	
 	
 	

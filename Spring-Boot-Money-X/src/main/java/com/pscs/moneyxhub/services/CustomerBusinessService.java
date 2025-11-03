@@ -20,6 +20,7 @@ import com.pscs.moneyxhub.entity.MobContactInfo;
 import com.pscs.moneyxhub.entity.MobCustomerMaster;
 import com.pscs.moneyxhub.entity.OtpDataTabl;
 import com.pscs.moneyxhub.entity.Transactions;
+import com.pscs.moneyxhub.entity.UserLoginCredentials;
 import com.pscs.moneyxhub.entity.WalletAcctData;
 import com.pscs.moneyxhub.helper.ConvertRequestUtils;
 import com.pscs.moneyxhub.helper.CoreConstant;
@@ -37,6 +38,7 @@ import com.pscs.moneyxhub.repo.MobContactInfoRepo;
 import com.pscs.moneyxhub.repo.MobCustomerMasterRepo;
 import com.pscs.moneyxhub.repo.OtpDataTablRepo;
 import com.pscs.moneyxhub.repo.TransactionsRepo;
+import com.pscs.moneyxhub.repo.UserLoginCredentialsRepo;
 import com.pscs.moneyxhub.repo.WalletAcctDataRepository;
 import com.pscs.moneyxhub.services.post.EmailAndSMSPostingService;
 import com.pscs.moneyxhub.utils.CommonUtils;
@@ -61,6 +63,7 @@ public class CustomerBusinessService {
 	private final WalletAcctDataRepository walletAcctDataRepository;
 	private final CorporateCustomerRepo corporateCustomerRepo;
 	private final TransactionsRepo transactionsRepo;
+	private final UserLoginCredentialsRepo userLoginCredentialsRepo;;
 
 	
 
@@ -69,7 +72,7 @@ public class CustomerBusinessService {
 			CustomerDocInfoRepo customerDocInfoRepo, DocumentRepo documentRepo, OtpDataTablRepo otpDataTablRepo,
 			EmailAndSMSPostingService smsPostingService, MobCustomerMasterRepo mobCustomerMasterRepo,
 			MobContactInfoRepo mobContactInfoRepo, WalletAcctDataRepository walletAcctDataRepository,
-			CorporateCustomerRepo corporateCustomerRepo, TransactionsRepo transactionsRepo) {
+			CorporateCustomerRepo corporateCustomerRepo, TransactionsRepo transactionsRepo, UserLoginCredentialsRepo userLoginCredentialsRepo) {
 		super();
 		this.customerLoginRepo = customerLoginRepo;
 		this.countryRepo = countryRepo;
@@ -84,6 +87,7 @@ public class CustomerBusinessService {
 		this.walletAcctDataRepository = walletAcctDataRepository;
 		this.corporateCustomerRepo = corporateCustomerRepo;
 		this.transactionsRepo = transactionsRepo;
+		this.userLoginCredentialsRepo = userLoginCredentialsRepo;
 	}
 
 
@@ -374,6 +378,7 @@ public class CustomerBusinessService {
 			customerMaster.setDob(CommonUtils.parseDateFromStr(jsonObject.getString("dob")));
 			customerMaster.setCustomerTypeId(jsonObject.getString("customerTypeId"));
 			customerMaster.setAlias(jsonObject.getString("alias"));
+			customerMaster.setApplicationId(jsonObject.has("applicationId") ? jsonObject.getString("applicationId") :"");
 			
 			MobContactInfo contactInfo = new MobContactInfo();
 			
@@ -384,6 +389,14 @@ public class CustomerBusinessService {
 			
 			contactInfo.setNationality(jsonObject.has("cuntry") ? jsonObject.getString("cuntry") :"");
 			
+			
+			UserLoginCredentials userLoginCredentials=new UserLoginCredentials();
+			
+			userLoginCredentials.setPassword(jsonObject.has("password") ? CommonUtils.b64_sha256(jsonObject.getString("password")) : "");
+			userLoginCredentials.setLoginUserId(jsonObject.has("userName") ? jsonObject.getString("userName") : "");
+			userLoginCredentials.setTxnPin(jsonObject.has("txnPin") ? CommonUtils.b64_sha256(jsonObject.getString("txnPin")) : "");
+			userLoginCredentials.setApplicationId(jsonObject.has("applicationId") ? jsonObject.getString("applicationId") : "");
+			userLoginCredentials.setStatus("A");
 			
 			
 			
@@ -420,8 +433,9 @@ public class CustomerBusinessService {
 					contactInfo.setCustId(responseData.has("id") ?responseData.getString("id"):"");
 					customerMaster.setCustomerId(responseData.getString("id"));
 					customerMaster.setmPrdCode(responseData.has("customerTierId") ? responseData.getInt("customerTierId")+"" :"");
-					
+					userLoginCredentials.setComonId(responseData.has("id") ?responseData.getString("id"):"");
 					customer = mobCustomerMasterRepo.save(customerMaster);
+					userLoginCredentialsRepo.save(userLoginCredentials);
 					MobContactInfo contactInforespo = mobContactInfoRepo.save(contactInfo);
 					if (customer == null) {
 						response.setResponseCode(CoreConstant.FAILURE_CODE);
@@ -1205,10 +1219,18 @@ public class CustomerBusinessService {
 					jsonObject.has("txnPin") ? CommonUtils.b64_sha256(jsonObject.getString("txnPin")) : "");
 			customerLogin.setMobileNumber(jsonObject.has("mobileNumber") ? jsonObject.getString("mobileNumber") : "");
 			customerLogin.setCountry(jsonObject.has("cuntry") ? jsonObject.getString("cuntry") : "");
+			customerLogin.setApplicationId(jsonObject.has("applicationId") ? jsonObject.getString("applicationId") : "");
+			
+			UserLoginCredentials userLoginCredentials=new UserLoginCredentials();
+			
+			userLoginCredentials.setPassword(jsonObject.has("password") ? CommonUtils.b64_sha256(jsonObject.getString("password")) : "");
+			userLoginCredentials.setLoginUserId(jsonObject.has("userName") ? jsonObject.getString("userName") : "");
+			userLoginCredentials.setTxnPin(jsonObject.has("txnPin") ? CommonUtils.b64_sha256(jsonObject.getString("txnPin")) : "");
+			userLoginCredentials.setApplicationId(jsonObject.has("applicationId") ? jsonObject.getString("applicationId") : "");
+			userLoginCredentials.setStatus("A");
 			
 			
-			
-			
+//			
 			
 
 			
@@ -1244,8 +1266,10 @@ public class CustomerBusinessService {
 					
 					customerLogin.setCustomerId(responseData.getString("id"));
 					customerLogin.setCustomerCode(jsonObject.has("id") ? jsonObject.getString("id") : "");
+					userLoginCredentials.setComonId(jsonObject.has("id") ? jsonObject.getString("id") : "");
 					customerLogin.setCustomerTierId(responseData.has("customerTierId") ? responseData.getInt("customerTierId")+"" :"");
 					customer = corporateCustomerRepo.save(customerLogin);
+					userLoginCredentialsRepo.save(userLoginCredentials);
 					if (customer == null) {
 						response.setResponseCode(CoreConstant.FAILURE_CODE);
 						response.setResponseMessage(CoreConstant.FAILED + " to Create Profile");
