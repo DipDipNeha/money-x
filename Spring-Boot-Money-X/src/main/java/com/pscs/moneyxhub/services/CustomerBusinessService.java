@@ -4,18 +4,23 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.pscs.embedly.caller.EmbedlyServiceCaller;
+import com.pscs.moneyxhub.entity.CorpDirector;
 import com.pscs.moneyxhub.entity.CorporateCustomer;
 import com.pscs.moneyxhub.entity.Country;
 import com.pscs.moneyxhub.entity.CustomerDocInfo;
 import com.pscs.moneyxhub.entity.CustomerLogin;
+import com.pscs.moneyxhub.entity.LocalGovernmentByState;
 import com.pscs.moneyxhub.entity.MobContactInfo;
 import com.pscs.moneyxhub.entity.MobCustomerMaster;
 import com.pscs.moneyxhub.entity.OtpDataTabl;
@@ -29,11 +34,13 @@ import com.pscs.moneyxhub.model.RequestData;
 import com.pscs.moneyxhub.model.ResponseData;
 import com.pscs.moneyxhub.repo.BusinessRoleRepo;
 import com.pscs.moneyxhub.repo.BusinessTypeRepo;
+import com.pscs.moneyxhub.repo.CorpDirectorRepo;
 import com.pscs.moneyxhub.repo.CorporateCustomerRepo;
 import com.pscs.moneyxhub.repo.CountryRepo;
 import com.pscs.moneyxhub.repo.CustomerDocInfoRepo;
 import com.pscs.moneyxhub.repo.CustomerLoginRepo;
 import com.pscs.moneyxhub.repo.DocumentRepo;
+import com.pscs.moneyxhub.repo.LocalGovernmentByStateRepo;
 import com.pscs.moneyxhub.repo.MobContactInfoRepo;
 import com.pscs.moneyxhub.repo.MobCustomerMasterRepo;
 import com.pscs.moneyxhub.repo.OtpDataTablRepo;
@@ -64,6 +71,10 @@ public class CustomerBusinessService {
 	private final CorporateCustomerRepo corporateCustomerRepo;
 	private final TransactionsRepo transactionsRepo;
 	private final UserLoginCredentialsRepo userLoginCredentialsRepo;;
+	@Autowired
+	LocalGovernmentByStateRepo localGovernmentByStateRepo;
+	@Autowired
+	CorpDirectorRepo corpDirectorRepo;
 
 	
 
@@ -1338,13 +1349,40 @@ public class CustomerBusinessService {
 			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 
 			JSONObject reqJson = new JSONObject(jsonString);
+			
+			JSONObject jbody= new JSONObject(ConvertRequestUtils.getJsonString(requestBody.getJbody()));
+			
 			System.out.println("Request Body: " + reqJson.toString());
+			
+			CorporateCustomer customerLogin = corporateCustomerRepo.findByCustomerId(jbody.getString("customerId"));
+			if (customerLogin == null) {
+				response.setResponseCode(CoreConstant.FAILURE_CODE);
+				response.setResponseMessage(CoreConstant.RECORD_NOT_FOUND + ": " + jbody.getString("customerId"));
+				return response;
+			}
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
 			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
+				customerLogin.setFullBusinessName(
+						jbody.has("fullBusinessName") ? jbody.getString("fullBusinessName") : "");
+				customerLogin.setWalletPreferredName(
+						jbody.has("walletPreferredName") ? jbody.getString("walletPreferredName") : "");
+				customerLogin.setTin(jbody.has("tin") ? jbody.getString("tin") : "");
+				customerLogin.setBusinessAddress(
+						jbody.has("businessAddress") ? jbody.getString("businessAddress") : "");
+				customerLogin.setCity(jbody.has("city") ? jbody.getString("city") : "");
+				customerLogin.setEmail(jbody.has("email") ? jbody.getString("email") : "");
+				customerLogin.setRcNumber(jbody.has("rcNumber") ? jbody.getString("rcNumber") : "");
+				customerLogin.setTin(jbody.has("tin") ? jbody.getString("tin") : "");
+				customerLogin.setCountryId(jbody.has("countryId") ? jbody.getString("countryId") : "");
+				corporateCustomerRepo.save(customerLogin);
+				
+				
+				
+				
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
 				buildResponseData(response, callService);
@@ -1371,12 +1409,31 @@ public class CustomerBusinessService {
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
+			
+			JSONObject jbody= new JSONObject(ConvertRequestUtils.getJsonString(requestBody.getJbody()));
+			
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
 			System.out.println("Response " + callService);
 			
 			if (callService.getString("respCode").equals("00")) {
+				
+				CorpDirector corporateDirector = new CorpDirector();
+				corporateDirector.setCustomerId(jbody.getString("customerId"));
+				corporateDirector.setFirstName(jbody.getString("firstName"));
+				corporateDirector.setLastName(jbody.getString("lastName"));
+				corporateDirector.setMiddleName(jbody.getString("middleName"));
+				corporateDirector.setDateOfBirth(jbody.getString("dateOfBirth"));
+				corporateDirector.setPhoneNumber(jbody.getString("phoneNumber"));
+				corporateDirector.setEmail(jbody.getString("email"));
+				corporateDirector.setAddress(jbody.getString("address"));
+				corporateDirector.setMeterNumber(jbody.getString("meterNumber"));
+				corporateDirector.setBvn(jbody.getString("bvn"));
+				corpDirectorRepo.save(corporateDirector);
+				
+			
+				
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
 				buildResponseData(response, callService);
@@ -1458,6 +1515,7 @@ public class CustomerBusinessService {
 		try {
 			System.out.println("Request : " + requestBody);
 			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
+			JSONObject jbody= new JSONObject(ConvertRequestUtils.getJsonString(requestBody.getJbody()));
 
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
@@ -1466,7 +1524,29 @@ public class CustomerBusinessService {
 			 JSONObject callService = service.callService(reqJson);
 			System.out.println("Response " + callService);
 			
+			CorpDirector byCustomerId = corpDirectorRepo.findByCustomerId(jbody.getString("customerId"));
+			if (byCustomerId == null) {
+				response.setResponseCode(CoreConstant.FAILURE_CODE);
+				response.setResponseMessage(CoreConstant.RECORD_NOT_FOUND + ": " + jbody.getString("customerId"));
+				return response;
+			}
+			
 			if (callService.getString("respCode").equals("00")) {
+				
+				
+				byCustomerId.setFirstName(jbody.getString("firstName"));
+				byCustomerId.setLastName(jbody.getString("lastName"));
+				byCustomerId.setMiddleName(jbody.getString("middleName"));
+				byCustomerId.setDateOfBirth(jbody.getString("dateOfBirth"));
+				byCustomerId.setPhoneNumber(jbody.getString("phoneNumber"));
+				byCustomerId.setEmail(jbody.getString("email"));
+				byCustomerId.setAddress(jbody.getString("address"));
+				byCustomerId.setMeterNumber(jbody.getString("meterNumber"));
+				byCustomerId.setBvn(jbody.getString("bvn"));
+				byCustomerId.setNin(jbody.getString("nin"));
+				corpDirectorRepo.save(byCustomerId);
+				
+				
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
 				buildResponseData(response, callService);
@@ -2947,6 +3027,51 @@ public class CustomerBusinessService {
 			response.setResponseCode(CoreConstant.FAILURE_CODE);
 			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
 		}
+		return response;
+	}
+
+
+	public ResponseData getLocalGovernment(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			System.out.println("Request : " + requestBody);
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+
+			JSONObject reqJson = new JSONObject(jsonString);
+			System.out.println("Request Body: " + reqJson.toString());
+			List<LocalGovernmentByState> lgas = localGovernmentByStateRepo.findAll();
+			if (lgas.isEmpty()) {
+				response.setResponseCode(CoreConstant.FAILURE_CODE);
+				response.setResponseMessage("No Local Government Areas found for state " + reqJson.getString("state"));
+				return response;
+			}
+			List<String> lgaNames = new ArrayList<>();
+			lgas.stream().map(LocalGovernmentByState::getLocalGovernmentArea).forEach(lga -> lgaNames.add(lga));
+			
+			List<String> state = new ArrayList<>();
+					
+			 lgas.stream().map(LocalGovernmentByState::getState).distinct().forEach(s -> state.add(s));
+			 
+			
+			
+			 Map<String,List<String>> collect = lgas.stream().collect(Collectors.groupingBy(LocalGovernmentByState::getState,Collectors.mapping(LocalGovernmentByState::getLocalGovernmentArea, Collectors.toList())));
+			
+			JSONObject respJson = new JSONObject();
+			respJson.put("state", state);
+			respJson.put("localGovernmentAreas", lgaNames);
+			respJson.put("groupByState", collect);
+			
+
+			response.setResponseCode(CoreConstant.SUCCESS_CODE);
+			response.setResponseMessage(CoreConstant.SUCCESS);
+			response.setResponseData(respJson.toMap());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			response.setResponseCode(CoreConstant.FAILURE_CODE);
+			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+		}
+		
 		return response;
 	}
 	

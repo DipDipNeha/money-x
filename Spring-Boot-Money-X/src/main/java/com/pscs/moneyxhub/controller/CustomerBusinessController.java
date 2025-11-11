@@ -573,4 +573,11 @@ public class CustomerBusinessController {
 			return new ResponseEntity<>(response, HttpStatus.OK);
     
     }
+    //get local government
+    @PostMapping("/getlocalgovernment")
+    public ResponseEntity<ResponseData> getLocalGovernment(@RequestBody RequestData requestBody) {
+		ResponseData response = customerBusinessService.getLocalGovernment(requestBody);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+		
+    }
 }
