@@ -1,8 +1,10 @@
 package com.pscs.moneyxhub.services;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.pscs.embedly.caller.EmbedlyServiceCaller;
+import com.pscs.embedly.posting.EmbedlyPostingService;
 import com.pscs.moneyxhub.entity.CorpDirector;
 import com.pscs.moneyxhub.entity.CorporateCustomer;
 import com.pscs.moneyxhub.entity.Country;
@@ -826,40 +829,52 @@ public class CustomerBusinessService {
 	}
 
 	public ResponseData uploadImage(ImageUpload imageUpload) {
-		ResponseData response = new ResponseData();
-		try {
-			JSONObject resjson = new JSONObject();
+	    ResponseData response = new ResponseData();
+	    try {
+	        JSONObject resjson = new JSONObject();
 
-			CustomerDocInfo mobCustomerDocInfo = new CustomerDocInfo();
-			String docId = "PSCS" + System.nanoTime();
-			mobCustomerDocInfo.setId(docId);
-			mobCustomerDocInfo.setImageData(imageUpload.getFile().getBytes());
-			mobCustomerDocInfo.setImageType(imageUpload.getFileType());
-			mobCustomerDocInfo.setMakerId(imageUpload.getUserId());
-			mobCustomerDocInfo.setMakerDttm(new Date());
-			CustomerDocInfo saveresponse = customerDocInfoRepo.save(mobCustomerDocInfo);
+	        CustomerDocInfo mobCustomerDocInfo = new CustomerDocInfo();
+	        String docId = "PSCS" + System.nanoTime();
+	        mobCustomerDocInfo.setId(docId);
+	        mobCustomerDocInfo.setImageData(imageUpload.getFile().getBytes());
+	        mobCustomerDocInfo.setImageType(imageUpload.getFileType());
+	        mobCustomerDocInfo.setMakerId(imageUpload.getUserId());
+	        mobCustomerDocInfo.setMakerDttm(new Date());
+	        customerDocInfoRepo.save(mobCustomerDocInfo);
 
-			resjson.put("docUploadId", docId);
+	        Map<String, String> params = new HashMap<>();
+	        params.put("docId", docId);
+	        params.put("fileType", imageUpload.getFileType());
+	        params.put("userId", imageUpload.getUserId());
 
-			if (saveresponse == null) {
-				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + " to upload image");
-				return response;
-			} else {
+	        File convFile = new File(System.getProperty("java.io.tmpdir") + "/" + imageUpload.getFile().getOriginalFilename());
+	        imageUpload.getFile().transferTo(convFile);
 
-				response.setResponseCode(CoreConstant.SUCCESS_CODE);
-				response.setResponseMessage(CoreConstant.SUCCESS );
-				response.setResponseData(resjson.toMap());
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			response.setResponseCode(CoreConstant.FAILURE_CODE);
-			response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
-			return response;
-		}
+	        JSONObject callService = EmbedlyPostingService.getInstance()
+	                .sendMultipartRequest(convFile, "UPLOAD_DOC_URL", params);
 
-		return response;
+	        convFile.delete();
+
+	        resjson.put("docUploadId", docId);
+	        System.out.println("Response " + callService);
+	        if (callService.getString("respcode").equals("00")) {
+	            response.setResponseCode(CoreConstant.SUCCESS_CODE);
+	            response.setResponseMessage(CoreConstant.SUCCESS);
+	            buildResponseData(response, callService);
+	        } else {
+	            response.setResponseCode(CoreConstant.FAILURE_CODE);
+	            response.setResponseMessage(CoreConstant.FAILED + " " + callService.getString("respmsg"));
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        response.setResponseCode(CoreConstant.FAILURE_CODE);
+	        response.setResponseMessage(CoreConstant.FAILED + e.getMessage());
+	        return response;
+	    }
+
+	    return response;
 	}
+
 
 	public ResponseData fetchDocumentType(RequestData request) {
 		ResponseData response = new ResponseData();
@@ -1412,6 +1427,14 @@ public class CustomerBusinessService {
 			
 			JSONObject jbody= new JSONObject(ConvertRequestUtils.getJsonString(requestBody.getJbody()));
 			
+			//check if director already exists
+			CorpDirector existingDirector = corpDirectorRepo.findByCustomerId(jbody.getString("customerId"));
+			if (existingDirector != null) {
+				response.setResponseCode(CoreConstant.FAILURE_CODE);
+				response.setResponseMessage(CoreConstant.RECORD_ALREADY_EXISTS + ": " + jbody.getString("customerId"));
+				return response;
+			}
+			
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
@@ -1430,6 +1453,9 @@ public class CustomerBusinessService {
 				corporateDirector.setAddress(jbody.getString("address"));
 				corporateDirector.setMeterNumber(jbody.getString("meterNumber"));
 				corporateDirector.setBvn(jbody.getString("bvn"));
+				corporateDirector.setNin(jbody.getString("nin"));
+				corporateDirector.setCreatedAt(new Date());
+				
 				corpDirectorRepo.save(corporateDirector);
 				
 			
@@ -1524,13 +1550,14 @@ public class CustomerBusinessService {
 			 JSONObject callService = service.callService(reqJson);
 			System.out.println("Response " + callService);
 			
+			
 			CorpDirector byCustomerId = corpDirectorRepo.findByCustomerId(jbody.getString("customerId"));
 			if (byCustomerId == null) {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.RECORD_NOT_FOUND + ": " + jbody.getString("customerId"));
 				return response;
 			}
-			
+			else {
 			if (callService.getString("respCode").equals("00")) {
 				
 				
@@ -1543,7 +1570,9 @@ public class CustomerBusinessService {
 				byCustomerId.setAddress(jbody.getString("address"));
 				byCustomerId.setMeterNumber(jbody.getString("meterNumber"));
 				byCustomerId.setBvn(jbody.getString("bvn"));
-				byCustomerId.setNin(jbody.getString("nin"));
+				byCustomerId.setNin(jbody.has("nin")?  jbody.getString("nin"):"");
+				byCustomerId.setUpdatedAt(new Date());
+				
 				corpDirectorRepo.save(byCustomerId);
 				
 				
@@ -1553,6 +1582,7 @@ public class CustomerBusinessService {
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
 				response.setResponseMessage(CoreConstant.FAILED +"  " + callService.getString("respmsg"));
+			}
 			}
 			
 		} catch (Exception e) {

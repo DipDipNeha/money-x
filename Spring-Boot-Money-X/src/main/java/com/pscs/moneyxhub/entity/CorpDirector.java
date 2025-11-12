@@ -1,5 +1,7 @@
 package com.pscs.moneyxhub.entity;
 
+import java.util.Date;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -25,6 +27,8 @@ public class CorpDirector {
 	private String dateOfBirth;
 	private String bvn;
 	private String email;
+	private Date createdAt;
+	private Date updatedAt;
 
 	public Long getId() {
 		return id;
@@ -122,4 +126,21 @@ public class CorpDirector {
 		this.email = email;
 	}
 
+	public Date getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(Date createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public Date getUpdatedAt() {
+		return updatedAt;
+	}
+
+	public void setUpdatedAt(Date updatedAt) {
+		this.updatedAt = updatedAt;
+	}
+
+	
 }

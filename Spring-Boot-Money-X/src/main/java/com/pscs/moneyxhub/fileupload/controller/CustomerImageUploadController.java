@@ -47,10 +47,18 @@ public class CustomerImageUploadController {
 			apiResponse.setResponseCode("99");
 			apiResponse.setResponseMessage("Unable to process request");
 
+			   if (file.isEmpty()) {
+				   apiResponse.setResponseCode( "01");
+				   apiResponse.setResponseMessage("File is empty");
+	                return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+	            }
+			
+			
 			String upfile = fileSytemStorage.saveFile(file);
 
 			String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/download/")
 					.path(upfile).toUriString();
+			
 
 			System.out.println("fileDownloadUri->" + fileDownloadUri);
 
@@ -59,7 +67,7 @@ public class CustomerImageUploadController {
 			imageUpload.setFileType(fileType);
 			imageUpload.setUserId(userId);
 			imageUpload.setFilePath(fileDownloadUri);
-
+			
 			apiResponse = customerProfileService.uploadImage(imageUpload);
 			
 
