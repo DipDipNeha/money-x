@@ -1428,10 +1428,10 @@ public class CustomerBusinessService {
 			JSONObject jbody= new JSONObject(ConvertRequestUtils.getJsonString(requestBody.getJbody()));
 			
 			//check if director already exists
-			CorpDirector existingDirector = corpDirectorRepo.findByCustomerId(jbody.getString("customerId"));
+			CorpDirector existingDirector = corpDirectorRepo.findByEmail(jbody.getString("email"));
 			if (existingDirector != null) {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.RECORD_ALREADY_EXISTS + ": " + jbody.getString("customerId"));
+				response.setResponseMessage(CoreConstant.RECORD_ALREADY_EXISTS + ": " + jbody.getString("email"));
 				return response;
 			}
 			
@@ -1546,34 +1546,37 @@ public class CustomerBusinessService {
 			JSONObject reqJson = new JSONObject(jsonString);
 			System.out.println("Request Body: " + reqJson.toString());
 
-			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
-			 JSONObject callService = service.callService(reqJson);
-			System.out.println("Response " + callService);
+		
 			
-			
-			CorpDirector byCustomerId = corpDirectorRepo.findByCustomerId(jbody.getString("customerId"));
-			if (byCustomerId == null) {
+			CorpDirector corpDirector = corpDirectorRepo.findByEmail(jbody.getString("email"));
+			if (corpDirector == null) {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.RECORD_NOT_FOUND + ": " + jbody.getString("customerId"));
+				response.setResponseMessage(CoreConstant.RECORD_NOT_FOUND + ": " + jbody.getString("email"));
 				return response;
 			}
 			else {
+				EmbedlyServiceCaller service = new EmbedlyServiceCaller();
+				 JSONObject callService = service.callService(reqJson);
+				System.out.println("Response " + callService);
+				
+				
+				
 			if (callService.getString("respCode").equals("00")) {
 				
+				corpDirector.setCustomerId(jbody.getString("customerId"));
+				corpDirector.setFirstName(jbody.getString("firstName"));
+				corpDirector.setLastName(jbody.getString("lastName"));
+				corpDirector.setMiddleName(jbody.getString("middleName"));
+				corpDirector.setDateOfBirth(jbody.getString("dateOfBirth"));
+				corpDirector.setPhoneNumber(jbody.getString("phoneNumber"));
+				corpDirector.setEmail(jbody.getString("email"));
+				corpDirector.setAddress(jbody.getString("address"));
+				corpDirector.setMeterNumber(jbody.getString("meterNumber"));
+				corpDirector.setBvn(jbody.getString("bvn"));
+				corpDirector.setNin(jbody.has("nin")?  jbody.getString("nin"):"");
+				corpDirector.setUpdatedAt(new Date());
 				
-				byCustomerId.setFirstName(jbody.getString("firstName"));
-				byCustomerId.setLastName(jbody.getString("lastName"));
-				byCustomerId.setMiddleName(jbody.getString("middleName"));
-				byCustomerId.setDateOfBirth(jbody.getString("dateOfBirth"));
-				byCustomerId.setPhoneNumber(jbody.getString("phoneNumber"));
-				byCustomerId.setEmail(jbody.getString("email"));
-				byCustomerId.setAddress(jbody.getString("address"));
-				byCustomerId.setMeterNumber(jbody.getString("meterNumber"));
-				byCustomerId.setBvn(jbody.getString("bvn"));
-				byCustomerId.setNin(jbody.has("nin")?  jbody.getString("nin"):"");
-				byCustomerId.setUpdatedAt(new Date());
-				
-				corpDirectorRepo.save(byCustomerId);
+				corpDirectorRepo.saveAndFlush(corpDirector);
 				
 				
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);

@@ -12,7 +12,7 @@ import com.pscs.moneyxhub.entity.CorpDirector;
 @Repository
 public interface CorpDirectorRepo extends  JpaRepository<CorpDirector, Long>  {
 
-	CorpDirector findByCustomerId(String string);
+	CorpDirector findByEmail(String string);
 	
 
 }
