@@ -76,6 +76,6 @@ public class SmsCallbackServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		response.setContentType("application/json");
-		response.getWriter().write("{\"message\":\"PSCS SMS callback endpoint active\"}");
+		response.getWriter().write("{\"message\":\"PSCS WebHook callback endpoint active\"}");
 	}
 }

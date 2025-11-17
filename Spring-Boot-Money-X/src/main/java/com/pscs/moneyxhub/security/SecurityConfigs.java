@@ -38,7 +38,7 @@ public class SecurityConfigs {
 		.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 		.and()
 		.authorizeHttpRequests(auth -> auth
-	            .requestMatchers("/api/auth/**", "/sms/callback","/api/v1/license/generate","api/customer/uploadImage")
+	            .requestMatchers("/api/auth/**", "/sms/callback","/api/v1/license/generate","api/customer/uploadImage","/v1/webhook")
 	            .permitAll() 
 	            .anyRequest().authenticated())
 		.httpBasic();

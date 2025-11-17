@@ -35,6 +35,21 @@ public class WebCheckOutController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
+	//get transaction status
+	@PostMapping("/gettransactionstatus" )
+	public ResponseEntity<ResponseData> getTransactionStatus(@RequestBody RequestData requestBody) {
+
+		ResponseData response = webCheckOutService.getTransactionStatus(requestBody);
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	@PostMapping("/initiatedpayment")
+	public ResponseEntity<ResponseData> initiatedPayment(@RequestBody RequestData requestBody) {
+
+		ResponseData response = webCheckOutService.initiatedPayment(requestBody);
+
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 	
 	
 }
