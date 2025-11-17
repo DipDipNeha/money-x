@@ -18,6 +18,7 @@ public class SubscriptionPlan {
 	private Long id;
 	private String packageName;
 	private Double price;
+	private String currency;
 	private String duration;
 	private String descriptidon;
 	private String featureDescription;
@@ -25,6 +26,7 @@ public class SubscriptionPlan {
 	private Boolean isActive;
 	private String createdAt;
 	private String updatedAt;
+	
 	public Long getId() {
 		return id;
 	}
@@ -86,7 +88,13 @@ public class SubscriptionPlan {
 		this.updatedAt = updatedAt;
 	}
 	
-	
+	public String getCurrency() {
+		return currency;
+	}
+
+	public void setCurrency(String currency) {
+		this.currency = currency;
+	}
 	
 	
 	
