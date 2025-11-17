@@ -433,10 +433,11 @@ private final MobContactInfoRepo mobContactInfoRepo;
 		ResponseData response = new ResponseData();
 		try {
 			logger.info("Request : " + requestBody);
-			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody);
 			logger.info("Request Json String : " + jsonString);
 			JSONObject reqJson = new JSONObject(jsonString);
-
+			String jsonStringheader = ConvertRequestUtils.getJsonString(requestBody.getJheader());
+			JSONObject reqJsonheader = new JSONObject(jsonStringheader);	
 
 			EmbedlyServiceCaller service = new EmbedlyServiceCaller();
 			 JSONObject callService = service.callService(reqJson);
@@ -445,10 +446,16 @@ private final MobContactInfoRepo mobContactInfoRepo;
 			if (callService.getString("respCode").equals("00")) {
 				response.setResponseCode(CoreConstant.SUCCESS_CODE);
 				response.setResponseMessage(CoreConstant.SUCCESS);
+				
+				MobCustomerMaster byUserName = mobCustomerMasterRepo.findByUserName(reqJsonheader.getString("userid"));
+				String mPrdCode = byUserName.getmPrdCode();
+				int prdCode = Integer.parseInt(mPrdCode)+1;
+				byUserName.setmPrdCode(prdCode+"");
+				mobCustomerMasterRepo.save(byUserName);
 				buildResponseData(response, callService);
 			} else {
 				response.setResponseCode(CoreConstant.FAILURE_CODE);
-				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respMessage"));
+				response.setResponseMessage(CoreConstant.FAILED + callService.getString("respmsg"));
 			}
 
 		} catch (Exception e) {
