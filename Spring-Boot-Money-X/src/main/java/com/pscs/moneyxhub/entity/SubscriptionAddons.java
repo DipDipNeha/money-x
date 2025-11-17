@@ -4,6 +4,8 @@
 
 package com.pscs.moneyxhub.entity;
 
+import java.util.Date;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,11 +17,13 @@ import jakarta.persistence.Table;
 public class SubscriptionAddons {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String addonName;
 	private String addonDescription;
 	private String addonPrice;
+	private Date createdAt;
+	private Date updatedAt;
 	
 	public Long getId() {
 		return id;
@@ -53,6 +57,23 @@ public class SubscriptionAddons {
 		this.addonPrice = addonPrice;
 	}
 		
+	public Date getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(Date createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public Date getUpdatedAt() {
+		return updatedAt;
+	}
+
+	public void setUpdatedAt(Date updatedAt) {
+		this.updatedAt = updatedAt;
+	}
+		
+	
 	
 	
 }
