@@ -40,7 +40,7 @@ public class WebCheckOutService {
 			JSONObject responseData = new JSONObject();
 			responseData.put("subscriptionPlan", subscriptionPlan);
 			responseData.put("subscriptionAddons", subscriptionAddons);
-			response.setResponseData(responseData);
+			response.setResponseData(responseData.toMap());
 			response.setResponseCode("00");
 			response.setResponseMessage("Packages Loaded Successfully");
 
