@@ -130,4 +130,35 @@ public class WebCheckOutService {
 		return response;
 	}
 
+	public ResponseData verifySubsPayment(RequestData requestBody) {
+		ResponseData response = new ResponseData();
+		try {
+			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
+			JSONObject requestJson = new JSONObject(jsonString);
+			response.setResponseCode("01");
+			response.setResponseMessage("Subscription Verification Failed");
+			SubscriptionPayments subscriptionPayments = subscriptionPaymentsRepo.findByMobileNumber(requestJson.getString("mobileNumber"));
+			if (subscriptionPayments != null) {
+				String responseCode= subscriptionPayments.getResponseCode();
+				if(responseCode.equals("00")) {
+                    response.setResponseCode("00");
+                    response.setResponseMessage("Subscription is Active");
+				
+				} else {
+					response.setResponseCode("01");
+					response.setResponseMessage("Subscription Failed .Please try again!");
+				}
+				
+			} else {
+				response.setResponseCode("01");
+				response.setResponseMessage("No Subscription Found for this Mobile Number");
+			}
+			
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return response;
+	}
+
 }

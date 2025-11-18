@@ -16,4 +16,6 @@ public interface SubscriptionPaymentsRepo extends JpaRepository<SubscriptionPaym
 
 	 Optional<Object> findByTransactionReference(String string);
 
+	 SubscriptionPayments findByMobileNumber(String string);
+
 }

@@ -3,7 +3,6 @@ package com.pscs.moneyxhub.services.post;
 import java.util.ResourceBundle;
 
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -18,8 +17,7 @@ public class InterswitchService {
 
 
 	private ResourceBundle bundle = ResourceBundle.getBundle("interswitchng");
-	@Autowired
-	private RestTemplate restTemplate;
+	
 
 	public JSONObject getTransaction(String merchantCode, String reference, String amount) {
 		JSONObject responseJson = new JSONObject();
@@ -27,6 +25,8 @@ public class InterswitchService {
 
 			String url = bundle.getString("QA_BASE_URL")+ "?merchantcode=" + merchantCode
 					+ "&transactionreference=" + reference + "&amount=" + amount;
+
+			 RestTemplate restTemplate = new RestTemplate();
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_JSON);
 
