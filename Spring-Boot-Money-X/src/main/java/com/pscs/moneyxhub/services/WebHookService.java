@@ -38,15 +38,17 @@ public class WebHookService {
 			String paymentReference, String dateOfTransaction, JSONObject requestData) {
 		try {
 			String userId = "";
-			WalletAcctData byAcctNo = walletAcctDataRepository.findByAcctNo(creditAccountNumber);
+			String walletId = "";
+			WalletAcctData byAcctNo = walletAcctDataRepository.findByAcctNo(debitAccountNumber);
 			if (byAcctNo != null) {
+				walletId = byAcctNo.getWalletAcctId();
 				MobCustomerMaster byCustomerId = mobCustomerMasterRepo.findByCustomerId(byAcctNo.getCustId());
 				if (byCustomerId != null) {
 					userId = byCustomerId.getUserName();
 				}
 
 			} else {
-				System.out.println("No wallet account found for credit account number: " + creditAccountNumber);
+				System.out.println("No wallet account found for credit account number: " + debitAccountNumber);
 			}
 
 			CreditTransactionLog log = new CreditTransactionLog();
@@ -68,6 +70,7 @@ public class WebHookService {
 			log.setDrcrStatus("DR");
 			log.setCreatedAt(new java.util.Date());
 			log.setRequestData(requestData.toString());
+			log.setWalletId(walletId);
 			creditTransactionLogRepo.save(log);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -108,6 +111,7 @@ public class WebHookService {
 			log.setDescription("Checkout Payment processed via webhook with reference: " + reference + " Amount: " + amount + " from " + senderName + " to " + recipientName);
 			log.setDrcrStatus("DR");
 			log.setCreatedAt(new java.util.Date());
+			log.setWalletId(walletId);
 			log.setRequestData(requestData.toString());
 			creditTransactionLogRepo.save(log);
 		} catch (Exception e) {
@@ -119,8 +123,10 @@ public class WebHookService {
 			String senderBank, String dateOfTransaction, String description, JSONObject requestData) {
 		try {
 			String userId = "";
+			String walletId = "";
 			WalletAcctData byAcctNo = walletAcctDataRepository.findByAcctNo(accountNumber);
 			if (byAcctNo != null) {
+				walletId = byAcctNo.getWalletAcctId();
 				MobCustomerMaster byCustomerId = mobCustomerMasterRepo.findByCustomerId(byAcctNo.getCustId());
 				if (byCustomerId != null) {
 					userId = byCustomerId.getUserName();
@@ -148,6 +154,7 @@ public class WebHookService {
 			log.setDrcrStatus("CR");
 			log.setCreatedAt(new java.util.Date());
 			log.setRequestData(requestData.toString());
+			log.setWalletId(walletId);
 			creditTransactionLogRepo.save(log);
 
 		} catch (Exception e) {

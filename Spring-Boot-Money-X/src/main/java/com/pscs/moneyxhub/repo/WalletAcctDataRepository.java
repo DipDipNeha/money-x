@@ -10,7 +10,7 @@ public interface WalletAcctDataRepository extends JpaRepository<WalletAcctData, 
 
 	WalletAcctData findByCustId(String customerId);
 
-	WalletAcctData findByAcctNo(String creditAccountNumber);
+	WalletAcctData findByAcctNo(String debitAccountNumber);
 
 	WalletAcctData findByWalletAcctId(String walletId);
 	
