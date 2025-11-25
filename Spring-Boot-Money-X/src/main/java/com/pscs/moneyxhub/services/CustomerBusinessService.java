@@ -347,6 +347,27 @@ public class CustomerBusinessService {
 						}
 					
 					
+					SubscriptionPayments subscriptionPayments = subscriptionPaymentsRepo.findByMobileNumber(checkCustomerres.getMobileNumber());
+					
+					if (subscriptionPayments != null) {
+						String responseCode= subscriptionPayments.getResponseCode();
+						if(responseCode.equals("00")) {
+		                    response.setResponseCode("00");
+		                    response.setResponseMessage("Subscription is Active");
+						
+						} else {
+							response.setResponseCode("03");
+							response.setResponseMessage("Subscription Failed .Please try again!");
+							return response;
+						}
+						
+					} else {
+						response.setResponseCode("03");
+						response.setResponseMessage("No Subscription Found for this Mobile Number");
+						return response;
+					}
+					
+					
 					response.setResponseData(customerJson.toMap());
 					if (isLoginAttemptActive.equals("Y")) {
 						corporateCustomerRepo.resetRetryLoginAttempt(checkCustomerres.getUserName());
