@@ -5,7 +5,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.pscs.moneyxhub.services.WebHookService;
 
@@ -18,7 +19,7 @@ import jakarta.servlet.http.HttpServletResponse;
 @WebServlet("/v1/webhook")
 public class WebhookCallback extends HttpServlet {
 	
-	@Autowired
+	
 	private WebHookService webHookService;
 	private static final long serialVersionUID = 1L;
 
@@ -69,10 +70,10 @@ public class WebhookCallback extends HttpServlet {
                 
                 
 				webHookService.processPayout(sessionId, debitAccountNumber, creditAccountNumber, debitAccountName,
-						creditAccountName, amount, currency, status, paymentReference, dateOfTransaction, data);
+						creditAccountName, amount, currency, status, paymentReference, dateOfTransaction, json);
                 
             }
-			else if( json.has("event")&& "nip".equals(json.getString("nip"))) {
+			else if( json.has("event")&& "nip".equals(json.getString("event"))) {
                 JSONObject data = json.getJSONObject("data");
                 String accountNumber = data.getString("accountNumber");
                 String reference = data.getString("reference");
@@ -96,10 +97,10 @@ public class WebhookCallback extends HttpServlet {
                 System.out.println("Date of Transaction: " + dateOfTransaction);
                 System.out.println("Description: " + description);
                 
-                webHookService.processNIP(accountNumber, reference, amount, fee, senderName, senderBank, dateOfTransaction, description, data);
+                webHookService.processNIP(accountNumber, reference, amount, fee, senderName, senderBank, dateOfTransaction, description, json);
                 
             }
-			else if (json.has("event")&& "checkout.payment.success".startsWith(json.getString("checkout"))) {
+			else if (json.has("event")&& "checkout.payment.success".startsWith(json.getString("event"))) {
 	
 				JSONObject data = json.getJSONObject("data");
 				String transactionId = data.getString("transactionId");
@@ -135,7 +136,7 @@ public class WebhookCallback extends HttpServlet {
 				System.out.println("Created At: " + createdAt);
 				webHookService.processCheckoutPayment(transactionId, walletId, checkoutRef, amount, status, message,
 						senderAccountNumber, senderName, senderBankCode, recipientAccountNumber, recipientName,
-						reference, createdAt,data);
+						reference, createdAt,json);
 			}
 				
 			
@@ -156,7 +157,12 @@ public class WebhookCallback extends HttpServlet {
 		out.print("{\"status\":\"ok\"}");
 		out.flush();
 	}
-
+	@Override
+	public void init() throws ServletException {
+	    super.init();
+	    WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
+	    this.webHookService = ctx.getBean(WebHookService.class);
+	}
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {

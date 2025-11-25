@@ -53,7 +53,7 @@ public class WebHookService {
 
 			log.setUserId(userId);
 			log.setSessionId(sessionId);
-			log.setEventType("payout");
+			log.setEventType("DEBIT");
 			log.setDebitAccountNumber(debitAccountNumber);
 			log.setCreditAccountNumber(creditAccountNumber);
 			log.setDebitAccountName(debitAccountName);
@@ -64,7 +64,8 @@ public class WebHookService {
 			log.setPaymentReference(paymentReference);
 			log.setDateOfTransaction(dateOfTransaction);
 			log.setProcessedAt(java.time.LocalDateTime.now().toString());
-			log.setRemarks("Payout processed via webhook");
+			log.setDescription("Your payout has been processed via webhook.\n with reference: " + paymentReference+" Credited to account number: "+creditAccountNumber+" Amount: "+amount);
+			log.setDrcrStatus("DR");
 			log.setCreatedAt(new java.util.Date());
 			log.setRequestData(requestData.toString());
 			creditTransactionLogRepo.save(log);
@@ -93,7 +94,7 @@ public class WebHookService {
 			CreditTransactionLog log = new CreditTransactionLog();
 			log.setUserId(userId);
 			log.setSessionId(transactionId);
-			log.setEventType("checkout.payment.success");
+			log.setEventType("DEBIT");
 			log.setDebitAccountNumber(senderAccountNumber);
 			log.setCreditAccountNumber(recipientAccountNumber);
 			log.setDebitAccountName(senderName);
@@ -104,7 +105,8 @@ public class WebHookService {
 			log.setPaymentReference(reference);
 			log.setDateOfTransaction(createdAt);
 			log.setProcessedAt(java.time.LocalDateTime.now().toString());
-			log.setRemarks("Checkout Payment processed via webhook");
+			log.setDescription("Checkout Payment processed via webhook with reference: " + reference + " Amount: " + amount + " from " + senderName + " to " + recipientName);
+			log.setDrcrStatus("DR");
 			log.setCreatedAt(new java.util.Date());
 			log.setRequestData(requestData.toString());
 			creditTransactionLogRepo.save(log);
@@ -131,7 +133,7 @@ public class WebHookService {
 			CreditTransactionLog log = new CreditTransactionLog();
 			log.setUserId(userId);
 			log.setSessionId(reference);
-			log.setEventType("nip");
+			log.setEventType("CREDIT");
 			log.setDebitAccountNumber("");
 			log.setCreditAccountNumber(accountNumber);
 			log.setDebitAccountName(senderName);
@@ -142,7 +144,8 @@ public class WebHookService {
 			log.setPaymentReference(reference);
 			log.setDateOfTransaction(dateOfTransaction);
 			log.setProcessedAt(java.time.LocalDateTime.now().toString());
-			log.setRemarks("NIP transaction processed via webhook");
+			log.setDescription("NIP transaction processed via webhook with reference: " + reference + " Amount: " + amount + " from " + senderName);
+			log.setDrcrStatus("CR");
 			log.setCreatedAt(new java.util.Date());
 			log.setRequestData(requestData.toString());
 			creditTransactionLogRepo.save(log);

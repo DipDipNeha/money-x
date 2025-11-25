@@ -34,8 +34,10 @@ public class CreditTransactionLog {
 	private String paymentReference;
 	private String dateOfTransaction;
 	private String processedAt;
-	private String remarks;
+	
 	private Date createdAt;
+	private String drcrStatus;
+	private String description;
 	private String requestData;
 	public Long getId() {
 		return id;
@@ -127,12 +129,7 @@ public class CreditTransactionLog {
 	public void setProcessedAt(String processedAt) {
 		this.processedAt = processedAt;
 	}
-	public String getRemarks() {
-		return remarks;
-	}
-	public void setRemarks(String remarks) {
-		this.remarks = remarks;
-	}
+	
 	public Date getCreatedAt() {
 		return createdAt;
 	}
@@ -148,6 +145,21 @@ public class CreditTransactionLog {
 		this.requestData = requestData;
 	}
 	
+	public String getDrcrStatus() {
+		return drcrStatus;
+	}
+
+	public void setDrcrStatus(String drcrStatus) {
+		this.drcrStatus = drcrStatus;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
 	@Override
 	public String toString() {
 		return "CreditTransactionLog [id=" + id + ", userId=" + userId + ", sessionId=" + sessionId + ", walletId="
@@ -155,8 +167,8 @@ public class CreditTransactionLog {
 				+ ", creditAccountNumber=" + creditAccountNumber + ", debitAccountName=" + debitAccountName
 				+ ", creditAccountName=" + creditAccountName + ", amount=" + amount + ", currency=" + currency
 				+ ", status=" + status + ", paymentReference=" + paymentReference + ", dateOfTransaction="
-				+ dateOfTransaction + ", processedAt=" + processedAt + ", remarks=" + remarks + ", createdAt="
-				+ createdAt + "]";
+				+ dateOfTransaction + ", processedAt=" + processedAt + ", createdAt=" + createdAt + ", drcrStatus="
+				+ drcrStatus + ", description=" + description + ", requestData=" + requestData + "]";
 	}
 	
 	
