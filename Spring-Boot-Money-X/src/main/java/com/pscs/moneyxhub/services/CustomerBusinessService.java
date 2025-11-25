@@ -27,6 +27,7 @@ import com.pscs.moneyxhub.entity.LocalGovernmentByState;
 import com.pscs.moneyxhub.entity.MobContactInfo;
 import com.pscs.moneyxhub.entity.MobCustomerMaster;
 import com.pscs.moneyxhub.entity.OtpDataTabl;
+import com.pscs.moneyxhub.entity.SubscriptionPayments;
 import com.pscs.moneyxhub.entity.Transactions;
 import com.pscs.moneyxhub.entity.UserLoginCredentials;
 import com.pscs.moneyxhub.entity.WalletAcctData;
@@ -47,6 +48,7 @@ import com.pscs.moneyxhub.repo.LocalGovernmentByStateRepo;
 import com.pscs.moneyxhub.repo.MobContactInfoRepo;
 import com.pscs.moneyxhub.repo.MobCustomerMasterRepo;
 import com.pscs.moneyxhub.repo.OtpDataTablRepo;
+import com.pscs.moneyxhub.repo.SubscriptionPaymentsRepo;
 import com.pscs.moneyxhub.repo.TransactionsRepo;
 import com.pscs.moneyxhub.repo.UserLoginCredentialsRepo;
 import com.pscs.moneyxhub.repo.WalletAcctDataRepository;
@@ -73,7 +75,8 @@ public class CustomerBusinessService {
 	private final WalletAcctDataRepository walletAcctDataRepository;
 	private final CorporateCustomerRepo corporateCustomerRepo;
 	private final TransactionsRepo transactionsRepo;
-	private final UserLoginCredentialsRepo userLoginCredentialsRepo;;
+	private final UserLoginCredentialsRepo userLoginCredentialsRepo;
+	private final SubscriptionPaymentsRepo subscriptionPaymentsRepo;
 	@Autowired
 	LocalGovernmentByStateRepo localGovernmentByStateRepo;
 	@Autowired
@@ -86,7 +89,7 @@ public class CustomerBusinessService {
 			CustomerDocInfoRepo customerDocInfoRepo, DocumentRepo documentRepo, OtpDataTablRepo otpDataTablRepo,
 			EmailAndSMSPostingService smsPostingService, MobCustomerMasterRepo mobCustomerMasterRepo,
 			MobContactInfoRepo mobContactInfoRepo, WalletAcctDataRepository walletAcctDataRepository,
-			CorporateCustomerRepo corporateCustomerRepo, TransactionsRepo transactionsRepo, UserLoginCredentialsRepo userLoginCredentialsRepo) {
+			CorporateCustomerRepo corporateCustomerRepo, TransactionsRepo transactionsRepo, UserLoginCredentialsRepo userLoginCredentialsRepo, SubscriptionPaymentsRepo subscriptionPaymentsRepo) {
 		super();
 		this.customerLoginRepo = customerLoginRepo;
 		this.countryRepo = countryRepo;
@@ -102,6 +105,7 @@ public class CustomerBusinessService {
 		this.corporateCustomerRepo = corporateCustomerRepo;
 		this.transactionsRepo = transactionsRepo;
 		this.userLoginCredentialsRepo = userLoginCredentialsRepo;
+		this.subscriptionPaymentsRepo = subscriptionPaymentsRepo;
 	}
 
 
@@ -120,6 +124,9 @@ public class CustomerBusinessService {
 			JSONObject requestJson = new JSONObject(jsonString);
 			logger.info("Request Body: " + requestJson.toString());
 			
+			
+			
+			
 			String customerType = requestJson.has("customerType") ? requestJson.getString("customerType") : "INDIVIDUAL";
 			
 			if (customerType.toUpperCase().equals("CORPORATE")) {
@@ -131,6 +138,7 @@ public class CustomerBusinessService {
 				
 //				ResponseData validateOtp = validateOtp(request);
 				
+			
 				
 				
 				
@@ -193,6 +201,27 @@ public class CustomerBusinessService {
 						customerJson.put("address", contactInfo.getAddress());
 						customerJson.put("city", contactInfo.getCity());
 						customerJson.put("cuntry", contactInfo.getNationality());
+						
+						
+						SubscriptionPayments subscriptionPayments = subscriptionPaymentsRepo.findByMobileNumber(contactInfo.getMobileNumber());
+						
+						if (subscriptionPayments != null) {
+							String responseCode= subscriptionPayments.getResponseCode();
+							if(responseCode.equals("00")) {
+			                    response.setResponseCode("00");
+			                    response.setResponseMessage("Subscription is Active");
+							
+							} else {
+								response.setResponseCode("03");
+								response.setResponseMessage("Subscription Failed .Please try again!");
+								return response;
+							}
+							
+						} else {
+							response.setResponseCode("03");
+							response.setResponseMessage("No Subscription Found for this Mobile Number");
+							return response;
+						}
 					}
 					
 					

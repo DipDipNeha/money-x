@@ -71,10 +71,10 @@ public class WebCheckOutService {
 			response.setResponseCode("01");
 			response.setResponseMessage("Transaction Status Fetch Failed");
 
-			JSONObject interswitchResponse = interswitchService.getTransaction(requestJson.getString("merchantcode"),
-					requestJson.getString("transactionreference"), requestJson.getString("amount"));
+			JSONObject interswitchResponse = interswitchService.getTransaction(requestJson.getString("merchantCode"),
+					requestJson.getString("transactionReference"), requestJson.getString("amount"));
 
-			Optional<Object> byTransactionReference = subscriptionPaymentsRepo.findByTransactionReference(requestJson.getString("transactionreference"));
+			Optional<Object> byTransactionReference = subscriptionPaymentsRepo.findByTransactionReference(requestJson.getString("transactionReference"));
 			if (byTransactionReference.isPresent()) {
 				SubscriptionPayments payment = (SubscriptionPayments) byTransactionReference.get();
 				payment.setResponseData(interswitchResponse.toString());
@@ -100,6 +100,7 @@ public class WebCheckOutService {
 		try {
 			String jsonString = ConvertRequestUtils.getJsonString(requestBody.getJbody());
 			JSONObject requestJson = new JSONObject(jsonString);
+			
 			response.setResponseCode("01");
 			response.setResponseMessage("Transaction Status Fetch Failed");
 
@@ -115,9 +116,9 @@ public class WebCheckOutService {
 			payment.setResponseData(requestJson.getJSONObject("responseData").toString());
 			JSONObject respData = requestJson.getJSONObject("responseData");
 			
-			payment.setResponseMessage(respData.getString("responseDescription"));
+			payment.setResponseMessage(respData.getJSONObject("data").getString("responseDescription"));
 			payment.setAddonsId(requestJson.getString("addonsId"));
-			payment.setResponseCode(respData.getString("responseCode"));
+			payment.setResponseCode(respData.getJSONObject("data").getString("responseCode"));
 			payment.setDuration(requestJson.getString("duration"));
 			
 			subscriptionPaymentsRepo.save(payment);

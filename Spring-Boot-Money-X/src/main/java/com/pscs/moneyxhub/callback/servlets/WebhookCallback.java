@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.pscs.moneyxhub.services.WebHookService;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -14,7 +17,9 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @WebServlet("/v1/webhook")
 public class WebhookCallback extends HttpServlet {
-
+	
+	@Autowired
+	private WebHookService webHookService;
 	private static final long serialVersionUID = 1L;
 
 	@Override
@@ -35,7 +40,7 @@ public class WebhookCallback extends HttpServlet {
 
 		try {
 			JSONObject json = new JSONObject(requestBody);
-	
+			
 			
 			
 			if(json.has("event") && "payout".equals(json.getString("event"))) {
@@ -61,6 +66,11 @@ public class WebhookCallback extends HttpServlet {
                 System.out.println("Status: " + status);
                 System.out.println("Payment Reference: " + paymentReference);
                 System.out.println("Date of Transaction: " + dateOfTransaction);
+                
+                
+				webHookService.processPayout(sessionId, debitAccountNumber, creditAccountNumber, debitAccountName,
+						creditAccountName, amount, currency, status, paymentReference, dateOfTransaction, data);
+                
             }
 			else if( json.has("event")&& "nip".equals(json.getString("nip"))) {
                 JSONObject data = json.getJSONObject("data");
@@ -85,6 +95,9 @@ public class WebhookCallback extends HttpServlet {
                 System.out.println("Sender Bank: " + senderBank);
                 System.out.println("Date of Transaction: " + dateOfTransaction);
                 System.out.println("Description: " + description);
+                
+                webHookService.processNIP(accountNumber, reference, amount, fee, senderName, senderBank, dateOfTransaction, description, data);
+                
             }
 			else if (json.has("event")&& "checkout.payment.success".startsWith(json.getString("checkout"))) {
 	
@@ -120,6 +133,9 @@ public class WebhookCallback extends HttpServlet {
 				System.out.println("Recipient Name: " + recipientName);
 				System.out.println("Reference: " + reference);
 				System.out.println("Created At: " + createdAt);
+				webHookService.processCheckoutPayment(transactionId, walletId, checkoutRef, amount, status, message,
+						senderAccountNumber, senderName, senderBankCode, recipientAccountNumber, recipientName,
+						reference, createdAt,data);
 			}
 				
 			

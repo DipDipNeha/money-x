@@ -9,5 +9,9 @@ import com.pscs.moneyxhub.entity.WalletAcctData;
 public interface WalletAcctDataRepository extends JpaRepository<WalletAcctData, Long>{
 
 	WalletAcctData findByCustId(String customerId);
+
+	WalletAcctData findByAcctNo(String creditAccountNumber);
+
+	WalletAcctData findByWalletAcctId(String walletId);
 	
 }
